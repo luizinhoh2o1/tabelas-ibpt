@@ -44,7 +44,7 @@ graph TD
 2. **Publicação:** A cada push no repositório, o GitHub Actions executa o build automaticamente e publica os arquivos no GitHub Pages. Os dados ficam acessíveis como URLs estáticas.
 
 3. **Consulta:** O usuário pode consultar de duas formas:
-   - **Página interativa:** Filtros por ano, versão, UF, tipo, código e descrição. A página baixa os arquivos comprimidos, descomprime no navegador e exibe os resultados em tabela paginada com opção de exportar CSV.
+   - **Página interativa:** Filtros por ano, versão, UF, tipo, código, descrição, vigência início e vigência fim. A página baixa os arquivos comprimidos, descomprime no navegador e exibe os resultados em tabela paginada com opção de exportar CSV.
    - **Acesso direto:** Qualquer aplicação pode acessar os endpoints e descomprimir os dados com a ferramenta de sua preferência.
 
 ### Compressão
@@ -63,8 +63,8 @@ A pesquisa na página interativa é inteiramente **client-side** — não existe
 
 1. Ao abrir a página, os metadados são carregados e os filtros são populados (anos, versões, UFs, tipos).
 2. Ao consultar, a página monta as combinações necessárias com base nos filtros selecionados. Filtros vazios incluem todas as opções.
-3. Os arquivos comprimidos são baixados em lotes paralelos, descomprimidos no navegador e filtrados por código e/ou descrição.
-4. Os resultados são exibidos em tabela paginada, ordenável por qualquer coluna, com opção de exportar CSV.
+3. Os arquivos comprimidos são baixados em lotes paralelos, descomprimidos no navegador e filtrados por código, descrição e/ou período de vigência.
+4. Os resultados são exibidos em tabela paginada (12 colunas incluindo vigência), ordenável por qualquer coluna, com opção de exportar CSV.
 
 Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca com ano + versão + tipo + UF específicos baixa apenas 1 arquivo (~190 KB).
 
@@ -97,6 +97,7 @@ graph LR
         E3["/api/{ano}/{tabela}/index.json"]
         E4["/api/{ano}/{tabela}/{tipo}/index.json"]
         E5["/api/{ano}/{tabela}/{tipo}/{uf}.json.gz"]
+        E6["/api/todos.csv.gz"]
     end
 
     E1 -.- D1["Metadados: anos, versões, tipos e UFs"]
@@ -104,20 +105,23 @@ graph LR
     E3 -.- D3["Índice de uma versão/tabela específica"]
     E4 -.- D4["Índice por tipo com contagem por UF"]
     E5 -.- D5["Dados completos comprimidos com gzip"]
+    E6 -.- D6["CSV consolidado com todos os registros (gzip)"]
 
     style E1 fill:#238636,stroke:#3fb950,color:#fff
     style E2 fill:#238636,stroke:#3fb950,color:#fff
     style E3 fill:#238636,stroke:#3fb950,color:#fff
     style E4 fill:#238636,stroke:#3fb950,color:#fff
     style E5 fill:#1f6feb,stroke:#58a6ff,color:#fff
+    style E6 fill:#9e6a03,stroke:#d29922,color:#fff
     style D1 fill:#161b22,stroke:#30363d,color:#8b949e
     style D2 fill:#161b22,stroke:#30363d,color:#8b949e
     style D3 fill:#161b22,stroke:#30363d,color:#8b949e
     style D4 fill:#161b22,stroke:#30363d,color:#8b949e
     style D5 fill:#161b22,stroke:#30363d,color:#8b949e
+    style D6 fill:#161b22,stroke:#30363d,color:#8b949e
 ```
 
-> Endpoints verdes retornam JSON simples. O endpoint azul retorna dados comprimidos com gzip (`.json.gz`).
+> Endpoints verdes retornam JSON simples. O endpoint azul retorna dados comprimidos com gzip (`.json.gz`). O endpoint amarelo retorna CSV consolidado comprimido com gzip.
 
 ### Parâmetros
 

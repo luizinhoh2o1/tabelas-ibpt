@@ -17,7 +17,8 @@ globs: "**/*"
 - DecompressionStream no browser para descompressão client-side
 
 ## Estrutura de Dados
-- Registros IBPT usam propriedades descritivas: `codigo`, `excecao`, `descricao`, `aliquotaNacionalFederal`, `aliquotaImportadosFederal`, `aliquotaEstadual`, `aliquotaMunicipal`
+- Registros IBPT usam propriedades descritivas: `codigo`, `excecao`, `descricao`, `aliquotaNacionalFederal`, `aliquotaImportadosFederal`, `aliquotaEstadual`, `aliquotaMunicipal`, `vigenciaInicio`, `vigenciaFim`
+- Datas de vigência no formato dd/mm/aaaa (string), extraídas dos campos[8] e campos[9] do CSV original
 - Tipos de tabela: `ncm`, `nbs`, `lc116`
 - 27 UFs brasileiras
 
@@ -31,6 +32,9 @@ globs: "**/*"
 - Fontes: Ubuntu (texto) + Ubuntu Mono (valores numéricos, código)
 - Ícones: Font Awesome 6
 - 4 abas: Home, Pesquisa, Endpoints, Informações
+- 8 filtros: Ano, Versão, UF, Tipo, Código, Descrição, Vigência Início, Vigência Fim
+- Filtros de vigência usam input type="date" com filtragem por intervalo
+- 12 colunas na tabela de resultados (inclui Início Vig. e Fim Vig.)
 - Tooltips nos cabeçalhos da tabela de resultados
 - Consultas amplas (>50 arquivos) usam o CSV consolidado via streaming
 - Limite de 100.000 resultados no navegador
@@ -40,3 +44,4 @@ globs: "**/*"
 - Processamento de CSVs via streaming (readline) para baixo consumo de memória
 - Escrita paralela de arquivos com Promise.all
 - CSV consolidado (`todos.csv.gz`) usa streaming gzip (createGzip) para não acumular em memória
+- CSV consolidado tem 13 colunas: ano;tabela;tipo;uf;codigo;excecao;descricao;4 alíquotas;vigenciaInicio;vigenciaFim

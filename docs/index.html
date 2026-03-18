@@ -565,10 +565,11 @@ for item in dados['dados']:
         <h3><i class="fas fa-search"></i> Pesquisa Client-Side</h3>
         <ol>
           <li>Metadados carregados ao abrir a página (anos, versões, UFs, tipos).</li>
-          <li>Filtros montam combinações <code>{ano}/{versão}/{tipo}/{uf}</code>.</li>
+          <li>8 filtros disponíveis: ano, versão, UF, tipo, código, descrição, vigência início e vigência fim.</li>
+          <li>Filtros de vigência permitem buscar registros válidos em um período específico.</li>
           <li>Arquivos buscados em lotes paralelos de 8, descomprimidos com DecompressionStream.</li>
           <li>Consultas amplas (&gt;50 arquivos) usam o CSV consolidado <code>todos.csv.gz</code> via streaming.</li>
-          <li>Resultados paginados (100/página), ordenáveis, exportáveis como CSV.</li>
+          <li>Resultados em tabela com 12 colunas (incluindo vigência), paginados (100/página), ordenáveis, exportáveis como CSV.</li>
         </ol>
 
         <h3><i class="fas fa-cubes"></i> Tipos de Dados</h3>

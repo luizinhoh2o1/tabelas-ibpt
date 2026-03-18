@@ -48,6 +48,22 @@ repositorio-ibpt/   → Submodule com os ZIPs originais do IBPT
 - **NBS** (tipo `1` no CSV): Serviços - 9 dígitos, ~860 registros/UF
 - **LC116** (tipo `2` no CSV): Serviços municipais - 4 dígitos, ~200 registros/UF
 
+## Campos do Registro
+
+Cada registro contém 9 propriedades extraídas do CSV original do IBPT:
+
+| Propriedade | Tipo | Origem CSV | Descrição |
+|---|---|---|---|
+| `codigo` | string | campos[0] | Código NCM/NBS/LC116 |
+| `excecao` | string | campos[1] | Exceção tarifária |
+| `descricao` | string | campos[3] | Descrição do item |
+| `aliquotaNacionalFederal` | number | campos[4] | Alíquota federal (nacionais) % |
+| `aliquotaImportadosFederal` | number | campos[5] | Alíquota federal (importados) % |
+| `aliquotaEstadual` | number | campos[6] | Alíquota estadual (ICMS) % |
+| `aliquotaMunicipal` | number | campos[7] | Alíquota municipal (ISS) % |
+| `vigenciaInicio` | string | campos[8] | Data de início da vigência (dd/mm/aaaa) |
+| `vigenciaFim` | string | campos[9] | Data de fim da vigência (dd/mm/aaaa) |
+
 ## Comandos
 
 ```bash
@@ -68,7 +84,9 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
       "aliquotaNacionalFederal": 13.45,
       "aliquotaImportadosFederal": 15.45,
       "aliquotaEstadual": 18.00,
-      "aliquotaMunicipal": 0.00
+      "aliquotaMunicipal": 0.00,
+      "vigenciaInicio": "20/02/2026",
+      "vigenciaFim": "31/03/2026"
     }
   ]
 }
@@ -78,7 +96,10 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
 
 - **Design System VALRAW UI** — Cores, tipografia (Ubuntu/Ubuntu Mono), glassmorphism, glow, orbs
 - **4 abas:** Home (sobre a API), Pesquisa (filtros + tabela), Endpoints (documentação técnica), Informações (extras)
+- **8 filtros de pesquisa:** Ano, Versão, UF, Tipo, Código, Descrição, Vigência Início, Vigência Fim
+- **Filtros de vigência** permitem buscar registros por período (input type="date", filtragem por intervalo)
 - **Tooltips** nos cabeçalhos da tabela de resultados explicando cada coluna
+- **12 colunas na tabela:** Código, Ex, Tipo, UF, Tabela, Descrição, 4 alíquotas, Início Vig., Fim Vig.
 - **CSV consolidado** (`todos.csv.gz`) usado automaticamente quando consulta exigiria >50 arquivos individuais
 - **Limite de 100.000 resultados** para evitar travamento do navegador
 - Ícones via Font Awesome 6
