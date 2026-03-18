@@ -24,7 +24,9 @@ import {
   gerarIndiceVersao,
   gerarIndiceAno,
   gerarIndiceTipoVersao,
-  gerarMetaDados
+  gerarMetaDados,
+  criarFluxoCsvGz,
+  type FluxoCsvGz
 } from './geradorJson.js';
 import { UFS, ROTULO_TIPO, TIPOS } from './constantes.js';
 import type { Versao, TipoTabela, IndiceVersao, IndiceAno, MetaDados } from './tipos.js';
@@ -104,7 +106,8 @@ function contarArquivosEtamanho(diretorio: string): { arquivos: number; tamanho:
 
 async function processarVersao(
   versao: Versao,
-  diretorioApi: string
+  diretorioApi: string,
+  fluxoCsv: FluxoCsvGz
 ): Promise<{ registros: number } | null> {
   const diretorioExtracao = join(DIRETORIO_TEMP, versao.codigo);
   mkdirSync(diretorioExtracao, { recursive: true });
@@ -167,6 +170,7 @@ async function processarVersao(
         tarefasEscrita.push(
           gerarArquivoDados(diretorioApi, ano, versao.codigo, tipo, uf, registros)
         );
+        fluxoCsv.escreverRegistros(versao.ano, versao.codigo, tipo, uf, registros);
         contagemTipo.ufs[uf] = registros.length;
         contagemTipo.total += registros.length;
       }
@@ -201,6 +205,9 @@ async function construir(): Promise<void> {
   mkdirSync(DIRETORIO_API, { recursive: true });
   mkdirSync(DIRETORIO_TEMP, { recursive: true });
 
+  // Criar fluxo CSV consolidado (streaming gzip)
+  const fluxoCsv = criarFluxoCsvGz(join(DIRETORIO_API, 'todos.csv.gz'));
+
   // Listar e agrupar ZIPs
   const arquivosZip = readdirSync(DIRETORIO_REPO).filter(f => f.endsWith('.zip')).sort();
   const porAno = agruparPorAno(arquivosZip);
@@ -233,7 +240,7 @@ async function construir(): Promise<void> {
 
     for (const versao of versoes) {
       console.log(`Processando ${versao.codigo} (${versao.arquivo})...`);
-      const resultado = await processarVersao(versao, DIRETORIO_API);
+      const resultado = await processarVersao(versao, DIRETORIO_API, fluxoCsv);
 
       if (resultado) {
         indiceAno.versoes.push({
@@ -252,6 +259,10 @@ async function construir(): Promise<void> {
 
   metaDados.anos.sort((a, b) => b - a);
   await gerarMetaDados(DIRETORIO_API, metaDados);
+
+  // Finalizar CSV consolidado
+  await fluxoCsv.finalizar();
+  console.log('CSV consolidado gerado: todos.csv.gz');
 
   // Estatisticas finais
   const { arquivos, tamanho } = contarArquivosEtamanho(DIRETORIO_API);

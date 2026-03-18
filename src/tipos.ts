@@ -19,6 +19,8 @@ export interface Registro {
   aliquotaImportadosFederal: number;
   aliquotaEstadual: number;
   aliquotaMunicipal: number;
+  vigenciaInicio: string;
+  vigenciaFim: string;
 }
 
 export interface ArquivoSaida {

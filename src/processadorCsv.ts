@@ -50,7 +50,7 @@ export async function processarCsv(caminhoArquivo: string): Promise<DadosPorTipo
     if (!linha.trim()) continue;
 
     const campos = analisarLinhaCsv(linha);
-    if (campos.length < 8) continue;
+    if (campos.length < 10) continue;
 
     const tipo = MAPA_TIPO[campos[2]];
     if (!tipo) continue;
@@ -62,7 +62,9 @@ export async function processarCsv(caminhoArquivo: string): Promise<DadosPorTipo
       aliquotaNacionalFederal: parseFloat(campos[4]) || 0,
       aliquotaImportadosFederal: parseFloat(campos[5]) || 0,
       aliquotaEstadual: parseFloat(campos[6]) || 0,
-      aliquotaMunicipal: parseFloat(campos[7]) || 0
+      aliquotaMunicipal: parseFloat(campos[7]) || 0,
+      vigenciaInicio: campos[8] || '',
+      vigenciaFim: campos[9] || ''
     };
 
     dados[tipo].push(registro);

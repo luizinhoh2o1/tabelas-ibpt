@@ -1,6 +1,9 @@
 import { writeFile, mkdir } from 'node:fs/promises';
-import { gzipSync } from 'node:zlib';
+import { createWriteStream } from 'node:fs';
+import { gzipSync, createGzip } from 'node:zlib';
 import { join } from 'node:path';
+import { pipeline } from 'node:stream/promises';
+import { Readable } from 'node:stream';
 import type { ArquivoSaida, Registro, TipoTabela, IndiceVersao, IndiceAno, MetaDados } from './tipos.js';
 
 /**
@@ -98,4 +101,51 @@ export async function gerarMetaDados(
   meta: MetaDados
 ): Promise<void> {
   await escreverJson(join(diretorioBase, 'meta.json'), meta);
+}
+
+// ─── CSV consolidado (streaming) ─────────────────────────
+
+const CABECALHO_CSV = 'ano;tabela;tipo;uf;codigo;excecao;descricao;aliquotaNacionalFederal;aliquotaImportadosFederal;aliquotaEstadual;aliquotaMunicipal;vigenciaInicio;vigenciaFim\n';
+
+function escaparCampoCsv(valor: string): string {
+  if (valor.includes(';') || valor.includes('"') || valor.includes('\n')) {
+    return `"${valor.replace(/"/g, '""')}"`;
+  }
+  return valor;
+}
+
+export interface FluxoCsvGz {
+  escreverRegistros(ano: number, tabela: string, tipo: TipoTabela, uf: string, registros: Registro[]): void;
+  finalizar(): Promise<void>;
+}
+
+/**
+ * Cria um fluxo de escrita CSV comprimido com gzip (streaming).
+ * Os registros sao escritos incrementalmente sem acumular em memoria.
+ */
+export function criarFluxoCsvGz(caminho: string): FluxoCsvGz {
+  const gzip = createGzip({ level: 9 });
+  const arquivo = createWriteStream(caminho);
+  gzip.pipe(arquivo);
+
+  // Escrever cabecalho
+  gzip.write(CABECALHO_CSV);
+
+  return {
+    escreverRegistros(ano: number, tabela: string, tipo: TipoTabela, uf: string, registros: Registro[]) {
+      const linhas: string[] = [];
+      for (const r of registros) {
+        linhas.push(`${ano};${tabela};${tipo};${uf};${r.codigo};${escaparCampoCsv(r.excecao)};${escaparCampoCsv(r.descricao)};${r.aliquotaNacionalFederal};${r.aliquotaImportadosFederal};${r.aliquotaEstadual};${r.aliquotaMunicipal};${r.vigenciaInicio};${r.vigenciaFim}\n`);
+      }
+      gzip.write(linhas.join(''));
+    },
+
+    finalizar(): Promise<void> {
+      return new Promise((resolve, reject) => {
+        arquivo.on('finish', resolve);
+        arquivo.on('error', reject);
+        gzip.end();
+      });
+    }
+  };
 }

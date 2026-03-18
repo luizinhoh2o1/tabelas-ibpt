@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBPT API</title>
+  <style>
+    :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --text-muted: #8b949e; --accent: #58a6ff; --green: #3fb950; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'SFMono-Regular', Consolas, monospace; background: var(--bg); color: var(--text); padding: 24px; }
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .header a { color: var(--accent); text-decoration: none; font-size: 14px; }
+    .header a:hover { text-decoration: underline; }
+    .method { background: var(--green); color: var(--bg); padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; }
+    .path { color: var(--accent); font-size: 14px; }
+    .status { font-size: 13px; color: var(--text-muted); }
+    .error { color: #f85149; }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow: auto;
+      max-height: calc(100vh - 120px);
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .not-found {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+    }
+    .not-found h1 { font-size: 48px; color: var(--text); margin-bottom: 12px; }
+    .not-found p { font-size: 16px; margin-bottom: 24px; }
+    .not-found a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div id="conteudo"></div>
+  <script>
+    const caminho = location.pathname.replace(/\/$/, '');
+    const base = location.origin;
+
+    // Verificar se o path corresponde a um endpoint de dados da API
+    const padraoApi = caminho.match(/\/api\/(\d{4})\/([^/]+)\/([^/]+)\/([A-Z]{2})$/);
+
+    if (padraoApi) {
+      // Rota de dados: /api/{ano}/{tabela}/{tipo}/{uf}
+      const urlGz = `${base}${caminho}.json.gz`;
+      exibirDados(urlGz, caminho);
+    } else if (caminho.match(/\/api(\/|$)/) && !caminho.endsWith('.json') && !caminho.endsWith('.gz')) {
+      // Tentar como index.json
+      const urlJson = `${base}${caminho}${caminho.endsWith('/') ? '' : '/'}index.json`;
+      exibirJson(urlJson, caminho);
+    } else {
+      exibir404();
+    }
+
+    async function exibirDados(url, rota) {
+      const el = document.getElementById('conteudo');
+      el.innerHTML = `
+        <div class="header">
+          <span class="method">GET</span>
+          <span class="path">${rota}</span>
+          <span class="status">Carregando...</span>
+          <a href="/">Voltar para consulta</a>
+        </div>
+        <pre id="json">Descomprimindo...</pre>
+      `;
+
+      try {
+        const resposta = await fetch(url);
+        if (!resposta.ok) { exibir404(); return; }
+
+        const fluxo = resposta.body.pipeThrough(new DecompressionStream('gzip'));
+        const texto = await new Response(fluxo).text();
+        const dados = JSON.parse(texto);
+
+        document.querySelector('.status').textContent =
+          `${resposta.status} OK | ${dados.dados ? dados.dados.length.toLocaleString('pt-BR') + ' registros' : ''}`;
+        document.getElementById('json').textContent = JSON.stringify(dados, null, 2);
+      } catch (e) {
+        document.querySelector('.status').className = 'status error';
+        document.querySelector('.status').textContent = 'Erro ao descomprimir';
+        document.getElementById('json').textContent = e.message;
+      }
+    }
+
+    async function exibirJson(url, rota) {
+      const el = document.getElementById('conteudo');
+      el.innerHTML = `
+        <div class="header">
+          <span class="method">GET</span>
+          <span class="path">${rota}</span>
+          <span class="status">Carregando...</span>
+          <a href="/">Voltar para consulta</a>
+        </div>
+        <pre id="json">Carregando...</pre>
+      `;
+
+      try {
+        const resposta = await fetch(url);
+        if (!resposta.ok) { exibir404(); return; }
+
+        const dados = await resposta.json();
+        document.querySelector('.status').textContent = `${resposta.status} OK`;
+        document.getElementById('json').textContent = JSON.stringify(dados, null, 2);
+      } catch (e) {
+        exibir404();
+      }
+    }
+
+    function exibir404() {
+      document.getElementById('conteudo').innerHTML = `
+        <div class="not-found">
+          <h1>404</h1>
+          <p>Página não encontrada</p>
+          <p><a href="/">Ir para a página de consulta</a></p>
+          <p style="font-size:13px; margin-top:24px;">
+            Endpoints disponíveis:<br>
+            <code>/api/meta.json</code><br>
+            <code>/api/{ano}/{tabela}/{tipo}/{uf}</code>
+          </p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -169,7 +169,9 @@ Os endpoints de dados (`.json.gz`) retornam JSON com propriedades descritivas co
       "aliquotaNacionalFederal": 13.45,
       "aliquotaImportadosFederal": 15.45,
       "aliquotaEstadual": 18.00,
-      "aliquotaMunicipal": 0.00
+      "aliquotaMunicipal": 0.00,
+      "vigenciaInicio": "20/02/2026",
+      "vigenciaFim": "31/03/2026"
     }
   ]
 }
@@ -191,6 +193,8 @@ graph TD
     R --> R4["<b>aliquotaImportadosFederal</b><br/>Alíquota Importados Federal %"]
     R --> R5["<b>aliquotaEstadual</b><br/>Alíquota Estadual %"]
     R --> R6["<b>aliquotaMunicipal</b><br/>Alíquota Municipal %"]
+    R --> R7["<b>vigenciaInicio</b><br/>Início da vigência (dd/mm/aaaa)"]
+    R --> R8["<b>vigenciaFim</b><br/>Fim da vigência (dd/mm/aaaa)"]
 
     style ROOT fill:#1f6feb,stroke:#58a6ff,color:#fff
     style T fill:#161b22,stroke:#3fb950,color:#e6edf3
@@ -203,6 +207,8 @@ graph TD
     style R4 fill:#161b22,stroke:#30363d,color:#8b949e
     style R5 fill:#161b22,stroke:#30363d,color:#8b949e
     style R6 fill:#161b22,stroke:#30363d,color:#8b949e
+    style R7 fill:#161b22,stroke:#30363d,color:#8b949e
+    style R8 fill:#161b22,stroke:#30363d,color:#8b949e
 ```
 
 ---
@@ -286,6 +292,18 @@ Para configurar:
 1. Vá em **Settings > Pages** no repositório
 2. Em **Source**, selecione **GitHub Actions**
 3. Faça push na branch principal
+
+---
+
+## Claude Code
+
+Este projeto inclui arquivos de configuração para o [Claude Code](https://claude.com/claude-code), facilitando o uso de IA para desenvolvimento e manutenção:
+
+- **`CLAUDE.md`** — Guia principal com estrutura do projeto, convenções, comandos e regras
+- **`.claude/rules/`** — Regras automáticas de nomenclatura, tecnologias e padrões de código
+- **`.claude/skills/`** — Skills personalizadas para tarefas específicas
+
+Ao abrir o projeto com Claude Code, essas configurações são carregadas automaticamente, garantindo que a IA siga as convenções do projeto (nomenclatura em português, compressão gzip, TypeScript ESM, etc.).
 
 ---
 
