@@ -32,12 +32,13 @@ globs: "**/*"
 - Fontes: Ubuntu (texto) + Ubuntu Mono (valores numéricos, código)
 - Ícones: Font Awesome 6
 - 4 abas: Home, Pesquisa, Endpoints, Informações
-- 8 filtros: Ano, Versão, UF, Tipo, Código, Descrição, Vigência Início, Vigência Fim
-- Filtros de vigência usam input type="date" com filtragem por intervalo
+- 6 filtros: Ano, Versão, UF, Tipo, Código, Descrição
 - 12 colunas na tabela de resultados (inclui Início Vig. e Fim Vig.)
+- Tabela sempre visível com estados de vazio e carregamento
+- Spinner de carregamento ao lado do status de busca
 - Tooltips nos cabeçalhos da tabela de resultados
 - Consultas amplas (>50 arquivos) usam o CSV consolidado via streaming
-- Limite de 100.000 resultados no navegador
+- Sem limite de resultados
 
 ## Padrões de Código
 - CSV usa ponto-e-vírgula como separador

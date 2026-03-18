@@ -197,8 +197,6 @@
     }
     .filter-group select { cursor: pointer; }
     .filter-group input::placeholder { color: var(--texto-mutado); }
-    .filter-group input[type="date"] { color-scheme: dark; }
-    .filter-group input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
     .search-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
     /* ── Botões ── */
@@ -214,7 +212,10 @@
     .btn-primary:hover { background: var(--primaria-hover); box-shadow: 0 0 30px rgba(41,121,255,0.3); }
     .btn-ghost { background: transparent; color: var(--texto-terciario); border: 1px solid var(--borda-forte); }
     .btn-ghost:hover { border-color: var(--primaria); color: var(--texto-principal); background: rgb(0 0 0 / 6%); }
-    .search-status { font-family: 'Ubuntu Mono', monospace; font-size: 13px; color: var(--texto-terciario); margin-left: auto; }
+    .search-status { font-family: 'Ubuntu Mono', monospace; font-size: 13px; color: var(--texto-terciario); margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .spinner { width: 14px; height: 14px; border: 2px solid var(--borda-sutil); border-top-color: var(--primaria); border-radius: 50%; animation: spin .6s linear infinite; display: none; flex-shrink: 0; }
+    .spinner.ativo { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Endpoint URL ── */
     .endpoint-url {
@@ -411,6 +412,10 @@
     <!-- ═══════ ABA PESQUISA ═══════ -->
     <div id="aba-pesquisa" class="tab-content">
       <div style="padding-top:24px">
+        <div class="aviso" style="margin-bottom:16px">
+          <i class="fas fa-memory"></i>
+          <div>Consultar sem filtros carrega todos os registros de uma vez, o que pode consumir toda a memória do navegador e fazer a página parar de responder. Use pelo menos um filtro para refinar a busca.</div>
+        </div>
         <div class="search-box">
           <div class="filters">
             <div class="filter-group">
@@ -442,25 +447,17 @@
               <label><i class="fas fa-font"></i> Descrição</label>
               <input id="f-descricao" type="text" placeholder="Buscar…">
             </div>
-            <div class="filter-group">
-              <label><i class="fas fa-calendar-check"></i> Vigência Início</label>
-              <input id="f-vigencia-inicio" type="date">
-            </div>
-            <div class="filter-group">
-              <label><i class="fas fa-calendar-times"></i> Vigência Fim</label>
-              <input id="f-vigencia-fim" type="date">
-            </div>
           </div>
           <div class="search-actions">
             <button class="btn btn-primary" id="btn-consultar" onclick="consultar()"><i class="fas fa-search"></i> Consultar</button>
             <button class="btn btn-ghost" onclick="limparFiltros()"><i class="fas fa-times"></i> Limpar</button>
-            <span class="search-status" id="status-busca"></span>
+            <span class="search-status" id="status-busca"><span class="spinner" id="spinner-busca"></span><span id="texto-status"></span></span>
           </div>
           <div class="progress-bar" id="barra-progresso" style="display:none"><div class="fill" id="progresso-fill" style="width:0%"></div></div>
           <div class="endpoint-url" id="endpoint-display" style="display:none"><span class="method">GET</span><span id="endpoint-path"></span></div>
         </div>
 
-        <div id="resultados" class="results" style="display:none">
+        <div id="resultados" class="results">
           <div class="results-header">
             <h3><i class="fas fa-table"></i> <span id="titulo-resultados">Resultados</span></h3>
             <button class="btn btn-ghost" onclick="exportarCsv()" style="font-size:12px;width:auto"><i class="fas fa-download"></i> Exportar CSV</button>
@@ -565,8 +562,7 @@ for item in dados['dados']:
         <h3><i class="fas fa-search"></i> Pesquisa Client-Side</h3>
         <ol>
           <li>Metadados carregados ao abrir a página (anos, versões, UFs, tipos).</li>
-          <li>8 filtros disponíveis: ano, versão, UF, tipo, código, descrição, vigência início e vigência fim.</li>
-          <li>Filtros de vigência permitem buscar registros válidos em um período específico.</li>
+          <li>6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.</li>
           <li>Arquivos buscados em lotes paralelos de 8, descomprimidos com DecompressionStream.</li>
           <li>Consultas amplas (&gt;50 arquivos) usam o CSV consolidado <code>todos.csv.gz</code> via streaming.</li>
           <li>Resultados em tabela com 12 colunas (incluindo vigência), paginados (100/página), ordenáveis, exportáveis como CSV.</li>
@@ -615,12 +611,15 @@ for item in dados['dados']:
     let colunaOrdenada = -1;
     let ordemCrescente = true;
 
-    // Converte dd/mm/yyyy para yyyy-mm-dd (comparável)
-    function vigenciaParaIso(v) {
-      if (!v || v.length < 10) return '';
-      const p = v.split('/');
-      if (p.length !== 3) return '';
-      return `${p[2]}-${p[1]}-${p[0]}`;
+    function mostrarStatus(texto, carregando) {
+      document.getElementById('texto-status').textContent = texto;
+      document.getElementById('spinner-busca').classList.toggle('ativo', !!carregando);
+    }
+
+    function mostrarTabelaVazia(msg) {
+      document.getElementById('corpo-tabela').innerHTML = `<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--texto-mutado);font-style:italic">${msg}</td></tr>`;
+      document.getElementById('paginacao').innerHTML = '';
+      document.getElementById('titulo-resultados').textContent = 'Resultados';
     }
 
     // ── Tabs ──
@@ -641,7 +640,7 @@ for item in dados['dados']:
         document.getElementById('base-url-ep').textContent = location.origin + BASE;
       } catch (e) {
         console.error('Falha ao carregar metadados:', e);
-        document.getElementById('status-busca').textContent = 'Erro ao carregar metadados';
+        mostrarStatus('Erro ao carregar metadados', false);
       }
     }
 
@@ -694,8 +693,6 @@ for item in dados['dados']:
       return JSON.parse(await new Response(f).text());
     }
 
-    const LIMITE_RESULTADOS = 100000;
-
     async function consultarViaCsv() {
       const codigo = document.getElementById('f-codigo').value.trim();
       const descricao = document.getElementById('f-descricao').value.trim().toLowerCase();
@@ -703,9 +700,6 @@ for item in dados['dados']:
       const versao = document.getElementById('f-versao').value;
       const uf = document.getElementById('f-uf').value;
       const tipo = document.getElementById('f-tipo').value;
-      const vigInicio = document.getElementById('f-vigencia-inicio').value;
-      const vigFim = document.getElementById('f-vigencia-fim').value;
-      const statusEl = document.getElementById('status-busca');
       const btn = document.getElementById('btn-consultar');
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
@@ -713,7 +707,8 @@ for item in dados['dados']:
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       document.getElementById('endpoint-display').style.display = 'flex';
       document.getElementById('endpoint-path').textContent = `${API}/todos.csv.gz`;
-      statusEl.textContent = 'Baixando CSV consolidado…';
+      mostrarStatus('Baixando CSV consolidado…', true);
+      mostrarTabelaVazia('Buscando dados…');
       todosResultados = [];
 
       try {
@@ -722,7 +717,7 @@ for item in dados['dados']:
         const total = parseInt(resp.headers.get('Content-Length') || '0');
         const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream());
         const leitor = fluxo.getReader();
-        let buf = '', skip = false, bytes = 0, linhas = 0, limitado = false;
+        let buf = '', skip = false, bytes = 0, linhas = 0;
 
         while (true) {
           const { done, value } = await leitor.read();
@@ -743,9 +738,6 @@ for item in dados['dados']:
             const desc = c[6].replace(/^"|"$/g, '').replace(/""/g, '"');
             if (descricao && !desc.toLowerCase().includes(descricao)) continue;
             const vi = c[11] || '', vf = c[12] || '';
-            const viIso = vigenciaParaIso(vi), vfIso = vigenciaParaIso(vf);
-            if (vigInicio && vfIso && vfIso < vigInicio) continue;
-            if (vigFim && viIso && viIso > vigFim) continue;
             todosResultados.push({
               ano: c[0], tabela: c[1], tipo: c[2], uf: c[3],
               r: { codigo: c[4], excecao: c[5].replace(/^"|"$/g,'').replace(/""/g,'"'), descricao: desc,
@@ -754,19 +746,15 @@ for item in dados['dados']:
                 vigenciaInicio: vi, vigenciaFim: vf }
             });
             linhas++;
-            if (todosResultados.length >= LIMITE_RESULTADOS) { limitado = true; await leitor.cancel(); break; }
           }
-          if (limitado) break;
           if (total > 0) fill.style.width = Math.min(100, (bytes/total)*30) + '%';
-          statusEl.textContent = `Processando… ${linhas.toLocaleString('pt-BR')} linhas`;
+          mostrarStatus(`Processando… ${linhas.toLocaleString('pt-BR')} linhas`, true);
         }
-      } catch (e) { statusEl.textContent = 'Erro ao processar CSV'; console.error(e); }
+      } catch (e) { mostrarStatus('Erro ao processar CSV', false); console.error(e); }
 
       paginaAtual = 1; colunaOrdenada = -1; renderizarResultados();
       barra.style.display = 'none'; btn.disabled = false;
-      const msg = `${todosResultados.length.toLocaleString('pt-BR')} registros`;
-      statusEl.textContent = todosResultados.length >= LIMITE_RESULTADOS
-        ? `${msg} (limite atingido — refine os filtros)` : msg;
+      mostrarStatus(`${todosResultados.length.toLocaleString('pt-BR')} registros`, false);
     }
 
     async function consultar() {
@@ -776,9 +764,6 @@ for item in dados['dados']:
       const tipo = document.getElementById('f-tipo').value;
       const codigo = document.getElementById('f-codigo').value.trim();
       const descricao = document.getElementById('f-descricao').value.trim().toLowerCase();
-      const vigInicio = document.getElementById('f-vigencia-inicio').value;
-      const vigFim = document.getElementById('f-vigencia-fim').value;
-
       const anos = ano ? [ano] : metaDados.anos.map(String);
       const tipos = tipo ? [tipo] : ['ncm','nbs','lc116'];
       const ufs = uf ? [uf] : metaDados.ufs;
@@ -786,12 +771,12 @@ for item in dados['dados']:
       for (const a of anos) { const v = versao ? [versao] : (metaDados.versoes[a]||[]); total += v.length*tipos.length*ufs.length; }
       if (total > 50) return consultarViaCsv();
 
-      const statusEl = document.getElementById('status-busca');
       const btn = document.getElementById('btn-consultar');
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
-      statusEl.textContent = 'Preparando consulta…';
+      mostrarStatus('Preparando consulta…', true);
+      mostrarTabelaVazia('Buscando dados…');
 
       const tarefas = [];
       for (const a of anos) {
@@ -815,24 +800,21 @@ for item in dados['dados']:
             for (const r of d.dados) {
               if (codigo && !r.codigo.startsWith(codigo)) continue;
               if (descricao && !r.descricao.toLowerCase().includes(descricao)) continue;
-              const viIso = vigenciaParaIso(r.vigenciaInicio), vfIso = vigenciaParaIso(r.vigenciaFim);
-              if (vigInicio && vfIso && vfIso < vigInicio) continue;
-              if (vigFim && viIso && viIso > vigFim) continue;
               todosResultados.push({ano:a,tabela:v,tipo:t,uf:u,r});
             }
           } catch { erros++; }
-          finally { concluidas++; fill.style.width=(concluidas/tarefas.length)*100+'%'; statusEl.textContent=`Carregando… ${concluidas}/${tarefas.length}`; }
+          finally { concluidas++; fill.style.width=(concluidas/tarefas.length)*100+'%'; mostrarStatus(`Carregando… ${concluidas}/${tarefas.length}`, true); }
         }));
       }
 
       paginaAtual = 1; colunaOrdenada = -1; renderizarResultados();
       barra.style.display = 'none'; btn.disabled = false;
-      statusEl.textContent = `${todosResultados.length.toLocaleString('pt-BR')} registros` + (erros > 0 ? ` (${erros} não encontrados)` : '');
+      mostrarStatus(`${todosResultados.length.toLocaleString('pt-BR')} registros` + (erros > 0 ? ` (${erros} não encontrados)` : ''), false);
     }
 
     function renderizarResultados() {
-      document.getElementById('resultados').style.display = 'block';
       const corpo = document.getElementById('corpo-tabela');
+      if (!todosResultados.length) { mostrarTabelaVazia('Nenhum dado para exibir'); document.getElementById('paginacao').innerHTML = ''; document.getElementById('titulo-resultados').textContent = 'Resultados'; return; }
       const inicio = (paginaAtual-1)*TAMANHO_PAGINA;
       const pagina = todosResultados.slice(inicio, inicio+TAMANHO_PAGINA);
       const totalPag = Math.ceil(todosResultados.length/TAMANHO_PAGINA);
@@ -868,10 +850,10 @@ for item in dados['dados']:
     }
 
     function limparFiltros() {
-      ['f-ano','f-uf','f-tipo','f-versao','f-codigo','f-descricao','f-vigencia-inicio','f-vigencia-fim'].forEach(id => document.getElementById(id).value = '');
+      ['f-ano','f-uf','f-tipo','f-versao','f-codigo','f-descricao'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('endpoint-display').style.display = 'none';
-      document.getElementById('resultados').style.display = 'none';
-      document.getElementById('status-busca').textContent = '';
+      mostrarStatus('', false);
+      mostrarTabelaVazia('Nenhum dado para exibir');
       document.getElementById('barra-progresso').style.display = 'none';
       atualizarVersoes(); todosResultados = [];
     }

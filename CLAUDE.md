@@ -96,12 +96,13 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
 
 - **Design System VALRAW UI** — Cores, tipografia (Ubuntu/Ubuntu Mono), glassmorphism, glow, orbs
 - **4 abas:** Home (sobre a API), Pesquisa (filtros + tabela), Endpoints (documentação técnica), Informações (extras)
-- **8 filtros de pesquisa:** Ano, Versão, UF, Tipo, Código, Descrição, Vigência Início, Vigência Fim
-- **Filtros de vigência** permitem buscar registros por período (input type="date", filtragem por intervalo)
+- **6 filtros de pesquisa:** Ano, Versão, UF, Tipo, Código, Descrição
 - **Tooltips** nos cabeçalhos da tabela de resultados explicando cada coluna
 - **12 colunas na tabela:** Código, Ex, Tipo, UF, Tabela, Descrição, 4 alíquotas, Início Vig., Fim Vig.
+- **Tabela sempre visível** com estados de vazio ("Nenhum dado para exibir") e carregamento ("Buscando dados…")
+- **Spinner de carregamento** ao lado do status de busca durante consultas
 - **CSV consolidado** (`todos.csv.gz`) usado automaticamente quando consulta exigiria >50 arquivos individuais
-- **Limite de 100.000 resultados** para evitar travamento do navegador
+- **Sem limite de resultados** — todos os registros encontrados são exibidos
 - Ícones via Font Awesome 6
 - Layout responsivo (mobile-first)
 

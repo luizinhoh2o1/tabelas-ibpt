@@ -44,7 +44,7 @@ graph TD
 2. **Publicação:** A cada push no repositório, o GitHub Actions executa o build automaticamente e publica os arquivos no GitHub Pages. Os dados ficam acessíveis como URLs estáticas.
 
 3. **Consulta:** O usuário pode consultar de duas formas:
-   - **Página interativa:** Filtros por ano, versão, UF, tipo, código, descrição, vigência início e vigência fim. A página baixa os arquivos comprimidos, descomprime no navegador e exibe os resultados em tabela paginada com opção de exportar CSV.
+   - **Página interativa:** Filtros por ano, versão, UF, tipo, código e descrição. A página baixa os arquivos comprimidos, descomprime no navegador e exibe os resultados em tabela paginada com opção de exportar CSV.
    - **Acesso direto:** Qualquer aplicação pode acessar os endpoints e descomprimir os dados com a ferramenta de sua preferência.
 
 ### Compressão
@@ -63,7 +63,7 @@ A pesquisa na página interativa é inteiramente **client-side** — não existe
 
 1. Ao abrir a página, os metadados são carregados e os filtros são populados (anos, versões, UFs, tipos).
 2. Ao consultar, a página monta as combinações necessárias com base nos filtros selecionados. Filtros vazios incluem todas as opções.
-3. Os arquivos comprimidos são baixados em lotes paralelos, descomprimidos no navegador e filtrados por código, descrição e/ou período de vigência.
+3. Os arquivos comprimidos são baixados em lotes paralelos, descomprimidos no navegador e filtrados por código e/ou descrição.
 4. Os resultados são exibidos em tabela paginada (12 colunas incluindo vigência), ordenável por qualquer coluna, com opção de exportar CSV.
 
 Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca com ano + versão + tipo + UF específicos baixa apenas 1 arquivo (~190 KB).

@@ -36,7 +36,7 @@ function analisarLinhaCsv(linha: string): string[] {
 export async function processarCsv(caminhoArquivo: string): Promise<DadosPorTipo> {
   const dados: DadosPorTipo = { ncm: [], nbs: [], lc116: [] };
 
-  const fluxo = createReadStream(caminhoArquivo, { encoding: 'utf8', highWaterMark: 64 * 1024 });
+  const fluxo = createReadStream(caminhoArquivo, { encoding: 'latin1', highWaterMark: 64 * 1024 });
   const leitor = createInterface({ input: fluxo, crlfDelay: Infinity });
 
   let primeiraLinha = true;
