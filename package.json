@@ -1,0 +1,19 @@
+{
+  "name": "repositorio-ibpt",
+  "version": "1.0.0",
+  "description": "API estatica IBPT - Consulta de aliquotas tributarias",
+  "type": "module",
+  "scripts": {
+    "construir": "tsx src/construir.ts",
+    "build": "tsx src/construir.ts"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  },
+  "license": "Apache-2.0"
+}

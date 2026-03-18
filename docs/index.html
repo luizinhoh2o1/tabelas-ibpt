@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBPT API - Consulta de Aliquotas Tributarias</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    .aviso {
+      background: #d2992215;
+      border: 1px solid var(--orange);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin: 16px auto;
+      max-width: 900px;
+      font-size: 13px;
+      color: var(--orange);
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    header .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    header h1 { font-size: 20px; font-weight: 600; }
+    header h1 span { color: var(--text-muted); font-weight: 400; }
+    header nav a { margin-left: 16px; font-size: 14px; color: var(--text-muted); }
+    header nav a:hover { color: var(--text); }
+
+    .hero { padding: 48px 0 16px; text-align: center; }
+    .hero h2 { font-size: 32px; margin-bottom: 12px; }
+    .hero p { color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto; }
+
+    .search-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px auto;
+      max-width: 900px;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .filter-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .filter-group select, .filter-group input {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .search-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 8px 20px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: var(--text-muted); }
+    .btn-outline:hover { background: var(--surface); color: var(--text); }
+    .search-status { font-size: 13px; color: var(--text-muted); margin-left: auto; }
+
+    .endpoint-url {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 13px;
+      color: var(--green);
+      margin-top: 12px;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .endpoint-url .method {
+      background: var(--green);
+      color: var(--bg);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .results { max-width: 900px; margin: 0 auto 48px; }
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .results-header h3 { font-size: 16px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: var(--surface);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      cursor: pointer;
+    }
+    thead th:hover { color: var(--text); }
+    tbody td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tbody tr:hover { background: rgba(88, 166, 255, 0.05); }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .code { font-family: monospace; font-weight: 500; color: var(--accent); }
+    .desc { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+    .pagination button {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .pagination button:disabled { opacity: 0.4; cursor: default; }
+    .pagination span { color: var(--text-muted); }
+
+    .docs { max-width: 900px; margin: 0 auto; padding: 48px 0; }
+    .docs h2 {
+      font-size: 24px;
+      margin-bottom: 24px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .docs h3 { font-size: 18px; margin: 32px 0 12px; color: var(--accent); }
+    .docs p, .docs li { color: var(--text-muted); margin-bottom: 8px; }
+    .docs ul { padding-left: 20px; }
+    .docs code {
+      background: var(--surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--green);
+    }
+    .docs pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .docs pre code { background: none; padding: 0; }
+    .endpoint-list { list-style: none; padding: 0; }
+    .endpoint-list li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .endpoint-list .method {
+      background: var(--green);
+      color: var(--bg);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      font-family: monospace;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .endpoint-list .path { font-family: monospace; color: var(--text); font-size: 14px; }
+    .endpoint-list .path-desc { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-ncm { background: #1f6feb33; color: #58a6ff; }
+    .badge-nbs { background: #3fb95033; color: #3fb950; }
+    .badge-lc116 { background: #d2992233; color: #d29922; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 24px auto;
+      max-width: 900px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-card .value { font-size: 28px; font-weight: 700; color: var(--accent); }
+    .stat-card .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 600px) {
+      .filters { grid-template-columns: 1fr 1fr; }
+      .hero h2 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>IBPT API <span>/ Consulta Tributaria</span></h1>
+      <nav>
+        <a href="#consulta">Consulta</a>
+        <a href="#documentacao">Documentacao</a>
+        <a href="#endpoints">Endpoints</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="hero">
+      <h2>Consulta de Aliquotas IBPT</h2>
+      <p>API estatica com dados do Instituto Brasileiro de Planejamento e Tributacao.
+         Consulte aliquotas por NCM, NBS e LC116, filtradas por ano, versao e UF.</p>
+    </div>
+
+    <div class="aviso">
+      <strong>AVISO:</strong> Os dados contidos neste repositorio nao sao atualizados em tempo real.
+      As tabelas sao utilizadas apenas para <strong>consulta historica</strong> e nao e recomendado
+      o uso em sistemas reais de producao, apesar dos documentos serem tabelas oficiais publicadas pelo IBPT.
+    </div>
+
+    <div id="stats" class="stats"></div>
+
+    <div id="consulta" class="search-box">
+      <div class="filters">
+        <div class="filter-group">
+          <label>Ano</label>
+          <select id="f-ano"><option value="">Todos</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Tabela (Versao)</label>
+          <select id="f-versao"><option value="">Todas</option></select>
+        </div>
+        <div class="filter-group">
+          <label>UF (Estado)</label>
+          <select id="f-uf"><option value="">Todos</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Tipo</label>
+          <select id="f-tipo">
+            <option value="">Todos</option>
+            <option value="ncm">NCM</option>
+            <option value="nbs">NBS</option>
+            <option value="lc116">LC116</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Codigo</label>
+          <input id="f-codigo" type="text" placeholder="Ex: 01012100, 0101...">
+        </div>
+        <div class="filter-group">
+          <label>Descricao</label>
+          <input id="f-descricao" type="text" placeholder="Buscar na descricao...">
+        </div>
+      </div>
+      <div class="search-actions">
+        <button class="btn" id="btn-consultar" onclick="consultar()">Consultar</button>
+        <button class="btn btn-outline" onclick="limparFiltros()">Limpar</button>
+        <span class="search-status" id="status-busca"></span>
+      </div>
+      <div class="progress-bar" id="barra-progresso" style="display:none">
+        <div class="fill" id="progresso-fill" style="width:0%"></div>
+      </div>
+      <div class="endpoint-url" id="endpoint-display" style="display:none">
+        <span class="method">GET</span>
+        <span id="endpoint-path"></span>
+      </div>
+    </div>
+
+    <div id="resultados" class="results" style="display:none">
+      <div class="results-header">
+        <h3 id="titulo-resultados">Resultados</h3>
+        <button class="btn btn-outline" onclick="exportarCsv()" style="font-size:12px">Exportar CSV</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="ordenarPor(0)">Codigo</th>
+              <th onclick="ordenarPor(1)">Ex</th>
+              <th onclick="ordenarPor(2)">Tipo</th>
+              <th onclick="ordenarPor(3)">UF</th>
+              <th onclick="ordenarPor(4)">Tabela</th>
+              <th onclick="ordenarPor(5)">Descricao</th>
+              <th onclick="ordenarPor(6)" class="num">Nac. Federal</th>
+              <th onclick="ordenarPor(7)" class="num">Imp. Federal</th>
+              <th onclick="ordenarPor(8)" class="num">Estadual</th>
+              <th onclick="ordenarPor(9)" class="num">Municipal</th>
+            </tr>
+          </thead>
+          <tbody id="corpo-tabela"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="paginacao"></div>
+    </div>
+
+    <div id="documentacao" class="docs">
+      <h2>Documentacao da API</h2>
+
+      <p>API estatica hospedada no GitHub Pages. Os dados sao arquivos JSON comprimidos com <strong>gzip</strong>,
+         gerados automaticamente a partir das tabelas oficiais do IBPT, conforme a Lei da Transparencia Fiscal (Lei 12.741/2012).</p>
+
+      <p>Todas as versoes/tabelas de cada ano estao disponiveis (1o e 2o semestre, revisoes A, B, C, etc.).</p>
+
+      <h3>Como Funciona o Sistema</h3>
+      <p>O sistema opera em 3 etapas:</p>
+      <ul>
+        <li><strong>Construcao (build):</strong> Um script TypeScript extrai os ZIPs do repositorio, le cada CSV via streaming, agrupa
+            os registros por ano, versao/tabela, tipo e UF, converte para JSON com propriedades descritivas e comprime com <strong>gzip nivel 9</strong>.
+            Todos os CSVs sao processados em paralelo.</li>
+        <li><strong>Publicacao (deploy):</strong> O GitHub Actions executa o build automaticamente a cada push e publica os arquivos no GitHub Pages.
+            Os <code>.json.gz</code> ficam acessiveis como URLs estaticas.</li>
+        <li><strong>Consulta:</strong> O usuario pode usar esta pagina interativa (busca client-side) ou acessar os endpoints diretamente
+            via <code>fetch</code>, <code>cURL</code>, <code>Python</code>, etc.</li>
+      </ul>
+
+      <h3>Sistema de Compressao</h3>
+      <p>Os dados originais em JSON somam ~1.7 GB. Para viabilizar a hospedagem no GitHub Pages, todos os arquivos de dados sao comprimidos com
+         <strong>gzip nivel 9</strong>, reduzindo para ~314 MB (<strong>82% de reducao</strong>).</p>
+      <ul>
+        <li>Arquivos de dados: extensao <code>.json.gz</code> (comprimidos)</li>
+        <li>Arquivos de indice: extensao <code>.json</code> (sem compressao, pequenos)</li>
+        <li>Descompressao no browser: <code>DecompressionStream('gzip')</code> - API nativa (Chrome 80+, Firefox 113+, Safari 16.4+)</li>
+        <li>Descompressao via cURL: <code>curl URL | gunzip</code></li>
+        <li>Descompressao via Python: <code>gzip.decompress(resp.content)</code></li>
+      </ul>
+
+      <h3>Como Funciona a Pesquisa</h3>
+      <p>A pesquisa e inteiramente <strong>client-side</strong> - nao existe backend. O fluxo e:</p>
+      <ol>
+        <li><strong>Metadados:</strong> Ao abrir a pagina, o arquivo <code>/api/meta.json</code> e carregado. Ele contem a lista de anos,
+            versoes por ano, UFs e tipos. Os filtros sao populados dinamicamente a partir desses metadados.</li>
+        <li><strong>Montagem:</strong> Ao clicar em "Consultar", a pagina monta a lista de combinacoes <code>{ano}/{versao}/{tipo}/{uf}</code>
+            com base nos filtros selecionados. Filtros vazios incluem todas as opcoes daquele campo.</li>
+        <li><strong>Busca em lotes:</strong> Os arquivos <code>.json.gz</code> sao buscados em lotes paralelos de 8 requisicoes simultaneas.
+            Uma barra de progresso acompanha o andamento. Cada arquivo e descomprimido com <code>DecompressionStream</code> e os registros sao
+            filtrados por codigo (prefixo) e/ou descricao (substring case-insensitive).</li>
+        <li><strong>Exibicao:</strong> Os resultados sao exibidos em tabela paginada (100 registros/pagina), ordenavel por qualquer coluna.
+            Os resultados podem ser exportados como CSV.</li>
+      </ol>
+      <p><strong>Dica de desempenho:</strong> Quanto mais filtros voce selecionar, mais rapida sera a consulta.
+         Uma busca com ano + versao + tipo + UF especificos baixa apenas 1 arquivo (~190 KB).</p>
+
+      <h3>Tipos de Dados</h3>
+      <ul>
+        <li><span class="badge badge-ncm">NCM</span> <strong>Nomenclatura Comum do Mercosul</strong> - Codigos de produtos (8 digitos). ~11.000 registros por UF.</li>
+        <li><span class="badge badge-nbs">NBS</span> <strong>Nomenclatura Brasileira de Servicos</strong> - Codigos de servicos (9 digitos). ~860 registros por UF.</li>
+        <li><span class="badge badge-lc116">LC116</span> <strong>Lei Complementar 116</strong> - Codigos de servicos municipais (4 digitos). ~200 registros por UF.</li>
+      </ul>
+
+      <h3 id="endpoints">Endpoints Disponiveis</h3>
+      <p>Base URL: <code id="base-url"></code></p>
+      <p>Arquivos de dados usam extensao <code>.json.gz</code> (gzip). Indices usam <code>.json</code> (sem compressao).</p>
+
+      <ul class="endpoint-list">
+        <li>
+          <span class="method">GET</span>
+          <div>
+            <div class="path">/api/meta.json</div>
+            <div class="path-desc">Metadados: anos disponiveis, todas as versoes/tabelas, tipos e UFs.</div>
+          </div>
+        </li>
+        <li>
+          <span class="method">GET</span>
+          <div>
+            <div class="path">/api/{ano}/index.json</div>
+            <div class="path-desc">Indice do ano com todas as versoes e contagem de registros. Ex: <code>/api/2026/index.json</code></div>
+          </div>
+        </li>
+        <li>
+          <span class="method">GET</span>
+          <div>
+            <div class="path">/api/{ano}/{tabela}/index.json</div>
+            <div class="path-desc">Indice de uma versao/tabela especifica. Ex: <code>/api/2026/26.1.F/index.json</code></div>
+          </div>
+        </li>
+        <li>
+          <span class="method">GET</span>
+          <div>
+            <div class="path">/api/{ano}/{tabela}/{tipo}/index.json</div>
+            <div class="path-desc">Indice por tipo com contagem por UF. Ex: <code>/api/2026/26.1.F/ncm/index.json</code></div>
+          </div>
+        </li>
+        <li>
+          <span class="method">GET</span>
+          <div>
+            <div class="path">/api/{ano}/{tabela}/{tipo}/{uf}.json.gz</div>
+            <div class="path-desc">Dados completos (gzip). Ex: <code>/api/2026/26.1.F/ncm/SP.json.gz</code></div>
+          </div>
+        </li>
+      </ul>
+
+      <h3>Formato de Resposta (dados)</h3>
+      <pre><code>{
+  "tabela": "26.1.F",
+  "dados": [
+    {
+      "codigo": "01012100",
+      "excecao": "",
+      "descricao": "Cavalos reprodutores,de raca pura",
+      "aliquotaNacionalFederal": 13.45,
+      "aliquotaImportadosFederal": 15.45,
+      "aliquotaEstadual": 18.00,
+      "aliquotaMunicipal": 0.00
+    }
+  ]
+}</code></pre>
+
+      <h3>Descompressao (gzip)</h3>
+      <pre><code>// JavaScript - descomprimir com DecompressionStream
+async function buscarDados(url) {
+  const resposta = await fetch(url);
+  const fluxo = resposta.body.pipeThrough(new DecompressionStream('gzip'));
+  const texto = await new Response(fluxo).text();
+  return JSON.parse(texto);
+}
+
+// Uso
+const dados = await buscarDados('/api/2026/26.1.F/ncm/SP.json.gz');
+dados.dados.forEach(item => {
+  console.log(`${item.codigo}: Federal=${item.aliquotaNacionalFederal}%, Estadual=${item.aliquotaEstadual}%`);
+});</code></pre>
+
+      <pre><code># cURL - descomprimir com gunzip
+curl -s https://SEU_USUARIO.github.io/REPO/api/2026/26.1.F/ncm/SP.json.gz | gunzip | jq '.dados | length'
+
+# Buscar codigo especifico
+curl -s https://SEU_USUARIO.github.io/REPO/api/2026/26.1.F/ncm/SP.json.gz | gunzip | jq '.dados[] | select(.codigo=="22030000")'</code></pre>
+
+      <pre><code># Python
+import requests, gzip, json
+
+resp = requests.get('https://SEU_USUARIO.github.io/REPO/api/2026/26.1.F/nbs/MG.json.gz')
+dados = json.loads(gzip.decompress(resp.content))
+
+for item in dados['dados']:
+    print(f'{item["codigo"]}: {item["descricao"]} - Federal: {item["aliquotaNacionalFederal"]}%, Estadual: {item["aliquotaEstadual"]}%')</code></pre>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      Dados: <a href="https://ibpt.com.br" target="_blank">IBPT</a> / empresometro.com.br |
+      Licenca: Apache 2.0
+    </div>
+  </footer>
+
+  <script>
+    const BASE = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+    const API = BASE + '/api';
+    let metaDados = null;
+    let todosResultados = [];
+    let paginaAtual = 1;
+    const TAMANHO_PAGINA = 100;
+    let colunaOrdenada = -1;
+    let ordemCrescente = true;
+
+    document.getElementById('base-url').textContent = location.origin + BASE;
+
+    /**
+     * Busca e descomprime um arquivo .json.gz usando DecompressionStream.
+     */
+    async function buscarJsonGz(url) {
+      const resposta = await fetch(url);
+      if (!resposta.ok) return null;
+
+      // Descomprimir gzip no browser
+      const fluxoDescomprimido = resposta.body.pipeThrough(new DecompressionStream('gzip'));
+      const texto = await new Response(fluxoDescomprimido).text();
+      return JSON.parse(texto);
+    }
+
+    async function inicializar() {
+      try {
+        const resp = await fetch(API + '/meta.json');
+        metaDados = await resp.json();
+        popularFiltros();
+        mostrarEstatisticas();
+      } catch (e) {
+        console.error('Falha ao carregar metadados:', e);
+        document.getElementById('status-busca').textContent = 'Erro ao carregar metadados';
+      }
+    }
+
+    function popularFiltros() {
+      const selAno = document.getElementById('f-ano');
+      metaDados.anos.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        const qtdVersoes = metaDados.versoes[a].length;
+        opt.textContent = `${a} (${qtdVersoes} ${qtdVersoes === 1 ? 'versao' : 'versoes'})`;
+        selAno.appendChild(opt);
+      });
+
+      const selUf = document.getElementById('f-uf');
+      metaDados.ufs.forEach(uf => {
+        const opt = document.createElement('option');
+        opt.value = uf;
+        opt.textContent = uf;
+        selUf.appendChild(opt);
+      });
+
+      // Atualizar versoes quando o ano mudar
+      selAno.addEventListener('change', atualizarVersoes);
+    }
+
+    function atualizarVersoes() {
+      const selVersao = document.getElementById('f-versao');
+      const ano = document.getElementById('f-ano').value;
+      selVersao.innerHTML = '<option value="">Todas</option>';
+
+      if (ano && metaDados.versoes[ano]) {
+        metaDados.versoes[ano].forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v;
+          selVersao.appendChild(opt);
+        });
+      }
+    }
+
+    function mostrarEstatisticas() {
+      const totalVersoes = Object.values(metaDados.versoes).reduce((s, v) => s + v.length, 0);
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="value">${metaDados.anos.length}</div><div class="label">Anos</div></div>
+        <div class="stat-card"><div class="value">${totalVersoes}</div><div class="label">Versoes/Tabelas</div></div>
+        <div class="stat-card"><div class="value">${metaDados.ufs.length}</div><div class="label">Estados (UFs)</div></div>
+        <div class="stat-card"><div class="value">3</div><div class="label">Tipos</div></div>
+      `;
+    }
+
+    async function consultar() {
+      const ano = document.getElementById('f-ano').value;
+      const versao = document.getElementById('f-versao').value;
+      const uf = document.getElementById('f-uf').value;
+      const tipo = document.getElementById('f-tipo').value;
+      const codigo = document.getElementById('f-codigo').value.trim();
+      const descricao = document.getElementById('f-descricao').value.trim().toLowerCase();
+
+      const statusEl = document.getElementById('status-busca');
+      const btnConsultar = document.getElementById('btn-consultar');
+      const barraProgresso = document.getElementById('barra-progresso');
+      const progressoFill = document.getElementById('progresso-fill');
+
+      btnConsultar.disabled = true;
+      barraProgresso.style.display = 'block';
+      progressoFill.style.width = '0%';
+      statusEl.textContent = 'Preparando consulta...';
+
+      // Montar lista de tarefas (combinacoes ano/versao/tipo/uf)
+      const anos = ano ? [ano] : metaDados.anos.map(String);
+      const tipos = tipo ? [tipo] : ['ncm', 'nbs', 'lc116'];
+      const ufs = uf ? [uf] : metaDados.ufs;
+
+      const tarefas = [];
+      for (const a of anos) {
+        const versoes = versao ? [versao] : (metaDados.versoes[a] || []);
+        for (const v of versoes) {
+          for (const t of tipos) {
+            for (const u of ufs) {
+              tarefas.push({ ano: a, versao: v, tipo: t, uf: u });
+            }
+          }
+        }
+      }
+
+      // Mostrar endpoint se consulta especifica
+      if (ano && versao && tipo && uf) {
+        document.getElementById('endpoint-display').style.display = 'flex';
+        document.getElementById('endpoint-path').textContent =
+          `${API}/${ano}/${versao}/${tipo}/${uf}.json.gz`;
+      } else {
+        document.getElementById('endpoint-display').style.display = 'none';
+      }
+
+      todosResultados = [];
+      let concluidas = 0;
+      let erros = 0;
+
+      // Processar em lotes para nao sobrecarregar
+      const LOTE = 8;
+      for (let i = 0; i < tarefas.length; i += LOTE) {
+        const lote = tarefas.slice(i, i + LOTE);
+        const promessas = lote.map(async ({ ano: a, versao: v, tipo: t, uf: u }) => {
+          try {
+            const dados = await buscarJsonGz(`${API}/${a}/${v}/${t}/${u}.json.gz`);
+            if (!dados || !dados.dados) return;
+
+            for (const registro of dados.dados) {
+              if (codigo && !registro.codigo.startsWith(codigo)) continue;
+              if (descricao && !registro.descricao.toLowerCase().includes(descricao)) continue;
+              todosResultados.push({
+                ano: a,
+                tabela: v,
+                tipo: t,
+                uf: u,
+                r: registro
+              });
+            }
+          } catch {
+            erros++;
+          } finally {
+            concluidas++;
+            const progresso = (concluidas / tarefas.length) * 100;
+            progressoFill.style.width = progresso + '%';
+            statusEl.textContent = `Carregando... ${concluidas}/${tarefas.length}`;
+          }
+        });
+        await Promise.all(promessas);
+      }
+
+      paginaAtual = 1;
+      colunaOrdenada = -1;
+      renderizarResultados();
+
+      barraProgresso.style.display = 'none';
+      btnConsultar.disabled = false;
+      statusEl.textContent = `${todosResultados.length.toLocaleString('pt-BR')} registros encontrados` +
+        (erros > 0 ? ` (${erros} arquivos nao encontrados)` : '');
+    }
+
+    function renderizarResultados() {
+      const el = document.getElementById('resultados');
+      const corpo = document.getElementById('corpo-tabela');
+      el.style.display = 'block';
+
+      const inicio = (paginaAtual - 1) * TAMANHO_PAGINA;
+      const pagina = todosResultados.slice(inicio, inicio + TAMANHO_PAGINA);
+      const totalPaginas = Math.ceil(todosResultados.length / TAMANHO_PAGINA);
+
+      document.getElementById('titulo-resultados').textContent =
+        `Resultados (${todosResultados.length.toLocaleString('pt-BR')} registros)`;
+
+      const badgeTipo = t => `<span class="badge badge-${t}">${t.toUpperCase()}</span>`;
+
+      corpo.innerHTML = pagina.map(r => `
+        <tr>
+          <td class="code">${r.r.codigo}</td>
+          <td>${r.r.excecao}</td>
+          <td>${badgeTipo(r.tipo)}</td>
+          <td>${r.uf}</td>
+          <td><code>${r.tabela}</code></td>
+          <td class="desc" title="${r.r.descricao}">${r.r.descricao}</td>
+          <td class="num">${r.r.aliquotaNacionalFederal.toFixed(2)}%</td>
+          <td class="num">${r.r.aliquotaImportadosFederal.toFixed(2)}%</td>
+          <td class="num">${r.r.aliquotaEstadual.toFixed(2)}%</td>
+          <td class="num">${r.r.aliquotaMunicipal.toFixed(2)}%</td>
+        </tr>
+      `).join('');
+
+      const pag = document.getElementById('paginacao');
+      if (totalPaginas > 1) {
+        pag.innerHTML = `
+          <button onclick="irParaPagina(1)" ${paginaAtual===1?'disabled':''}>&#171;</button>
+          <button onclick="irParaPagina(${paginaAtual-1})" ${paginaAtual===1?'disabled':''}>&#8249;</button>
+          <span>Pagina ${paginaAtual} de ${totalPaginas.toLocaleString('pt-BR')}</span>
+          <button onclick="irParaPagina(${paginaAtual+1})" ${paginaAtual===totalPaginas?'disabled':''}>&#8250;</button>
+          <button onclick="irParaPagina(${totalPaginas})" ${paginaAtual===totalPaginas?'disabled':''}>&#187;</button>
+        `;
+      } else {
+        pag.innerHTML = '';
+      }
+    }
+
+    function irParaPagina(p) {
+      paginaAtual = p;
+      renderizarResultados();
+      document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function ordenarPor(coluna) {
+      if (colunaOrdenada === coluna) {
+        ordemCrescente = !ordemCrescente;
+      } else {
+        colunaOrdenada = coluna;
+        ordemCrescente = true;
+      }
+
+      const campos = ['codigo','excecao','tipo','uf','tabela','descricao',
+        'aliquotaNacionalFederal','aliquotaImportadosFederal','aliquotaEstadual','aliquotaMunicipal'];
+      const obterValor = (r, c) => {
+        const campo = campos[c];
+        if (campo === 'tipo') return r.tipo;
+        if (campo === 'uf') return r.uf;
+        if (campo === 'tabela') return r.tabela;
+        return r.r[campo];
+      };
+
+      todosResultados.sort((a, b) => {
+        let va = obterValor(a, coluna), vb = obterValor(b, coluna);
+        if (typeof va === 'number') return ordemCrescente ? va - vb : vb - va;
+        va = String(va); vb = String(vb);
+        return ordemCrescente ? va.localeCompare(vb) : vb.localeCompare(va);
+      });
+
+      paginaAtual = 1;
+      renderizarResultados();
+    }
+
+    function limparFiltros() {
+      document.getElementById('f-ano').value = '';
+      document.getElementById('f-uf').value = '';
+      document.getElementById('f-tipo').value = '';
+      document.getElementById('f-versao').value = '';
+      document.getElementById('f-codigo').value = '';
+      document.getElementById('f-descricao').value = '';
+      document.getElementById('endpoint-display').style.display = 'none';
+      document.getElementById('resultados').style.display = 'none';
+      document.getElementById('status-busca').textContent = '';
+      document.getElementById('barra-progresso').style.display = 'none';
+      atualizarVersoes();
+      todosResultados = [];
+    }
+
+    function exportarCsv() {
+      if (!todosResultados.length) return;
+      const cabecalho = 'Codigo;Excecao;Tipo;UF;Tabela;Descricao;AliquotaNacionalFederal;AliquotaImportadosFederal;AliquotaEstadual;AliquotaMunicipal\n';
+      const linhas = todosResultados.map(r =>
+        `${r.r.codigo};${r.r.excecao};${r.tipo};${r.uf};${r.tabela};"${r.r.descricao}";${r.r.aliquotaNacionalFederal};${r.r.aliquotaImportadosFederal};${r.r.aliquotaEstadual};${r.r.aliquotaMunicipal}`
+      ).join('\n');
+      const blob = new Blob([cabecalho + linhas], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'ibpt-consulta.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.querySelectorAll('.filter-group input').forEach(el => {
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') consultar(); });
+    });
+
+    inicializar();
+  </script>
+</body>
+</html>

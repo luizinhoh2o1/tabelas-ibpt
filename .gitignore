@@ -1,0 +1,13 @@
+# Generated API files (built during CI/CD)
+docs/api/
+
+# Node
+node_modules/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+/tmp/
