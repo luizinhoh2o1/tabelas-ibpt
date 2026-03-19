@@ -74,7 +74,7 @@ Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca c
 
 Acesse a página de consulta interativa:
 
-> **[Acessar Consulta](https://luizinhoh2o1.github.io/tabelas-ibpt/)**
+> **[Acessar Consulta](https://ibpt.valraw.com.br/)**
 
 ---
 
@@ -83,7 +83,7 @@ Acesse a página de consulta interativa:
 ### Base URL
 
 ```
-https://luizinhoh2o1.github.io/tabelas-ibpt/api
+https://ibpt.valraw.com.br/
 ```
 
 ### Endpoints Disponíveis
