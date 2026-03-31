@@ -10,61 +10,33 @@ Este repositório disponibiliza uma **API estática via GitHub Pages** para cons
 
 ## Como Funciona o Sistema
 
-O sistema funciona em 3 etapas: **construção**, **publicação** e **consulta**.
-
-```mermaid
-graph TD
-    subgraph Construcao["1. Construção"]
-        A["Arquivos ZIP com CSVs"] --> B["Extrair e ler CSVs"]
-        B --> C["Agrupar por ano, versão, tipo e UF"]
-        C --> D["Gerar JSON descritivo"]
-        D --> E["Comprimir com gzip"]
-    end
-
-    subgraph Publicacao["2. Publicação"]
-        E --> F["GitHub Actions executa o build"]
-        F --> G["Publica no GitHub Pages"]
-        G --> H["Arquivos .json.gz acessíveis via URL"]
-    end
-
-    subgraph Consulta["3. Consulta"]
-        H --> K["Página interativa no navegador"]
-        H --> L["Acesso direto via cURL"]
-        H --> M["Acesso via Python ou outras linguagens"]
-        K --> N["Descomprime, filtra e exibe resultados"]
-    end
-
-    style Construcao fill:#161b22,stroke:#58a6ff,color:#e6edf3
-    style Publicacao fill:#161b22,stroke:#3fb950,color:#e6edf3
-    style Consulta fill:#161b22,stroke:#d29922,color:#e6edf3
-```
-
-1. **Construção:** Os arquivos ZIP contendo CSVs do IBPT são extraídos, lidos e agrupados por ano, versão/tabela, tipo (NCM, NBS, LC116) e UF. Os dados são convertidos para JSON com propriedades descritivas e comprimidos com gzip.
-
-2. **Publicação:** A cada push no repositório, o GitHub Actions executa o build automaticamente e publica os arquivos no GitHub Pages. Os dados ficam acessíveis como URLs estáticas.
-
-3. **Consulta:** O usuário pode consultar de duas formas:
-   - **Página interativa:** Filtros por ano, versão, UF, tipo, código e descrição. A página baixa os arquivos comprimidos, descomprime no navegador e exibe os resultados em tabela paginada com opção de exportar CSV.
-   - **Acesso direto:** Qualquer aplicação pode acessar os endpoints e descomprimir os dados com a ferramenta de sua preferência.
+| Etapa | Descrição |
+|---|---|
+| **1. Construção** | Arquivos ZIP com CSVs do IBPT são extraídos, agrupados por ano/versão/tipo/UF, convertidos para JSON e comprimidos com gzip |
+| **2. Publicação** | GitHub Actions executa o build e publica no GitHub Pages como arquivos `.json.gz` acessíveis via URL |
+| **3. Consulta** | Página interativa no navegador ou acesso direto via cURL/Python/qualquer linguagem |
 
 ### Compressão
 
-Os dados originais somam ~1.7 GB. Para viabilizar a hospedagem, todos os arquivos de dados são comprimidos com gzip, reduzindo para ~314 MB (82% de redução).
+Os dados originais somam ~1.7 GB. Com gzip, reduzem para ~314 MB (82% de redução).
 
-- Arquivos de dados usam extensão `.json.gz` (comprimidos)
-- Arquivos de índice usam extensão `.json` (sem compressão)
-- No navegador, a descompressão é automática e nativa (Chrome 80+, Firefox 113+, Safari 16.4+)
-- Via terminal: `curl URL | gunzip`
-- Via Python: `gzip.decompress(resposta.content)`
+| Formato | Extensão | Compressão |
+|---|---|---|
+| Dados | `.json.gz` | gzip nível 9 |
+| Índices | `.json` | Sem compressão |
+| CSV consolidado | `.csv.gz` | gzip nível 9 |
+
+Descompressão: navegador (nativo via `DecompressionStream`), terminal (`curl URL \| gunzip`), Python (`gzip.decompress()`).
 
 ### Pesquisa
 
 A pesquisa na página interativa é inteiramente **client-side** — não existe backend.
 
-1. Ao abrir a página, os metadados são carregados e os filtros são populados (anos, versões, UFs, tipos).
-2. Ao consultar, a página monta as combinações necessárias com base nos filtros selecionados. Filtros vazios incluem todas as opções.
-3. Os arquivos comprimidos são baixados em lotes paralelos, descomprimidos no navegador e filtrados por código e/ou descrição.
-4. Os resultados são exibidos em tabela paginada (12 colunas incluindo vigência), ordenável por qualquer coluna, com opção de exportar CSV.
+1. Metadados carregados ao abrir a página (anos, versões, UFs, tipos).
+2. 6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.
+3. Arquivos baixados em lotes paralelos de 8, descomprimidos com `DecompressionStream`.
+4. Consultas amplas (>50 arquivos) usam o CSV consolidado `todos.csv.gz` via streaming.
+5. Resultados em tabela com 12 colunas, paginados (100/página), ordenáveis, exportáveis como CSV.
 
 Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca com ano + versão + tipo + UF específicos baixa apenas 1 arquivo (~190 KB).
 
@@ -72,99 +44,49 @@ Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca c
 
 ## Página de Consulta
 
-Acesse a página de consulta interativa:
-
 > **[Acessar Consulta](https://ibpt.valraw.com.br/)**
 
 ---
 
 ## API - Endpoints
 
-### Base URL
+**Base URL:** `https://ibpt.valraw.com.br/api`
 
-```
-https://ibpt.valraw.com.br/
-```
-
-### Endpoints Disponíveis
-
-```mermaid
-graph LR
-    subgraph Endpoints
-        direction TB
-        E1["/api/meta.json"]
-        E2["/api/{ano}/index.json"]
-        E3["/api/{ano}/{tabela}/index.json"]
-        E4["/api/{ano}/{tabela}/{tipo}/index.json"]
-        E5["/api/{ano}/{tabela}/{tipo}/{uf}.json.gz"]
-        E6["/api/todos.csv.gz"]
-    end
-
-    E1 -.- D1["Metadados: anos, versões, tipos e UFs"]
-    E2 -.- D2["Índice do ano com todas as versões"]
-    E3 -.- D3["Índice de uma versão/tabela específica"]
-    E4 -.- D4["Índice por tipo com contagem por UF"]
-    E5 -.- D5["Dados completos comprimidos com gzip"]
-    E6 -.- D6["CSV consolidado com todos os registros (gzip)"]
-
-    style E1 fill:#238636,stroke:#3fb950,color:#fff
-    style E2 fill:#238636,stroke:#3fb950,color:#fff
-    style E3 fill:#238636,stroke:#3fb950,color:#fff
-    style E4 fill:#238636,stroke:#3fb950,color:#fff
-    style E5 fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style E6 fill:#9e6a03,stroke:#d29922,color:#fff
-    style D1 fill:#161b22,stroke:#30363d,color:#8b949e
-    style D2 fill:#161b22,stroke:#30363d,color:#8b949e
-    style D3 fill:#161b22,stroke:#30363d,color:#8b949e
-    style D4 fill:#161b22,stroke:#30363d,color:#8b949e
-    style D5 fill:#161b22,stroke:#30363d,color:#8b949e
-    style D6 fill:#161b22,stroke:#30363d,color:#8b949e
-```
-
-> Endpoints verdes retornam JSON simples. O endpoint azul retorna dados comprimidos com gzip (`.json.gz`). O endpoint amarelo retorna CSV consolidado comprimido com gzip.
+| Endpoint | Descrição |
+|---|---|
+| `/api/meta.json` | Metadados: anos disponíveis, versões, tipos e UFs |
+| `/api/{ano}/index.json` | Índice do ano com todas as versões |
+| `/api/{ano}/{tabela}/index.json` | Índice de uma versão/tabela específica |
+| `/api/{ano}/{tabela}/{tipo}/index.json` | Índice por tipo com contagem por UF |
+| `/api/{ano}/{tabela}/{tipo}/{uf}.json.gz` | Dados completos (gzip) |
+| `/api/todos.csv.gz` | CSV consolidado com todos os registros (gzip) |
 
 ### Parâmetros
 
-```mermaid
-graph LR
-    subgraph Parametros["Parâmetros"]
-        direction TB
-        P1["<b>{ano}</b><br/>2017 a 2026"]
-        P2["<b>{tabela}</b><br/>Código da versão ex: 26.1.F"]
-        P3["<b>{tipo}</b><br/>ncm, nbs ou lc116"]
-        P4["<b>{uf}</b><br/>Sigla do estado ex: SP, RJ"]
-    end
-
-    P1 --- P2 --- P3 --- P4
-
-    style P1 fill:#161b22,stroke:#58a6ff,color:#e6edf3
-    style P2 fill:#161b22,stroke:#58a6ff,color:#e6edf3
-    style P3 fill:#161b22,stroke:#58a6ff,color:#e6edf3
-    style P4 fill:#161b22,stroke:#58a6ff,color:#e6edf3
-```
+| Parâmetro | Valores | Exemplo |
+|---|---|---|
+| `{ano}` | 2017 a 2026 | `2026` |
+| `{tabela}` | Código da versão | `26.1.G` |
+| `{tipo}` | `ncm`, `nbs` ou `lc116` | `ncm` |
+| `{uf}` | Sigla do estado (27 UFs) | `SP` |
 
 ### Tipos de Dados
 
-```mermaid
-graph LR
-    NCM["<b>NCM</b><br/>Nomenclatura Comum do Mercosul<br/>Produtos - 8 dígitos<br/>~11.000 registros/UF"]
-    NBS["<b>NBS</b><br/>Nomenclatura Brasileira de Serviços<br/>Serviços - 9 dígitos<br/>~860 registros/UF"]
-    LC["<b>LC116</b><br/>Lei Complementar 116<br/>Serviços municipais - 4 dígitos<br/>~200 registros/UF"]
-
-    style NCM fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style NBS fill:#238636,stroke:#3fb950,color:#fff
-    style LC fill:#9e6a03,stroke:#d29922,color:#fff
-```
+| Tipo | Nome | Descrição | Registros/UF |
+|---|---|---|---|
+| `ncm` | Nomenclatura Comum do Mercosul | Produtos — 8 dígitos | ~11.000 |
+| `nbs` | Nomenclatura Brasileira de Serviços | Serviços — 9 dígitos | ~860 |
+| `lc116` | Lei Complementar 116 | Serviços municipais — 4 dígitos | ~200 |
 
 ---
 
 ## Formato de Resposta
 
-Os endpoints de dados (`.json.gz`) retornam JSON com propriedades descritivas comprimido com gzip:
+Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
 
 ```json
 {
-  "tabela": "26.1.F",
+  "tabela": "26.1.G",
   "dados": [
     {
       "codigo": "01012100",
@@ -174,104 +96,45 @@ Os endpoints de dados (`.json.gz`) retornam JSON com propriedades descritivas co
       "aliquotaImportadosFederal": 15.45,
       "aliquotaEstadual": 18.00,
       "aliquotaMunicipal": 0.00,
-      "vigenciaInicio": "20/02/2026",
-      "vigenciaFim": "31/03/2026"
+      "vigenciaInicio": "01/04/2026",
+      "vigenciaFim": "30/06/2026"
     }
   ]
 }
 ```
 
-### Estrutura do JSON
+### Campos do Registro
 
-```mermaid
-graph TD
-    ROOT["Resposta JSON"] --> T["<b>tabela</b><br/>Versão da tabela IBPTax"]
-    ROOT --> D["<b>dados</b><br/>Array de registros"]
-
-    D --> R["Cada registro é um objeto com propriedades descritivas"]
-
-    R --> R0["<b>codigo</b><br/>Código do produto/serviço"]
-    R --> R1["<b>excecao</b><br/>Exceção tarifária"]
-    R --> R2["<b>descricao</b><br/>Descrição do item"]
-    R --> R3["<b>aliquotaNacionalFederal</b><br/>Alíquota Nacional Federal %"]
-    R --> R4["<b>aliquotaImportadosFederal</b><br/>Alíquota Importados Federal %"]
-    R --> R5["<b>aliquotaEstadual</b><br/>Alíquota Estadual %"]
-    R --> R6["<b>aliquotaMunicipal</b><br/>Alíquota Municipal %"]
-    R --> R7["<b>vigenciaInicio</b><br/>Início da vigência (dd/mm/aaaa)"]
-    R --> R8["<b>vigenciaFim</b><br/>Fim da vigência (dd/mm/aaaa)"]
-
-    style ROOT fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style T fill:#161b22,stroke:#3fb950,color:#e6edf3
-    style D fill:#161b22,stroke:#3fb950,color:#e6edf3
-    style R fill:#161b22,stroke:#d29922,color:#e6edf3
-    style R0 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R1 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R2 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R3 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R4 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R5 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R6 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R7 fill:#161b22,stroke:#30363d,color:#8b949e
-    style R8 fill:#161b22,stroke:#30363d,color:#8b949e
-```
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `codigo` | string | Código NCM/NBS/LC116 |
+| `excecao` | string | Exceção tarifária |
+| `descricao` | string | Descrição do produto ou serviço |
+| `aliquotaNacionalFederal` | number | Alíquota federal (nacionais) % |
+| `aliquotaImportadosFederal` | number | Alíquota federal (importados) % |
+| `aliquotaEstadual` | number | Alíquota estadual (ICMS) % |
+| `aliquotaMunicipal` | number | Alíquota municipal (ISS) % |
+| `vigenciaInicio` | string | Início da vigência (dd/mm/aaaa) |
+| `vigenciaFim` | string | Fim da vigência (dd/mm/aaaa) |
 
 ---
 
 ## Versões Disponíveis
 
-Todas as versões/tabelas de cada ano são processadas e disponibilizadas:
+| Ano | Versões |
+|---|---|
+| 2017 | 17.1.B, 17.2.A |
+| 2018 | 18.1.A, 18.1.B, 18.2.C |
+| 2019 | 19.1.A, 19.1.B, 19.2.A |
+| 2020 | 20.1.A, 20.1.B, 20.2.A, 20.2.C |
+| 2021 | 21.1.D, 21.1.G, 21.2.A, 21.2.B, 21.2.C, 21.2.D, 21.2.F, 21.2.G |
+| 2022 | 22.1.A, 22.1.C, 22.1.E, 22.2.B |
+| 2023 | 23.1.A–G, 23.2.B–F |
+| 2024 | 24.1.A–F, 24.2.A–F |
+| 2025 | 25.1.A–F, 25.2.A–C, 25.2.G, 25.2.H |
+| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G |
 
-```mermaid
-graph LR
-    subgraph 2017
-        V17["17.1.B<br/>17.2.A"]
-    end
-    subgraph 2018
-        V18["18.1.A · 18.1.B<br/>18.2.C"]
-    end
-    subgraph 2019
-        V19["19.1.A · 19.1.B<br/>19.2.A"]
-    end
-    subgraph 2020
-        V20["20.1.A · 20.1.B<br/>20.2.A · 20.2.C"]
-    end
-    subgraph 2021
-        V21["21.1.D · 21.1.G<br/>21.2.A · 21.2.B · 21.2.C<br/>21.2.D · 21.2.F · 21.2.G"]
-    end
-
-    style 2017 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2018 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2019 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2020 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2021 fill:#161b22,stroke:#30363d,color:#e6edf3
-```
-
-```mermaid
-graph LR
-    subgraph 2022
-        V22["22.1.A · 22.1.C<br/>22.1.E · 22.2.B"]
-    end
-    subgraph 2023
-        V23["23.1.A-G<br/>23.2.B-F"]
-    end
-    subgraph 2024
-        V24["24.1.A-F<br/>24.2.A-F"]
-    end
-    subgraph 2025
-        V25["25.1.A-F<br/>25.2.A-C · 25.2.G · 25.2.H"]
-    end
-    subgraph 2026
-        V26["26.1.C<br/>26.1.F"]
-    end
-
-    style 2022 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2023 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2024 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2025 fill:#161b22,stroke:#30363d,color:#e6edf3
-    style 2026 fill:#161b22,stroke:#58a6ff,color:#e6edf3
-```
-
-UFs: `AC` `AL` `AM` `AP` `BA` `CE` `DF` `ES` `GO` `MA` `MG` `MS` `MT` `PA` `PB` `PE` `PI` `PR` `RJ` `RN` `RO` `RR` `RS` `SC` `SE` `SP` `TO`
+**UFs:** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO
 
 ---
 
@@ -292,7 +155,6 @@ Os arquivos serão gerados em `docs/api/`.
 
 O deploy é automático via **GitHub Actions**. A cada push na branch `main`/`master`, o workflow executa o build e publica no GitHub Pages.
 
-Para configurar:
 1. Vá em **Settings > Pages** no repositório
 2. Em **Source**, selecione **GitHub Actions**
 3. Faça push na branch principal
