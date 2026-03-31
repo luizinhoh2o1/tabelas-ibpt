@@ -75,7 +75,7 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
 
 ```json
 {
-  "tabela": "26.1.F",
+  "tabela": "26.1.G",
   "dados": [
     {
       "codigo": "01012100",
@@ -85,8 +85,8 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
       "aliquotaImportadosFederal": 15.45,
       "aliquotaEstadual": 18.00,
       "aliquotaMunicipal": 0.00,
-      "vigenciaInicio": "20/02/2026",
-      "vigenciaFim": "31/03/2026"
+      "vigenciaInicio": "20/03/2026",
+      "vigenciaFim": "30/04/2026"
     }
   ]
 }
@@ -101,10 +101,26 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
 - **12 colunas na tabela:** Código, Ex, Tipo, UF, Tabela, Descrição, 4 alíquotas, Início Vig., Fim Vig.
 - **Tabela sempre visível** com estados de vazio ("Nenhum dado para exibir") e carregamento ("Buscando dados…")
 - **Spinner de carregamento** ao lado do status de busca durante consultas
+- **Aviso de memória** na aba de pesquisa alertando que consultas sem filtro podem travar o navegador
 - **CSV consolidado** (`todos.csv.gz`) usado automaticamente quando consulta exigiria >50 arquivos individuais
 - **Sem limite de resultados** — todos os registros encontrados são exibidos
 - Ícones via Font Awesome 6
 - Layout responsivo (mobile-first)
+
+## Tabelas Disponíveis
+
+91 tabelas IBPTax de 2017 a 2026 (todas as versões publicadas pelo IBPT):
+
+- **2017:** 17.1.A, 17.1.B, 17.2.A, 17.2.B
+- **2018:** 18.1.A, 18.1.B, 18.2.A, 18.2.B, 18.2.C
+- **2019:** 19.1.A, 19.1.B, 19.2.A, 19.2.B
+- **2020:** 20.1.A, 20.1.B, 20.2.A, 20.2.B, 20.2.C
+- **2021:** 21.1.A–I (A, B, C, D, E, F, G, H, I), 21.2.A–G
+- **2022:** 22.1.A–G, 22.2.A–G
+- **2023:** 23.1.A–G, 23.2.A–F
+- **2024:** 24.1.A–F, 24.2.A–F
+- **2025:** 25.1.A–F, 25.2.A–H
+- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G
 
 ## Regras Importantes
 
@@ -113,3 +129,4 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
 - O `404.html` intercepta rotas sem extensão e descomprime/exibe o JSON no browser
 - Textos visíveis ao usuário (HTML, README) devem ter acentuação correta em português
 - O CSV consolidado (`todos.csv.gz`) é gerado via streaming (createGzip) para não acumular memória
+- CSVs do IBPT usam encoding `latin1` (ISO-8859-1) — o `processadorCsv.ts` lê com `encoding: 'latin1'`

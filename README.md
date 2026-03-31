@@ -121,18 +121,19 @@ Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
 
 ## Versões Disponíveis
 
-| Ano | Versões |
-|---|---|
-| 2017 | 17.1.B, 17.2.A |
-| 2018 | 18.1.A, 18.1.B, 18.2.C |
-| 2019 | 19.1.A, 19.1.B, 19.2.A |
-| 2020 | 20.1.A, 20.1.B, 20.2.A, 20.2.C |
-| 2021 | 21.1.D, 21.1.G, 21.2.A, 21.2.B, 21.2.C, 21.2.D, 21.2.F, 21.2.G |
-| 2022 | 22.1.A, 22.1.C, 22.1.E, 22.2.B |
-| 2023 | 23.1.A–G, 23.2.B–F |
-| 2024 | 24.1.A–F, 24.2.A–F |
-| 2025 | 25.1.A–F, 25.2.A–C, 25.2.G, 25.2.H |
-| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G |
+| Ano | Versões | Qtd |
+|---|---|---|
+| 2017 | 17.1.A, 17.1.B, 17.2.A, 17.2.B | 4 |
+| 2018 | 18.1.A, 18.1.B, 18.2.A, 18.2.B, 18.2.C | 5 |
+| 2019 | 19.1.A, 19.1.B, 19.2.A, 19.2.B | 4 |
+| 2020 | 20.1.A, 20.1.B, 20.2.A, 20.2.B, 20.2.C | 5 |
+| 2021 | 21.1.A–I, 21.2.A–G | 16 |
+| 2022 | 22.1.A–G, 22.2.A–G | 14 |
+| 2023 | 23.1.A–G, 23.2.A–F | 13 |
+| 2024 | 24.1.A–F, 24.2.A–F | 12 |
+| 2025 | 25.1.A–F, 25.2.A–H | 14 |
+| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G | 4 |
+| **Total** | | **91** |
 
 **UFs:** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO
 
@@ -167,7 +168,6 @@ Este projeto inclui arquivos de configuração para o [Claude Code](https://clau
 
 - **`CLAUDE.md`** — Guia principal com estrutura do projeto, convenções, comandos e regras
 - **`.claude/rules/`** — Regras automáticas de nomenclatura, tecnologias e padrões de código
-- **`.claude/skills/`** — Skills personalizadas para tarefas específicas
 
 Ao abrir o projeto com Claude Code, essas configurações são carregadas automaticamente, garantindo que a IA siga as convenções do projeto (nomenclatura em português, compressão gzip, TypeScript ESM, etc.).
 
