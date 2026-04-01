@@ -4,9 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IBPT API - Consulta de Alíquotas Tributárias</title>
+  <meta name="description" content="API estática com 91 tabelas IBPTax (2017–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ibpt.valraw.com.br/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ibpt.valraw.com.br/">
+  <meta property="og:title" content="IBPT API - Consulta de Alíquotas Tributárias">
+  <meta property="og:description" content="API estática com 91 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="IBPT API - Consulta de Alíquotas Tributárias">
+  <meta name="twitter:description" content="API estática com 91 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <!-- Preconnect para fontes e ícones -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <!-- Google Fonts — carregamento não-bloqueante -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap"></noscript>
+  <!-- Font Awesome — carregamento não-bloqueante -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <style>
     :root {
       --fundo-principal: #13171B;
@@ -167,7 +184,7 @@
       width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
       margin-bottom: 16px; font-size: 18px;
     }
-    .feature-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .feature-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
     .feature-card p { font-size: 13px; color: var(--texto-terciario); line-height: 1.5; }
 
     /* ── Search Box ── */
@@ -208,8 +225,8 @@
     }
     .btn:active { transform: scale(0.98); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-primary { background: var(--primaria); color: #fff; border: 1px solid var(--primaria-clara); box-shadow: 0 0 20px rgba(41,121,255,0.2); }
-    .btn-primary:hover { background: var(--primaria-hover); box-shadow: 0 0 30px rgba(41,121,255,0.3); }
+    .btn-primary { background: #1565C0; color: #fff; border: 1px solid var(--primaria); box-shadow: 0 0 20px rgba(41,121,255,0.2); }
+    .btn-primary:hover { background: #1976D2; box-shadow: 0 0 30px rgba(41,121,255,0.3); }
     .btn-ghost { background: transparent; color: var(--texto-terciario); border: 1px solid var(--borda-forte); }
     .btn-ghost:hover { border-color: var(--primaria); color: var(--texto-principal); background: rgb(0 0 0 / 6%); }
     .search-status { font-family: 'Ubuntu Mono', monospace; font-size: 13px; color: var(--texto-terciario); margin-left: auto; display: flex; align-items: center; gap: 8px; }
@@ -318,7 +335,7 @@
     /* ── Footer ── */
     footer {
       background: var(--fundo-base); border-top: 1px solid var(--borda-sutil);
-      padding: 32px 0; text-align: center; font-size: 13px; color: var(--texto-mutado);
+      padding: 32px 0; text-align: center; font-size: 13px; color: var(--texto-terciario);
     }
     footer a { color: var(--texto-terciario); }
     footer a:hover { color: var(--primaria-clara); }
@@ -341,17 +358,17 @@
         <div class="logo-icon"><i class="fas fa-chart-bar"></i></div>
         IBPT API <span>/ Alíquotas</span>
       </h1>
-      <a href="https://github.com/luizinhoh2o1/tabelas-ibpt" target="_blank" style="color:var(--texto-terciario);font-size:20px;transition:color 0.2s;" title="Ver no GitHub"><i class="fab fa-github"></i></a>
+      <a href="https://github.com/luizinhoh2o1/tabelas-ibpt" target="_blank" aria-label="Ver no GitHub" style="color:var(--texto-terciario);font-size:20px;transition:color 0.2s;"><i class="fab fa-github" aria-hidden="true"></i></a>
     </div>
   </header>
 
-  <div class="container">
+  <main class="container">
     <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="trocarAba('home')"><i class="fas fa-home"></i> <span>Home</span></button>
-      <button class="tab-btn" onclick="trocarAba('pesquisa')"><i class="fas fa-search"></i> <span>Pesquisa</span></button>
-      <button class="tab-btn" onclick="trocarAba('endpoints')"><i class="fas fa-plug"></i> <span>Endpoints</span></button>
-      <button class="tab-btn" onclick="trocarAba('info')"><i class="fas fa-info-circle"></i> <span>Informações</span></button>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="aba-home" aria-label="Home" onclick="trocarAba('home')"><i class="fas fa-home" aria-hidden="true"></i> <span>Home</span></button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="aba-pesquisa" aria-label="Pesquisa" onclick="trocarAba('pesquisa')"><i class="fas fa-search" aria-hidden="true"></i> <span>Pesquisa</span></button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="aba-endpoints" aria-label="Endpoints" onclick="trocarAba('endpoints')"><i class="fas fa-plug" aria-hidden="true"></i> <span>Endpoints</span></button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="aba-info" aria-label="Informações" onclick="trocarAba('info')"><i class="fas fa-info-circle" aria-hidden="true"></i> <span>Informações</span></button>
     </div>
 
     <!-- ═══════ ABA HOME ═══════ -->
@@ -367,8 +384,8 @@
           <h2>Consulta de <span class="gradient-text">Alíquotas IBPT</span></h2>
           <p>API estática com dados do Instituto Brasileiro de Planejamento e Tributação.
              Consulte alíquotas por NCM, NBS e LC116, filtradas por ano, versão e UF.</p>
-          <button class="btn btn-primary" onclick="trocarAba('pesquisa')" style="margin-top:8px">
-            <i class="fas fa-search"></i> Iniciar Consulta
+          <button class="btn btn-primary" onclick="trocarAba('pesquisa')" aria-label="Iniciar Consulta" style="margin-top:8px">
+            <i class="fas fa-search" aria-hidden="true"></i> Iniciar Consulta
           </button>
         </div>
       </div>
@@ -387,23 +404,23 @@
       <div class="features">
         <div class="feature-card">
           <div class="icon-box" style="background:var(--primaria-dim); border:1px solid var(--primaria-border); color:var(--primaria-clara);">
-            <i class="fas fa-compress-alt"></i>
+            <i class="fas fa-compress-alt" aria-hidden="true"></i>
           </div>
-          <h4>Compressão Gzip</h4>
+          <h3>Compressão Gzip</h3>
           <p>Dados comprimidos com gzip nível 9. De 1.7 GB para ~314 MB (82% de redução). Descompressão automática no navegador.</p>
         </div>
         <div class="feature-card">
           <div class="icon-box" style="background:var(--verde-dim); border:1px solid var(--verde-border); color:var(--acento-verde);">
-            <i class="fas fa-bolt"></i>
+            <i class="fas fa-bolt" aria-hidden="true"></i>
           </div>
-          <h4>100% Client-Side</h4>
+          <h3>100% Client-Side</h3>
           <p>Sem backend. Os dados são buscados, descomprimidos e filtrados diretamente no navegador via DecompressionStream.</p>
         </div>
         <div class="feature-card">
           <div class="icon-box" style="background:var(--secundaria-dim); border:1px solid var(--secundaria-border); color:var(--secundaria-clara);">
-            <i class="fas fa-layer-group"></i>
+            <i class="fas fa-layer-group" aria-hidden="true"></i>
           </div>
-          <h4>Todas as Versões</h4>
+          <h3>Todas as Versões</h3>
           <p>91 tabelas de 2017 a 2026. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
         </div>
       </div>
@@ -449,8 +466,8 @@
             </div>
           </div>
           <div class="search-actions">
-            <button class="btn btn-primary" id="btn-consultar" onclick="consultar()"><i class="fas fa-search"></i> Consultar</button>
-            <button class="btn btn-ghost" onclick="limparFiltros()"><i class="fas fa-times"></i> Limpar</button>
+            <button class="btn btn-primary" id="btn-consultar" onclick="consultar()"><i class="fas fa-search" aria-hidden="true"></i> Consultar</button>
+            <button class="btn btn-ghost" onclick="limparFiltros()"><i class="fas fa-times" aria-hidden="true"></i> Limpar</button>
             <span class="search-status" id="status-busca"><span class="spinner" id="spinner-busca"></span><span id="texto-status"></span></span>
           </div>
           <div class="progress-bar" id="barra-progresso" style="display:none"><div class="fill" id="progresso-fill" style="width:0%"></div></div>
@@ -460,7 +477,7 @@
         <div id="resultados" class="results">
           <div class="results-header">
             <h3><i class="fas fa-table"></i> <span id="titulo-resultados">Resultados</span></h3>
-            <button class="btn btn-ghost" onclick="exportarCsv()" style="font-size:12px;width:auto"><i class="fas fa-download"></i> Exportar CSV</button>
+            <button class="btn btn-ghost" onclick="exportarCsv()" style="font-size:12px;width:auto"><i class="fas fa-download" aria-hidden="true"></i> Exportar CSV</button>
           </div>
           <div class="table-wrapper">
             <table>
@@ -580,7 +597,6 @@ for item in dados['dados']:
         <ul>
           <li><code>CLAUDE.md</code> — Guia com estrutura, convenções e comandos do projeto</li>
           <li><code>.claude/rules/</code> — Regras automáticas de nomenclatura e padrões</li>
-          <li><code>.claude/skills/</code> — Skills personalizadas (ex: VALRAW UI)</li>
         </ul>
 
         <h3><i class="fas fa-balance-scale"></i> Licença</h3>
@@ -588,15 +604,15 @@ for item in dados['dados']:
         <p>Dados: <a href="https://ibpt.com.br" target="_blank">IBPT</a> / empresometro.com.br</p>
       </div>
     </div>
-  </div>
+  </main>
 
   <footer>
     <div class="container" style="display:flex;align-items:center;justify-content:center;gap:8px;">
-      <i class="fas fa-database" style="color:var(--primaria-clara)"></i>
+      <i class="fas fa-database" aria-hidden="true" style="color:var(--primaria-clara)"></i>
       Dados: <a href="https://ibpt.com.br" target="_blank">IBPT</a>
-      <span style="color:var(--borda-padrao)">|</span>
+      <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Licença: Apache 2.0
-      <span style="color:var(--borda-padrao)">|</span>
+      <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Powered by <a href="https://valraw.com.br" target="_blank" style="font-weight:600"><span class="gradient-text">VALRAW</span></a>
     </div>
   </footer>
@@ -623,11 +639,13 @@ for item in dados['dados']:
     }
 
     // ── Tabs ──
-    function trocarAba(id) {
+    function trocarAba(id, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('active'); el.setAttribute('aria-selected', 'false'); });
       document.getElementById('aba-' + id).classList.add('active');
-      event.currentTarget.classList.add('active');
+      const alvo = btn || event.currentTarget;
+      alvo.classList.add('active');
+      if (alvo.hasAttribute('aria-selected')) alvo.setAttribute('aria-selected', 'true');
     }
 
     // ── Init ──
@@ -831,11 +849,11 @@ for item in dados['dados']:
       </tr>`).join('');
       const pag = document.getElementById('paginacao');
       pag.innerHTML = totalPag > 1 ? `
-        <button onclick="irParaPagina(1)" ${paginaAtual===1?'disabled':''}><i class="fas fa-angle-double-left"></i></button>
-        <button onclick="irParaPagina(${paginaAtual-1})" ${paginaAtual===1?'disabled':''}><i class="fas fa-angle-left"></i></button>
+        <button onclick="irParaPagina(1)" aria-label="Primeira página" ${paginaAtual===1?'disabled':''}><i class="fas fa-angle-double-left" aria-hidden="true"></i></button>
+        <button onclick="irParaPagina(${paginaAtual-1})" aria-label="Página anterior" ${paginaAtual===1?'disabled':''}><i class="fas fa-angle-left" aria-hidden="true"></i></button>
         <span>Página ${paginaAtual} de ${totalPag.toLocaleString('pt-BR')}</span>
-        <button onclick="irParaPagina(${paginaAtual+1})" ${paginaAtual===totalPag?'disabled':''}><i class="fas fa-angle-right"></i></button>
-        <button onclick="irParaPagina(${totalPag})" ${paginaAtual===totalPag?'disabled':''}><i class="fas fa-angle-double-right"></i></button>` : '';
+        <button onclick="irParaPagina(${paginaAtual+1})" aria-label="Próxima página" ${paginaAtual===totalPag?'disabled':''}><i class="fas fa-angle-right" aria-hidden="true"></i></button>
+        <button onclick="irParaPagina(${totalPag})" aria-label="Última página" ${paginaAtual===totalPag?'disabled':''}><i class="fas fa-angle-double-right" aria-hidden="true"></i></button>` : '';
     }
 
     function irParaPagina(p) { paginaAtual = p; renderizarResultados(); document.getElementById('resultados').scrollIntoView({behavior:'smooth'}); }
@@ -870,6 +888,24 @@ for item in dados['dados']:
 
     document.querySelectorAll('.filter-group input').forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') consultar(); }));
     inicializar();
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "IBPT API – Tabelas IBPTax",
+    "description": "API estática com 91 tabelas IBPTax (2017–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
+    "url": "https://ibpt.valraw.com.br/",
+    "creator": {
+      "@type": "Organization",
+      "name": "VALRAW",
+      "url": "https://valraw.com.br"
+    },
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "keywords": ["IBPT", "IBPTax", "alíquotas", "NCM", "NBS", "LC116", "tributação", "impostos", "Brasil"],
+    "temporalCoverage": "2017/2026",
+    "spatialCoverage": "BR"
+  }
   </script>
 </body>
 </html>
