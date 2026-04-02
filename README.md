@@ -179,18 +179,18 @@ Este projeto está licenciado sob os termos do arquivo [LICENSE](LICENSE) (Apach
 
 O código fonte é de **uso livre**: qualquer pessoa pode baixar, modificar, distribuir e comercializar sem restrições.
 
-<!-- Keywords -->
-<!-- tabela IBPT, TabelaIBPTax, IBPT histórico, alíquota IBPT, IBPT NCM, IBPT NBS, IBPT LC116,
-tabela de impostos Brasil, De Olho no Imposto, Lei 12.741, valor aproximado de tributos,
-carga tributária NCM, alíquota federal nacional, alíquota federal importado, alíquota estadual,
-alíquota municipal, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020, IBPT 2021, IBPT 2022,
-IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT,
-auditoria fiscal NF-e, auditoria retroativa tributária, recuperação de créditos tributários,
-nota fiscal eletrônica impostos, NF-e tributos, NFC-e IBPT, ERP fiscal Brasil,
-Simples Nacional alíquota, NCM impostos, NCM alíquota, classificação fiscal NCM,
-ibpt.valraw.com.br, VALRAW, API IBPT, API fiscal brasileira, API NCM, API tributária,
-tabela IBPT JSON, tabela IBPT CSV, tabela IBPT open source, tabela IBPT gratuita,
-IBPT API estática, IBPT GitHub Pages, IBPT sem cadastro, IBPT sem token,
-IBPT todas as versões, IBPT semestral, IBPT vigência, IBPT revisões A B C,
-deolhonoimposto, iws.ibpt.org.br, apidoni.ibpt.org.br,
-imposto nota fiscal consumidor, transparência tributária, Lei de Transparência Fiscal -->
+## < -- Keywords -- >
+## Tabela IBPT, TabelaIBPTax, IBPT histórico, alíquota IBPT, IBPT NCM, IBPT NBS, IBPT LC116,
+## tabela de impostos Brasil, De Olho no Imposto, Lei 12.741, valor aproximado de tributos,
+## carga tributária NCM, alíquota federal nacional, alíquota federal importado, alíquota estadual,
+## alíquota municipal, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020, IBPT 2021, IBPT 2022,
+## IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT,
+## auditoria fiscal NF-e, auditoria retroativa tributária, recuperação de créditos tributários,
+## nota fiscal eletrônica impostos, NF-e tributos, NFC-e IBPT, ERP fiscal Brasil,
+## Simples Nacional alíquota, NCM impostos, NCM alíquota, classificação fiscal NCM,
+## ibpt.valraw.com.br, VALRAW, API IBPT, API fiscal brasileira, API NCM, API tributária,
+## tabela IBPT JSON, tabela IBPT CSV, tabela IBPT open source, tabela IBPT gratuita,
+## IBPT API estática, IBPT GitHub Pages, IBPT sem cadastro, IBPT sem token,
+## IBPT todas as versões, IBPT semestral, IBPT vigência, IBPT revisões A B C,
+## deolhonoimposto, iws.ibpt.org.br, apidoni.ibpt.org.br,
+## imposto nota fiscal consumidor, transparência tributária, Lei de Transparência Fiscal
