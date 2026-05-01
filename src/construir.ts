@@ -125,10 +125,10 @@ async function processarVersao(
     return null;
   }
 
-  // Processar todos os CSVs em paralelo
+  // Processar todos os CSVs em paralelo. Quando o CSV nao tem UF no nome
+  // (publicacao consolidada do IBPT), os dados sao replicados para todas as UFs.
   const tarefas = arquivosCsv.map(async (csvFile) => {
     const uf = extrairUfDoNomeArquivo(csvFile);
-    if (!uf) return null;
     const caminhoCsv = join(diretorioExtracao, csvFile);
     const dados = await processarCsv(caminhoCsv);
     return { uf, dados };
@@ -142,10 +142,12 @@ async function processarVersao(
   };
 
   for (const resultado of resultados) {
-    if (!resultado) continue;
+    const ufsAlvo = resultado.uf ? [resultado.uf] : [...UFS];
     for (const tipo of TIPOS) {
       if (resultado.dados[tipo].length > 0) {
-        dadosPorTipoUf[tipo][resultado.uf] = resultado.dados[tipo];
+        for (const uf of ufsAlvo) {
+          dadosPorTipoUf[tipo][uf] = resultado.dados[tipo];
+        }
       }
     }
   }
