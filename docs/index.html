@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IBPT API - Consulta de Alíquotas Tributárias</title>
-  <meta name="description" content="API estática com 91 tabelas IBPTax (2017–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
+  <meta name="description" content="API estática com 92 tabelas IBPTax (2017–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ibpt.valraw.com.br/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ibpt.valraw.com.br/">
   <meta property="og:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta property="og:description" content="API estática com 91 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
+  <meta property="og:description" content="API estática com 92 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta name="twitter:description" content="API estática com 91 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <meta name="twitter:description" content="API estática com 92 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116.">
   <!-- Preconnect para fontes e ícones -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -421,7 +421,7 @@
             <i class="fas fa-layer-group" aria-hidden="true"></i>
           </div>
           <h3>Todas as Versões</h3>
-          <p>91 tabelas de 2017 a 2026. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
+          <p>92 tabelas de 2017 a 2026. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
         </div>
       </div>
     </div>
@@ -513,15 +513,15 @@
         <ul class="endpoint-list">
           <li><span class="method">GET</span><div><div class="path">/api/meta.json</div><div class="path-desc">Metadados: anos disponíveis, versões/tabelas, tipos e UFs.</div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/index.json</div><div class="path-desc">Índice do ano com todas as versões. Ex: <code>/api/2026/index.json</code></div></div></li>
-          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/index.json</div><div class="path-desc">Índice de uma versão/tabela. Ex: <code>/api/2026/26.1.G/index.json</code></div></div></li>
-          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/index.json</div><div class="path-desc">Índice por tipo com contagem por UF. Ex: <code>/api/2026/26.1.G/ncm/index.json</code></div></div></li>
-          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/{uf}.json.gz</div><div class="path-desc">Dados completos (gzip). Ex: <code>/api/2026/26.1.G/ncm/SP.json.gz</code></div></div></li>
+          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/index.json</div><div class="path-desc">Índice de uma versão/tabela. Ex: <code>/api/2026/26.1.H/index.json</code></div></div></li>
+          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/index.json</div><div class="path-desc">Índice por tipo com contagem por UF. Ex: <code>/api/2026/26.1.H/ncm/index.json</code></div></div></li>
+          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/{uf}.json.gz</div><div class="path-desc">Dados completos (gzip). Ex: <code>/api/2026/26.1.H/ncm/SP.json.gz</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/todos.csv.gz</div><div class="path-desc">CSV consolidado com todos os registros (gzip). Usado para consultas amplas.</div></div></li>
         </ul>
 
         <h3><i class="fas fa-code"></i> Formato de Resposta</h3>
         <pre><code>{
-  "tabela": "26.1.G",
+  "tabela": "26.1.H",
   "dados": [
     {
       "codigo": "01012100",
@@ -531,25 +531,25 @@
       "aliquotaImportadosFederal": 15.45,
       "aliquotaEstadual": 18.00,
       "aliquotaMunicipal": 0.00,
-      "vigenciaInicio": "20/03/2026",
-      "vigenciaFim": "30/04/2026"
+      "vigenciaInicio": "20/04/2026",
+      "vigenciaFim": "31/05/2026"
     }
   ]
 }</code></pre>
 
         <h3><i class="fas fa-file-archive"></i> Descompressão</h3>
         <pre><code>// JavaScript
-const resp = await fetch('/api/2026/26.1.G/ncm/SP.json.gz');
+const resp = await fetch('/api/2026/26.1.H/ncm/SP.json.gz');
 const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip'));
 const dados = JSON.parse(await new Response(fluxo).text());
 dados.dados.forEach(item =&gt;
   console.log(`${item.codigo}: ${item.aliquotaNacionalFederal}%`)
 );</code></pre>
         <pre><code># cURL
-curl -s URL/api/2026/26.1.G/ncm/SP.json.gz | gunzip | jq '.dados | length'</code></pre>
+curl -s URL/api/2026/26.1.H/ncm/SP.json.gz | gunzip | jq '.dados | length'</code></pre>
         <pre><code># Python
 import requests, gzip, json
-resp = requests.get('URL/api/2026/26.1.G/nbs/MG.json.gz')
+resp = requests.get('URL/api/2026/26.1.H/nbs/MG.json.gz')
 dados = json.loads(gzip.decompress(resp.content))
 for item in dados['dados']:
     print(f'{item["codigo"]}: {item["aliquotaNacionalFederal"]}%')</code></pre>
@@ -894,7 +894,7 @@ for item in dados['dados']:
     "@context": "https://schema.org",
     "@type": "Dataset",
     "name": "IBPT API – Tabelas IBPTax",
-    "description": "API estática com 91 tabelas IBPTax (2017–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
+    "description": "API estática com 92 tabelas IBPTax (2017–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
     "url": "https://ibpt.valraw.com.br/",
     "creator": {
       "@type": "Organization",

@@ -109,7 +109,7 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
 
 ## Tabelas Disponíveis
 
-91 tabelas IBPTax de 2017 a 2026 (todas as versões publicadas pelo IBPT):
+92 tabelas IBPTax de 2017 a 2026 (todas as versões publicadas pelo IBPT):
 
 - **2017:** 17.1.A, 17.1.B, 17.2.A, 17.2.B
 - **2018:** 18.1.A, 18.1.B, 18.2.A, 18.2.B, 18.2.C
@@ -120,7 +120,7 @@ npm run construir    # Build: extrair ZIPs e gerar API estática
 - **2023:** 23.1.A–G, 23.2.A–F
 - **2024:** 24.1.A–F, 24.2.A–F
 - **2025:** 25.1.A–F, 25.2.A–H
-- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G
+- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H
 
 ## Regras Importantes
 
