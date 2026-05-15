@@ -67,6 +67,7 @@
       color: var(--texto-principal);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
     ::selection { color: #fff; background: rgba(41,121,255,0.3); }
     ::-webkit-scrollbar { width: 6px; }
@@ -121,8 +122,8 @@
     .tab-content.active { display: block; }
 
     /* ── Hero (Home) ── */
-    .hero { position: relative; padding: 48px 0 32px; text-align: center; }
-    .hero-bg { position: absolute; inset: -200px; pointer-events: none; overflow: hidden; }
+    .hero { position: relative; padding: 48px 0 32px; text-align: center; overflow: hidden; }
+    .hero-bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
     .hero-grid {
       position: absolute; inset: 0; opacity: 0.03;
       background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
@@ -355,7 +356,6 @@
   <header>
     <div class="container">
       <h1>
-        <div class="logo-icon"><i class="fas fa-chart-bar"></i></div>
         IBPT API <span>/ Alíquotas</span>
       </h1>
       <a href="https://github.com/luizinhoh2o1/tabelas-ibpt" target="_blank" aria-label="Ver no GitHub" style="color:var(--texto-terciario);font-size:20px;transition:color 0.2s;"><i class="fab fa-github" aria-hidden="true"></i></a>
@@ -407,7 +407,7 @@
             <i class="fas fa-compress-alt" aria-hidden="true"></i>
           </div>
           <h3>Compressão Gzip</h3>
-          <p>Dados comprimidos com gzip nível 9. De 1.7 GB para ~314 MB (82% de redução). Descompressão automática no navegador.</p>
+          <p>Dados comprimidos com gzip nível 9. De ~4,3 GB de CSV bruto para ~697 MB (84% de redução). Descompressão automática no navegador.</p>
         </div>
         <div class="feature-card">
           <div class="icon-box" style="background:var(--verde-dim); border:1px solid var(--verde-border); color:var(--acento-verde);">
@@ -569,7 +569,7 @@ for item in dados['dados']:
         </ul>
 
         <h3><i class="fas fa-compress-alt"></i> Compressão</h3>
-        <p>Dados originais: ~1.7 GB. Após gzip nível 9: ~314 MB (<strong>82% de redução</strong>).</p>
+        <p>Dados originais: ~4,3 GB de CSV bruto. Após gzip nível 9: ~697 MB (<strong>84% de redução</strong>).</p>
         <ul>
           <li>Dados: <code>.json.gz</code> (comprimidos)</li>
           <li>Índices: <code>.json</code> (sem compressão)</li>
