@@ -132,8 +132,8 @@ Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
 | 2023 | 23.1.A–G, 23.2.A–F | 13 |
 | 2024 | 24.1.A–F, 24.2.A–F | 12 |
 | 2025 | 25.1.A–F, 25.2.A–H | 14 |
-| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H | 5 |
-| **Total** | | **92** |
+| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K | 6 |
+| **Total** | | **93** |
 
 **UFs:** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO
 
