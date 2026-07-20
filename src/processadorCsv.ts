@@ -5,27 +5,46 @@ import type { Registro, TipoTabela } from './tipos.js';
 
 export type DadosPorTipo = Record<TipoTabela, Registro[]>;
 
+const CODIGO_ASPA = 34;    // "
+const CODIGO_PONTO_VIRGULA = 59;    // ;
+
+/**
+ * Extrai um campo de `linha` entre os indices [inicio, fim).
+ * Remove aspas envolventes e desescapa "" → " (convencao CSV).
+ * Fast path quando o campo nao comeca com aspas.
+ */
+function pegarCampo(linha: string, inicio: number, fim: number): string {
+  if (inicio === fim) return '';
+  if (linha.charCodeAt(inicio) !== CODIGO_ASPA) {
+    return linha.slice(inicio, fim);
+  }
+  const conteudo = fim > inicio + 1 && linha.charCodeAt(fim - 1) === CODIGO_ASPA
+    ? linha.slice(inicio + 1, fim - 1)
+    : linha.slice(inicio + 1, fim);
+  return conteudo.indexOf('""') < 0 ? conteudo : conteudo.replace(/""/g, '"');
+}
+
 /**
  * Faz o parse de uma linha CSV separada por ponto-e-virgula,
- * respeitando campos entre aspas.
+ * respeitando campos entre aspas. Usa slice em vez de concat char-a-char
+ * para evitar comportamento quadratico em linhas longas.
  */
 function analisarLinhaCsv(linha: string): string[] {
   const campos: string[] = [];
-  let atual = '';
+  const tamanho = linha.length;
+  let inicio = 0;
   let dentroDeAspas = false;
 
-  for (let i = 0; i < linha.length; i++) {
-    const caractere = linha[i];
-    if (caractere === '"') {
+  for (let i = 0; i < tamanho; i++) {
+    const codigo = linha.charCodeAt(i);
+    if (codigo === CODIGO_ASPA) {
       dentroDeAspas = !dentroDeAspas;
-    } else if (caractere === ';' && !dentroDeAspas) {
-      campos.push(atual);
-      atual = '';
-    } else {
-      atual += caractere;
+    } else if (codigo === CODIGO_PONTO_VIRGULA && !dentroDeAspas) {
+      campos.push(pegarCampo(linha, inicio, i));
+      inicio = i + 1;
     }
   }
-  campos.push(atual);
+  campos.push(pegarCampo(linha, inicio, tamanho));
   return campos;
 }
 
@@ -47,7 +66,7 @@ export async function processarCsv(caminhoArquivo: string): Promise<DadosPorTipo
       continue; // pular cabecalho
     }
 
-    if (!linha.trim()) continue;
+    if (linha.length === 0) continue;
 
     const campos = analisarLinhaCsv(linha);
     if (campos.length < 10) continue;

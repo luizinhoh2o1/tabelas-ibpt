@@ -1,10 +1,11 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import { createWriteStream } from 'node:fs';
-import { gzipSync, createGzip } from 'node:zlib';
+import { createGzip, gzip } from 'node:zlib';
+import { promisify } from 'node:util';
 import { join } from 'node:path';
-import { pipeline } from 'node:stream/promises';
-import { Readable } from 'node:stream';
 import type { ArquivoSaida, Registro, TipoTabela, IndiceVersao, IndiceAno, MetaDados } from './tipos.js';
+
+const gzipAsync = promisify(gzip);
 
 /**
  * Escreve um arquivo JSON comprimido com gzip (.json.gz).
@@ -12,7 +13,7 @@ import type { ArquivoSaida, Registro, TipoTabela, IndiceVersao, IndiceAno, MetaD
  */
 export async function escreverJsonGz(caminho: string, dados: unknown): Promise<number> {
   const json = JSON.stringify(dados);
-  const comprimido = gzipSync(Buffer.from(json), { level: 9 });
+  const comprimido = await gzipAsync(Buffer.from(json), { level: 9 });
   await writeFile(caminho, comprimido);
   return comprimido.length;
 }

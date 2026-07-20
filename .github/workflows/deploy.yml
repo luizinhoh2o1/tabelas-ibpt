@@ -34,7 +34,7 @@ jobs:
         run: npm ci
 
       - name: Construir API (extrair ZIPs e gerar JSON comprimido)
-        run: npm run construir
+        run: npm run build
 
       - name: Configurar Pages
         uses: actions/configure-pages@v5

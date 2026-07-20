@@ -147,7 +147,7 @@ Requisitos: Node.js >= 22 (LTS)
 
 ```bash
 npm install
-npm run construir
+npm run build
 ```
 
 Os arquivos serão gerados em `docs/api/`.

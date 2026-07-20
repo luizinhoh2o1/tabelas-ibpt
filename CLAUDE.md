@@ -68,7 +68,7 @@ Cada registro contém 9 propriedades extraídas do CSV original do IBPT:
 
 ```bash
 npm install          # Instalar dependências
-npm run construir    # Build: extrair ZIPs e gerar API estática
+npm run build        # Build: extrair ZIPs e gerar API estática
 ```
 
 ## Formato de Saída JSON
