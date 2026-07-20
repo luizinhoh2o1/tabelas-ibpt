@@ -49,6 +49,7 @@ globs: "**/*"
 - CSV consolidado tem 13 colunas: ano;tabela;tipo;uf;codigo;excecao;descricao;4 alíquotas;vigenciaInicio;vigenciaFim
 
 ## Tabelas Disponíveis
-- 91 tabelas IBPTax de 2017 a 2026 (todas as versões publicadas pelo IBPT)
-- Fonte dos ZIPs: portal De Olho no Imposto (IBPT) e SVN do Projeto ACBr (SourceForge)
+- 99 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou disponíveis no mirror do SVN ACBr)
+- Fonte dos ZIPs: portal De Olho no Imposto (IBPT) e SVN do Projeto ACBr (SourceForge / espelho GitHub `frones/ACBr`)
+- Tabelas 2015–2016 foram recuperadas do histórico de commits de `frones/ACBr` em `Exemplos/ACBrTCP/ACBrIBPTax/tabela` (o mirror git-svn começa em 2015-03-23)
 - O build detecta automaticamente novos ZIPs em `repositorio-ibpt/` — basta adicionar e rodar `npm run construir`

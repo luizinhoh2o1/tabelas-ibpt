@@ -18,7 +18,7 @@ Este repositório disponibiliza uma **API estática via GitHub Pages** para cons
 
 ### Compressão
 
-Os dados originais somam ~1.7 GB. Com gzip, reduzem para ~314 MB (82% de redução).
+Os dados originais somam ~4,5 GB de CSV bruto. Com gzip nível 9, reduzem para ~542 MB (88% de redução).
 
 | Formato | Extensão | Compressão |
 |---|---|---|
@@ -65,7 +65,7 @@ Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca c
 
 | Parâmetro | Valores | Exemplo |
 |---|---|---|
-| `{ano}` | 2017 a 2026 | `2026` |
+| `{ano}` | 2015 a 2026 | `2026` |
 | `{tabela}` | Código da versão | `26.1.G` |
 | `{tipo}` | `ncm`, `nbs` ou `lc116` | `ncm` |
 | `{uf}` | Sigla do estado (27 UFs) | `SP` |
@@ -123,6 +123,8 @@ Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
 
 | Ano | Versões | Qtd |
 |---|---|---|
+| 2015 | 15.1.B, 15.2.A | 2 |
+| 2016 | 16.1.A, 16.2.A, 16.2.B | 3 |
 | 2017 | 17.1.A, 17.1.B, 17.2.A, 17.2.B | 4 |
 | 2018 | 18.1.A, 18.1.B, 18.2.A, 18.2.B, 18.2.C | 5 |
 | 2019 | 19.1.A, 19.1.B, 19.2.A, 19.2.B | 4 |
@@ -132,8 +134,8 @@ Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
 | 2023 | 23.1.A–G, 23.2.A–F | 13 |
 | 2024 | 24.1.A–F, 24.2.A–F | 12 |
 | 2025 | 25.1.A–F, 25.2.A–H | 14 |
-| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K | 6 |
-| **Total** | | **93** |
+| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L | 7 |
+| **Total** | | **99** |
 
 **UFs:** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO
 
@@ -183,8 +185,8 @@ O código fonte é de **uso livre**: qualquer pessoa pode baixar, modificar, dis
 ## Tabela IBPT, TabelaIBPTax, IBPT histórico, alíquota IBPT, IBPT NCM, IBPT NBS, IBPT LC116,
 ## tabela de impostos Brasil, De Olho no Imposto, Lei 12.741, valor aproximado de tributos,
 ## carga tributária NCM, alíquota federal nacional, alíquota federal importado, alíquota estadual,
-## alíquota municipal, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020, IBPT 2021, IBPT 2022,
-## IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT,
+## alíquota municipal, IBPT 2015, IBPT 2016, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020,
+## IBPT 2021, IBPT 2022, IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT,
 ## auditoria fiscal NF-e, auditoria retroativa tributária, recuperação de créditos tributários,
 ## nota fiscal eletrônica impostos, NF-e tributos, NFC-e IBPT, ERP fiscal Brasil,
 ## Simples Nacional alíquota, NCM impostos, NCM alíquota, classificação fiscal NCM,

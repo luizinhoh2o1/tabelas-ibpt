@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IBPT API - Consulta de Alíquotas Tributárias</title>
-  <meta name="description" content="API estática com 92 tabelas IBPTax (2017–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
+  <meta name="description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ibpt.valraw.com.br/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ibpt.valraw.com.br/">
   <meta property="og:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta property="og:description" content="API estática com 92 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
+  <meta property="og:description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta name="twitter:description" content="API estática com 92 tabelas IBPTax (2017–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <meta name="twitter:description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116.">
   <!-- Preconnect para fontes e ícones -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +60,7 @@
       --texto-inverso: #0F1419;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; height: 100%; }
     body {
       font-family: 'Ubuntu', system-ui, sans-serif;
       background: var(--fundo-principal);
@@ -68,6 +68,9 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
     }
     ::selection { color: #fff; background: rgba(41,121,255,0.3); }
     ::-webkit-scrollbar { width: 6px; }
@@ -76,6 +79,7 @@
     a { color: var(--primaria-clara); text-decoration: none; transition: color 0.2s; }
     a:hover { color: var(--acento-verde-claro); }
     .container { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+    main { flex: 1 0 auto; width: 100%; }
     @media (min-width: 640px) { .container { padding: 0 24px; } }
     @media (min-width: 1024px) { .container { padding: 0 32px; } }
 
@@ -337,6 +341,7 @@
     footer {
       background: var(--fundo-base); border-top: 1px solid var(--borda-sutil);
       padding: 32px 0; text-align: center; font-size: 13px; color: var(--texto-terciario);
+      flex-shrink: 0;
     }
     footer a { color: var(--texto-terciario); }
     footer a:hover { color: var(--primaria-clara); }
@@ -374,12 +379,6 @@
     <!-- ═══════ ABA HOME ═══════ -->
     <div id="aba-home" class="tab-content active">
       <div class="hero">
-        <div class="hero-bg">
-          <div class="hero-grid"></div>
-          <div class="hero-orb hero-orb-blue"></div>
-          <div class="hero-orb hero-orb-green"></div>
-          <div class="hero-fade"></div>
-        </div>
         <div class="hero-content">
           <h2>Consulta de <span class="gradient-text">Alíquotas IBPT</span></h2>
           <p>API estática com dados do Instituto Brasileiro de Planejamento e Tributação.
@@ -403,25 +402,25 @@
 
       <div class="features">
         <div class="feature-card">
-          <div class="icon-box" style="background:var(--primaria-dim); border:1px solid var(--primaria-border); color:var(--primaria-clara);">
+          <div class="icon-box" style="color:var(--primaria-clara);">
             <i class="fas fa-compress-alt" aria-hidden="true"></i>
           </div>
           <h3>Compressão Gzip</h3>
-          <p>Dados comprimidos com gzip nível 9. De ~4,3 GB de CSV bruto para ~697 MB (84% de redução). Descompressão automática no navegador.</p>
+          <p>Dados comprimidos com gzip nível 9. De ~4,5 GB de CSV bruto para ~542 MB (88% de redução). Descompressão automática no navegador.</p>
         </div>
         <div class="feature-card">
-          <div class="icon-box" style="background:var(--verde-dim); border:1px solid var(--verde-border); color:var(--acento-verde);">
+          <div class="icon-box" style="color:var(--acento-verde);">
             <i class="fas fa-bolt" aria-hidden="true"></i>
           </div>
           <h3>100% Client-Side</h3>
           <p>Sem backend. Os dados são buscados, descomprimidos e filtrados diretamente no navegador via DecompressionStream.</p>
         </div>
         <div class="feature-card">
-          <div class="icon-box" style="background:var(--secundaria-dim); border:1px solid var(--secundaria-border); color:var(--secundaria-clara);">
+          <div class="icon-box" style="color:var(--secundaria-clara);">
             <i class="fas fa-layer-group" aria-hidden="true"></i>
           </div>
           <h3>Todas as Versões</h3>
-          <p>92 tabelas de 2017 a 2026. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
+          <p>99 tabelas de 2015 a 2026. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
         </div>
       </div>
     </div>
@@ -569,7 +568,7 @@ for item in dados['dados']:
         </ul>
 
         <h3><i class="fas fa-compress-alt"></i> Compressão</h3>
-        <p>Dados originais: ~4,3 GB de CSV bruto. Após gzip nível 9: ~697 MB (<strong>84% de redução</strong>).</p>
+        <p>Dados originais: ~4,5 GB de CSV bruto. Após gzip nível 9: ~542 MB (<strong>88% de redução</strong>).</p>
         <ul>
           <li>Dados: <code>.json.gz</code> (comprimidos)</li>
           <li>Índices: <code>.json</code> (sem compressão)</li>
@@ -787,7 +786,7 @@ for item in dados['dados']:
       const ufs = uf ? [uf] : metaDados.ufs;
       let total = 0;
       for (const a of anos) { const v = versao ? [versao] : (metaDados.versoes[a]||[]); total += v.length*tipos.length*ufs.length; }
-      if (total > 50) return consultarViaCsv();
+      if (!versao && total > 50) return consultarViaCsv();
 
       const btn = document.getElementById('btn-consultar');
       const barra = document.getElementById('barra-progresso');
@@ -894,7 +893,7 @@ for item in dados['dados']:
     "@context": "https://schema.org",
     "@type": "Dataset",
     "name": "IBPT API – Tabelas IBPTax",
-    "description": "API estática com 92 tabelas IBPTax (2017–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
+    "description": "API estática com 99 tabelas IBPTax (2015–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
     "url": "https://ibpt.valraw.com.br/",
     "creator": {
       "@type": "Organization",
@@ -903,7 +902,7 @@ for item in dados['dados']:
     },
     "license": "https://www.apache.org/licenses/LICENSE-2.0",
     "keywords": ["IBPT", "IBPTax", "alíquotas", "NCM", "NBS", "LC116", "tributação", "impostos", "Brasil"],
-    "temporalCoverage": "2017/2026",
+    "temporalCoverage": "2015/2026",
     "spatialCoverage": "BR"
   }
   </script>
