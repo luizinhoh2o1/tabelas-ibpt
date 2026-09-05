@@ -147,10 +147,16 @@ Requisitos: Node.js >= 22 (LTS)
 
 ```bash
 npm install
-npm run build
+npm test                    # testes do parser CSV
+npm run build               # build incremental (só reprocessa ano alterado)
+npm run build -- --completo # ignora o cache e reconstrói tudo
 ```
 
 Os arquivos serão gerados em `docs/api/`.
+
+O build é incremental: `docs/api/_manifesto.json` guarda o hash dos ZIPs de
+cada ano, e um ano cujos ZIPs não mudaram é reaproveitado do build anterior.
+Um build completo leva alguns minutos; um build sem alterações, poucos segundos.
 
 ---
 
