@@ -356,12 +356,12 @@
     .endpoint-list li {
       background: var(--fundo-cartao); border: 1px solid var(--borda-sutil);
       border-radius: 16px; padding: 16px 20px; margin-bottom: 10px;
-      display: flex; align-items: flex-start; gap: 14px;
+      display: flex; align-items: center; gap: 14px;
       box-shadow: var(--sombra-card);
       transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
     }
     .endpoint-list li:hover { transform: translateY(-3px); border-color: var(--borda-padrao); box-shadow: var(--sombra-card-hover); }
-    .endpoint-list .method { background: var(--verde-escuro); color: var(--texto-inverso); padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; font-family: 'Ubuntu Mono', monospace; flex-shrink: 0; margin-top: 2px; }
+    .endpoint-list .method { background: var(--verde-escuro); color: var(--texto-inverso); padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; font-family: 'Ubuntu Mono', monospace; flex-shrink: 0; }
     .endpoint-list .path { font-family: 'Ubuntu Mono', monospace; color: var(--texto-principal); font-size: 14px; }
     .endpoint-list .path-desc { color: var(--texto-terciario); font-size: 13px; margin-top: 6px; }
 
@@ -501,7 +501,7 @@
             <button class="btn btn-ghost" onclick="exportarCsv()" style="font-size:12px;width:auto"><i class="fas fa-download" aria-hidden="true"></i> Exportar CSV</button>
           </div>
           <div class="table-wrapper">
-            <table>
+            <table id="tabela-resultados">
               <thead><tr>
                 <th onclick="ordenarPor(0)" data-tooltip="Código NCM, NBS ou LC116 do produto/serviço"><i class="fas fa-barcode"></i> Código</th>
                 <th onclick="ordenarPor(1)" data-tooltip="Exceção tarifária (se aplicável)">Ex</th>
@@ -666,13 +666,17 @@ for item in dados['dados']:
     }
 
     // ── Tabs ──
-    function trocarAba(id, btn) {
+    function trocarAba(id, botao) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('active'); el.setAttribute('aria-selected', 'false'); });
       document.getElementById('aba-' + id).classList.add('active');
-      const alvo = btn || event.currentTarget;
+
+      // Sem `event` implicito: quem chama de fora do onclick (o botao da Home)
+      // nao passa botao nenhum, entao caimos na aba correspondente pelo id.
+      const alvo = botao || document.querySelector(`.tab-btn[aria-controls="aba-${id}"]`);
+      if (!alvo) return;
       alvo.classList.add('active');
-      if (alvo.hasAttribute('aria-selected')) alvo.setAttribute('aria-selected', 'true');
+      alvo.setAttribute('aria-selected', 'true');
     }
 
     // ── Init ──
@@ -960,7 +964,17 @@ for item in dados['dados']:
       const campos = ['codigo','excecao','tipo','uf','tabela','descricao','aliquotaNacionalFederal','aliquotaImportadosFederal','aliquotaEstadual','aliquotaMunicipal','vigenciaInicio','vigenciaFim'];
       const val = (r,c) => { const f=campos[c]; return f==='tipo'?r.tipo:f==='uf'?r.uf:f==='tabela'?r.tabela:r.r[f]; };
       todosResultados.sort((a,b) => { let va=val(a,coluna),vb=val(b,coluna); if (typeof va==='number') return ordemCrescente?va-vb:vb-va; return ordemCrescente?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va)); });
-      paginaAtual = 1; renderizarResultados();
+      paginaAtual = 1;
+      atualizarAriaSort();
+      renderizarResultados();
+    }
+
+    /** Marca no cabecalho qual coluna ordena a tabela e em que sentido. */
+    function atualizarAriaSort() {
+      document.querySelectorAll('#tabela-resultados thead th').forEach((th, i) => {
+        if (i === colunaOrdenada) th.setAttribute('aria-sort', ordemCrescente ? 'ascending' : 'descending');
+        else th.setAttribute('aria-sort', 'none');
+      });
     }
 
     function limparFiltros() {
@@ -974,13 +988,29 @@ for item in dados['dados']:
       mostrarTabelaVazia('Nenhum dado para exibir');
       document.getElementById('barra-progresso').style.display = 'none';
       atualizarVersoes(); todosResultados = [];
+      colunaOrdenada = -1; ordemCrescente = true; atualizarAriaSort();
+    }
+
+    // Escapa um campo CSV: aspas envolventes quando ha ; " ou quebra de linha,
+    // com as aspas internas dobradas. O prefixo ' neutraliza a formula que o
+    // Excel executaria num campo iniciado por = + - @.
+    function escaparCsv(valor) {
+      const texto = String(valor ?? '');
+      const seguro = /^[=+\-@\t\r]/.test(texto) ? `'${texto}` : texto;
+      return /[;"\n\r]/.test(seguro) ? `"${seguro.replace(/"/g, '""')}"` : seguro;
     }
 
     function exportarCsv() {
       if (!todosResultados.length) return;
       const h = 'Codigo;Excecao;Tipo;UF;Tabela;Descricao;AliquotaNacionalFederal;AliquotaImportadosFederal;AliquotaEstadual;AliquotaMunicipal;VigenciaInicio;VigenciaFim\n';
-      const l = todosResultados.map(r => `${r.r.codigo};${r.r.excecao};${r.tipo};${r.uf};${r.tabela};"${r.r.descricao}";${r.r.aliquotaNacionalFederal};${r.r.aliquotaImportadosFederal};${r.r.aliquotaEstadual};${r.r.aliquotaMunicipal};${r.r.vigenciaInicio||''};${r.r.vigenciaFim||''}`).join('\n');
-      const blob = new Blob([h+l], {type:'text/csv;charset=utf-8'});
+      const l = todosResultados.map(r => [
+        r.r.codigo, r.r.excecao, r.tipo, r.uf, r.tabela, r.r.descricao,
+        r.r.aliquotaNacionalFederal, r.r.aliquotaImportadosFederal,
+        r.r.aliquotaEstadual, r.r.aliquotaMunicipal,
+        r.r.vigenciaInicio || '', r.r.vigenciaFim || ''
+      ].map(escaparCsv).join(';')).join('\n');
+      // BOM para o Excel reconhecer UTF-8 e nao quebrar a acentuacao
+      const blob = new Blob(['\uFEFF' + h + l], {type:'text/csv;charset=utf-8'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = 'ibpt-consulta.csv'; a.click();
       URL.revokeObjectURL(url);
