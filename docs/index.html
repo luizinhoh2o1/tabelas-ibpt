@@ -3,17 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IBPT API - Consulta de Alíquotas Tributárias</title>
-  <meta name="description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
+  <title>Tabelas IBPT</title>
+  <meta name="description" content="API estática com 100 tabelas IBPTax (2015–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ibpt.valraw.com.br/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ibpt.valraw.com.br/">
-  <meta property="og:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta property="og:description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta name="twitter:description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <meta property="og:title" content="Tabelas IBPT">
+  <meta property="og:description" content="API estática com 100 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
+  <meta property="og:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta property="og:image:width" content="2000">
+  <meta property="og:image:height" content="1000">
+  <meta property="og:image:alt" content="Logo Tabelas IBPT">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta name="twitter:title" content="Tabelas IBPT">
+  <meta name="twitter:description" content="API estática com 100 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/public/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/public/favicon-64x64.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/public/favicon-128x128.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/public/favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="/public/favicon-256x256.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/public/favicon-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180x180.png">
   <!-- Preconnect para fontes e ícones -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,16 +105,9 @@
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--borda-sutil);
     }
-    header .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-    @media (min-width: 768px) { header .container { height: 72px; } }
-    header h1 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    header h1 .logo-icon {
-      width: 32px; height: 32px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--primaria), var(--secundaria));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: #fff;
-    }
-    header h1 span { color: var(--texto-terciario); font-weight: 400; }
+    header .container { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    header h1 { display: flex; align-items: center; }
+    header h1 .logo { height: 38px; width: auto; display: block; }
 
     /* ── Tabs ── */
     .tabs {
@@ -361,7 +369,7 @@
   <header>
     <div class="container">
       <h1>
-        IBPT API <span>/ Alíquotas</span>
+        <img class="logo" src="/public/logo.webp" alt="Tabelas IBPT" width="2000" height="1000">
       </h1>
       <a href="https://github.com/luizinhoh2o1/tabelas-ibpt" target="_blank" aria-label="Ver no GitHub" style="color:var(--texto-terciario);font-size:20px;transition:color 0.2s;"><i class="fab fa-github" aria-hidden="true"></i></a>
     </div>
