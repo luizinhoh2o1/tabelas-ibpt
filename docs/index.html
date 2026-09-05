@@ -497,7 +497,7 @@
           <div class="endpoint-url" id="endpoint-display" style="display:none"><span class="method">GET</span><span id="endpoint-path"></span></div>
         </div>
 
-        <div id="resultados" class="results">
+        <div id="resultados" class="results" hidden>
           <div class="results-header">
             <h3><i class="fas fa-table"></i> <span id="titulo-resultados">Resultados</span></h3>
             <button class="btn btn-ghost" onclick="exportarCsv()" style="font-size:12px;width:auto"><i class="fas fa-download" aria-hidden="true"></i> Exportar CSV</button>
@@ -745,6 +745,7 @@ for item in dados['dados']:
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
 
+      document.getElementById('resultados').hidden = false;
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       document.getElementById('endpoint-display').style.display = 'flex';
       document.getElementById('endpoint-path').textContent = `${API}/todos.csv.gz`;
@@ -815,6 +816,7 @@ for item in dados['dados']:
       const btn = document.getElementById('btn-consultar');
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
+      document.getElementById('resultados').hidden = false;
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       mostrarStatus('Preparando consulta…', true);
       mostrarTabelaVazia('Buscando dados…');
@@ -893,6 +895,7 @@ for item in dados['dados']:
     function limparFiltros() {
       ['f-ano','f-uf','f-tipo','f-versao','f-codigo','f-descricao'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('endpoint-display').style.display = 'none';
+      document.getElementById('resultados').hidden = true;
       mostrarStatus('', false);
       mostrarTabelaVazia('Nenhum dado para exibir');
       document.getElementById('barra-progresso').style.display = 'none';
