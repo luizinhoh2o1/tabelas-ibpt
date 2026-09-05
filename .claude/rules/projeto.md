@@ -66,5 +66,10 @@ globs: "**/*"
 - Fonte dos ZIPs: portal De Olho no Imposto (IBPT) e SVN do Projeto ACBr (SourceForge / espelho GitHub `frones/ACBr`)
 - Tabelas 2015–2016 foram recuperadas do histórico de commits de `frones/ACBr` em `Exemplos/ACBrTCP/ACBrIBPTax/tabela` (o mirror git-svn começa em 2015-03-23)
 - O build detecta automaticamente novos ZIPs em `repositorio-ibpt/` - basta adicionar e rodar `npm run build`
-- Os CSVs precisam estar na RAIZ do ZIP, sem subpasta: `construir.ts` usa `readdirSync` sem `recursive`, entao ZIP com pasta interna e pulado silenciosamente (so um `AVISO` no log, exit code continua 0)
+- Testes em `src/*.test.ts` com `node:test` + `node:assert/strict`, rodados por `npm test` (`tsx --test`). Sem framework, sem dependencia nova
+- O parser CSV (`analisarLinhaCsv`, `pegarCampo`) e exportado so para teste; mudanca nele exige rodar `npm test`
+- ZIPs sao extraidos com `fflate` (JS puro), nao com o binario `unzip`; temporarios em `os.tmpdir()`
+- `extrairZip()` grava cada entrada pelo nome-base, entao CSV dentro de subpasta e achatado automaticamente
+- Nunca montar `metaDados.versoes` a partir da lista de ZIPs: so entra a versao que gerou arquivo (`codigosGerados`), senao o filtro da pagina oferece versao que responde 404
+- ZIP que nao gera dados: o build imprime `ERRO:` com a lista e sai com `process.exitCode = 1`, entao o CI nao publica site parcial
 - 7 ZIPs (17.2.B, 18.2.A, 18.2.B, 21.1.A, 21.1.I, 22.1.B, 23.2.A) vinham do IBPT com os CSVs dentro de pasta e foram achatados em 2026-09-05

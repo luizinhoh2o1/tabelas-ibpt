@@ -106,7 +106,7 @@ npm test             # Testes do parser CSV (runner nativo do Node)
 - Estados de vazio ("Nenhum dado para exibir") e carregamento ("Buscando dados…") dentro da tabela
 - **Spinner de carregamento** ao lado do status de busca durante consultas
 - **Aviso de memória** na aba de pesquisa alertando que consultas sem filtro podem travar o navegador
-- **CSV consolidado** (`todos.csv.gz`) usado automaticamente quando consulta exigiria >50 arquivos individuais
+- **CSVs consolidados por ano** (`todos-{ano}.csv.gz`) usados automaticamente quando a consulta exigiria >50 arquivos individuais; com filtro de ano, só um arquivo é baixado
 - **Sem limite de resultados** - todos os registros encontrados são exibidos
 - Ícones via Font Awesome 6
 - Layout responsivo (mobile-first)

@@ -15,9 +15,11 @@
  * Uso: npx tsx src/construir.ts
  */
 
-import { readdirSync, rmSync, mkdirSync, existsSync, statSync } from 'node:fs';
-import { join } from 'node:path';
-import { execSync } from 'node:child_process';
+import { readdirSync, rmSync, mkdirSync, existsSync, statSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, basename } from 'node:path';
+import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
+import { unzipSync } from 'fflate';
 import { processarCsv, extrairUfDoNomeArquivo, type DadosPorTipo } from './processadorCsv.js';
 import {
   gerarArquivoDados,
@@ -35,7 +37,10 @@ const DIRETORIO_RAIZ = join(import.meta.dirname, '..');
 const DIRETORIO_REPO = join(DIRETORIO_RAIZ, 'repositorio-ibpt');
 const DIRETORIO_DOCS = join(DIRETORIO_RAIZ, 'docs');
 const DIRETORIO_API = join(DIRETORIO_DOCS, 'api');
-const DIRETORIO_TEMP = '/tmp/ibpt_construcao';
+const DIRETORIO_TEMP = join(tmpdir(), 'ibpt_construcao');
+
+/** Nome de diretorio de ano dentro de docs/api (ex: "2026"). */
+const ANO_DIR = /^[0-9]{4}$/;
 
 // ─── Funcoes auxiliares ───────────────────────────────────
 
@@ -73,11 +78,33 @@ function agruparPorAno(arquivos: string[]): Map<number, Versao[]> {
   return porAno;
 }
 
+/**
+ * Extrai um ZIP para `diretorioDestino` usando fflate (JS puro), sem depender
+ * do binario `unzip` do sistema -- que nao existe por padrao no Windows nem
+ * no macOS.
+ *
+ * As entradas sao gravadas pelo nome-base: alguns ZIPs do IBPT trazem os CSVs
+ * dentro de uma subpasta, e o resto do build so olha o nivel raiz.
+ */
 function extrairZip(caminhoZip: string, diretorioDestino: string): boolean {
   try {
-    execSync(`unzip -o "${caminhoZip}" -d "${diretorioDestino}"`, { stdio: 'pipe' });
+    const conteudo = unzipSync(readFileSync(caminhoZip));
+
+    for (const [caminhoInterno, dados] of Object.entries(conteudo)) {
+      if (caminhoInterno.endsWith('/') || dados.length === 0) continue;
+
+      const nome = basename(caminhoInterno);
+      const destino = join(diretorioDestino, nome);
+      if (existsSync(destino)) {
+        console.log(`  AVISO: nome repetido no ZIP, ignorando ${caminhoInterno}`);
+        continue;
+      }
+      writeFileSync(destino, dados);
+    }
+
     return true;
-  } catch {
+  } catch (erro) {
+    console.log(`  AVISO: falha ao extrair: ${(erro as Error).message}`);
     return false;
   }
 }
