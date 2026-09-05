@@ -1,11 +1,25 @@
-import { writeFile, mkdir } from 'node:fs/promises';
-import { createWriteStream } from 'node:fs';
+import { writeFile, mkdir, readFile } from 'node:fs/promises';
+import { createWriteStream, existsSync } from 'node:fs';
 import { createGzip, gzip } from 'node:zlib';
 import { promisify } from 'node:util';
 import { join } from 'node:path';
-import type { ArquivoSaida, Registro, TipoTabela, IndiceVersao, IndiceAno, MetaDados } from './tipos.js';
+import type { ArquivoSaida, Registro, TipoTabela, IndiceVersao, IndiceAno, MetaDados, Manifesto } from './tipos.js';
 
 const gzipAsync = promisify(gzip);
+
+/** Nome do manifesto do build incremental, dentro de docs/api. */
+export const MANIFESTO = '_manifesto.json';
+
+/** Nome do arquivo de metadados publicado na raiz da API. */
+export const META = 'meta.json';
+
+/** Subir esta versao invalida o cache e forca um build completo. */
+export const VERSAO_MANIFESTO = 1;
+
+/** Nome do CSV consolidado de um ano. */
+export function nomeCsvAno(ano: string | number): string {
+  return `todos-${ano}.csv.gz`;
+}
 
 /**
  * Escreve um arquivo JSON comprimido com gzip (.json.gz).
@@ -101,7 +115,27 @@ export async function gerarMetaDados(
   diretorioBase: string,
   meta: MetaDados
 ): Promise<void> {
-  await escreverJson(join(diretorioBase, 'meta.json'), meta);
+  await escreverJson(join(diretorioBase, META), meta);
+}
+
+/**
+ * Le o manifesto do build anterior. Retorna null quando nao existe ou esta
+ * corrompido -- nesses casos o build simplesmente refaz tudo.
+ */
+export async function lerManifesto(diretorioBase: string): Promise<Manifesto | null> {
+  const caminho = join(diretorioBase, MANIFESTO);
+  if (!existsSync(caminho)) return null;
+
+  try {
+    const manifesto = JSON.parse(await readFile(caminho, 'utf-8')) as Manifesto;
+    return manifesto.versao === VERSAO_MANIFESTO ? manifesto : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function gravarManifesto(diretorioBase: string, manifesto: Manifesto): Promise<void> {
+  await escreverJson(join(diretorioBase, MANIFESTO), manifesto);
 }
 
 // ─── CSV consolidado (streaming) ─────────────────────────

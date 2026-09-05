@@ -35,7 +35,7 @@ A pesquisa na página interativa é inteiramente **client-side** - não existe b
 1. Metadados carregados ao abrir a página (anos, versões, UFs, tipos).
 2. 6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.
 3. Arquivos baixados em lotes paralelos de 8, descomprimidos com `DecompressionStream`.
-4. Consultas amplas (>50 arquivos) usam o CSV consolidado `todos.csv.gz` via streaming.
+4. Consultas amplas (>50 arquivos) usam os CSVs consolidados por ano (`todos-{ano}.csv.gz`) via streaming.
 5. Resultados em tabela com 12 colunas, paginados (100/página), ordenáveis, exportáveis como CSV.
 
 Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca com ano + versão + tipo + UF específicos baixa apenas 1 arquivo (~190 KB).
@@ -59,7 +59,7 @@ Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca c
 | `/api/{ano}/{tabela}/index.json` | Índice de uma versão/tabela específica |
 | `/api/{ano}/{tabela}/{tipo}/index.json` | Índice por tipo com contagem por UF |
 | `/api/{ano}/{tabela}/{tipo}/{uf}.json.gz` | Dados completos (gzip) |
-| `/api/todos.csv.gz` | CSV consolidado com todos os registros (gzip) |
+| `/api/todos-{ano}.csv.gz` | CSV consolidado de um ano, com todas as versões, tipos e UFs (gzip) |
 
 ### Parâmetros
 

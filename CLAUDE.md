@@ -38,7 +38,7 @@ repositorio-ibpt/   → ZIPs originais do IBPT (rastreados neste repo, nao e sub
 /api/{ano}/{tabela}/index.json         → Índice da versão
 /api/{ano}/{tabela}/{tipo}/index.json  → Índice por tipo
 /api/{ano}/{tabela}/{tipo}/{uf}.json.gz → Dados comprimidos
-/api/todos.csv.gz                      → CSV consolidado com todos os registros
+/api/todos-{ano}.csv.gz                → CSV consolidado de um ano (todas as versões/tipos/UFs)
 /api/{ano}/{tabela}/{tipo}/{uf}        → Rota sem extensão (404.html descomprime e exibe)
 ```
 
@@ -132,7 +132,9 @@ npm test             # Testes do parser CSV (runner nativo do Node)
 
 - Arquivos em `docs/api/` são gerados pelo build e estão no `.gitignore` - nunca editar manualmente
 - Os ZIPs em `repositorio-ibpt/` sao rastreados diretamente neste repositorio (nao ha `.gitmodules`)
-- **CSVs devem ficar na raiz do ZIP.** `construir.ts` le apenas o nivel raiz (`readdirSync` sem `recursive`), entao ZIP com CSV dentro de subpasta e pulado com `AVISO: Nenhum CSV em ...` e o build ainda sai com codigo 0. Ao adicionar um ZIP novo, conferir e achatar se preciso
+- **Parser CSV coberto por testes** em `src/processadorCsv.test.ts` (`node:test` + `node:assert`, sem dependencia extra). Roda no CI antes do build. Ao mexer em `analisarLinhaCsv`/`pegarCampo`, rodar `npm test`
+- **Extracao dos ZIPs em JS puro** (`fflate`), sem depender do binario `unzip` do sistema; o diretorio temporario vem de `os.tmpdir()`. Cada entrada e gravada pelo nome-base, entao ZIP com CSV dentro de subpasta e achatado na extracao
+- **ZIP que nao gera dados nao entra no `meta.json`** e faz o build sair com codigo 1. `metaDados.versoes` e montado a partir do que virou arquivo, nunca da listagem de ZIPs - caso contrario a pagina oferece no filtro uma versao cujos endpoints respondem 404
 - O `404.html` intercepta rotas sem extensão e descomprime/exibe o JSON no browser
 - Textos visíveis ao usuário (HTML, README) devem ter acentuação correta em português
 - Os CSVs consolidados (`todos-{ano}.csv.gz`) são gerados via streaming (createGzip), um por ano, para não acumular memória

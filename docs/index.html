@@ -537,7 +537,7 @@
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/index.json</div><div class="path-desc">Índice de uma versão/tabela. Ex: <code>/api/2026/26.1.H/index.json</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/index.json</div><div class="path-desc">Índice por tipo com contagem por UF. Ex: <code>/api/2026/26.1.H/ncm/index.json</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/{uf}.json.gz</div><div class="path-desc">Dados completos (gzip). Ex: <code>/api/2026/26.1.H/ncm/SP.json.gz</code></div></div></li>
-          <li><span class="method">GET</span><div><div class="path">/api/todos.csv.gz</div><div class="path-desc">CSV consolidado com todos os registros (gzip). Usado para consultas amplas.</div></div></li>
+          <li><span class="method">GET</span><div><div class="path">/api/todos-{ano}.csv.gz</div><div class="path-desc">CSV consolidado de um ano, com todas as versões, tipos e UFs (gzip). Usado nas consultas amplas. Ex: <code>/api/todos-2026.csv.gz</code></div></div></li>
         </ul>
 
         <h3><i class="fas fa-code"></i> Formato de Resposta</h3>
@@ -602,7 +602,7 @@ for item in dados['dados']:
           <li>Metadados carregados ao abrir a página (anos, versões, UFs, tipos).</li>
           <li>6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.</li>
           <li>Arquivos buscados em lotes paralelos de <span class="est-lote">8</span>, descomprimidos com DecompressionStream.</li>
-          <li>Consultas amplas (&gt;<span class="est-limite-arquivos">50</span> arquivos) usam o CSV consolidado <code>todos.csv.gz</code> via streaming.</li>
+          <li>Consultas amplas (&gt;<span class="est-limite-arquivos">50</span> arquivos) usam os CSVs consolidados por ano (<code>todos-{ano}.csv.gz</code>) via streaming: com filtro de ano, só um arquivo é baixado.</li>
           <li>Resultados em tabela com 12 colunas (incluindo vigência), paginados (<span class="est-pagina">100</span>/página), ordenáveis, exportáveis como CSV.</li>
         </ol>
 
@@ -649,6 +649,7 @@ for item in dados['dados']:
     const TAMANHO_PAGINA = 100;
     const LOTE_ARQUIVOS = 8;      // requisicoes paralelas por lote
     const LIMITE_ARQUIVOS = 50;   // acima disso, usa o CSV consolidado
+    const csvDoAno = ano => `todos-${ano}.csv.gz`;
     let colunaOrdenada = -1;
     let ordemCrescente = true;
     let controleConsulta = null;
@@ -789,53 +790,66 @@ for item in dados['dados']:
       controleConsulta = new AbortController();
       const sinal = controleConsulta.signal;
 
+      // O CSV consolidado e dividido por ano. Com filtro de ano so um arquivo e
+      // baixado; sem filtro, os anos sao percorridos do mais recente ao mais antigo.
+      const anosAlvo = ano ? [ano] : metaDados.anos.map(String);
+
       document.getElementById('resultados').hidden = false;
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       document.getElementById('endpoint-display').style.display = 'flex';
-      document.getElementById('endpoint-path').textContent = `${API}/todos.csv.gz`;
+      document.getElementById('endpoint-path').textContent = anosAlvo.length === 1
+        ? `${API}/${csvDoAno(anosAlvo[0])}`
+        : `${API}/${csvDoAno('{ano}')} (${anosAlvo.length} anos)`;
       mostrarStatus('Baixando CSV consolidado…', true);
       mostrarTabelaVazia('Buscando dados…');
       todosResultados = [];
 
-      try {
-        const resp = await fetch(`${API}/todos.csv.gz`, { signal: sinal });
-        if (!resp.ok) throw new Error('Falha');
-        const total = parseInt(resp.headers.get('Content-Length') || '0');
-        const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream());
-        const leitor = fluxo.getReader();
-        let buf = '', skip = false, bytes = 0, linhas = 0;
+      let linhas = 0;
 
-        while (true) {
-          if (sinal.aborted) { await leitor.cancel(); return; }
-          const { done, value } = await leitor.read();
-          if (done) break;
-          buf += value; bytes += value.length;
-          let idx;
-          while ((idx = buf.indexOf('\n')) !== -1) {
-            const linha = buf.substring(0, idx); buf = buf.substring(idx + 1);
-            if (!skip) { skip = true; continue; }
-            if (!linha) continue;
-            const c = linha.split(';');
-            if (c.length < 13) continue;
-            if (ano && c[0] !== ano) continue;
-            if (versao && c[1] !== versao) continue;
-            if (tipo && c[2] !== tipo) continue;
-            if (uf && c[3] !== uf) continue;
-            if (codigo && !c[4].startsWith(codigo)) continue;
-            const desc = c[6].replace(/^"|"$/g, '').replace(/""/g, '"');
-            if (descricao && !desc.toLowerCase().includes(descricao)) continue;
-            const vi = c[11] || '', vf = c[12] || '';
-            todosResultados.push({
-              ano: c[0], tabela: c[1], tipo: c[2], uf: c[3],
-              r: { codigo: c[4], excecao: c[5].replace(/^"|"$/g,'').replace(/""/g,'"'), descricao: desc,
-                aliquotaNacionalFederal: parseFloat(c[7])||0, aliquotaImportadosFederal: parseFloat(c[8])||0,
-                aliquotaEstadual: parseFloat(c[9])||0, aliquotaMunicipal: parseFloat(c[10])||0,
-                vigenciaInicio: vi, vigenciaFim: vf }
-            });
-            linhas++;
+      try {
+        for (let i = 0; i < anosAlvo.length; i++) {
+          if (sinal.aborted) return;
+          const anoAtual = anosAlvo[i];
+
+          const resp = await fetch(`${API}/${csvDoAno(anoAtual)}`, { signal: sinal });
+          if (!resp.ok) continue;   // ano sem shard publicado: segue para o proximo
+
+          const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream());
+          const leitor = fluxo.getReader();
+          let buf = '', skip = false;
+
+          while (true) {
+            if (sinal.aborted) { await leitor.cancel(); return; }
+            const { done, value } = await leitor.read();
+            if (done) break;
+            buf += value;
+            let idx;
+            while ((idx = buf.indexOf('\n')) !== -1) {
+              const linha = buf.substring(0, idx); buf = buf.substring(idx + 1);
+              if (!skip) { skip = true; continue; }
+              if (!linha) continue;
+              const c = linha.split(';');
+              if (c.length < 13) continue;
+              if (versao && c[1] !== versao) continue;
+              if (tipo && c[2] !== tipo) continue;
+              if (uf && c[3] !== uf) continue;
+              if (codigo && !c[4].startsWith(codigo)) continue;
+              const desc = c[6].replace(/^"|"$/g, '').replace(/""/g, '"');
+              if (descricao && !desc.toLowerCase().includes(descricao)) continue;
+              const vi = c[11] || '', vf = c[12] || '';
+              todosResultados.push({
+                ano: c[0], tabela: c[1], tipo: c[2], uf: c[3],
+                r: { codigo: c[4], excecao: c[5].replace(/^"|"$/g,'').replace(/""/g,'"'), descricao: desc,
+                  aliquotaNacionalFederal: parseFloat(c[7])||0, aliquotaImportadosFederal: parseFloat(c[8])||0,
+                  aliquotaEstadual: parseFloat(c[9])||0, aliquotaMunicipal: parseFloat(c[10])||0,
+                  vigenciaInicio: vi, vigenciaFim: vf }
+              });
+              linhas++;
+            }
+            mostrarStatus(`Processando ${anoAtual}… ${linhas.toLocaleString('pt-BR')} linhas`, true);
           }
-          if (total > 0) fill.style.width = Math.min(100, (bytes/total)*30) + '%';
-          mostrarStatus(`Processando… ${linhas.toLocaleString('pt-BR')} linhas`, true);
+
+          fill.style.width = ((i + 1) / anosAlvo.length) * 100 + '%';
         }
       } catch (e) {
         if (sinal.aborted || e.name === 'AbortError') return;

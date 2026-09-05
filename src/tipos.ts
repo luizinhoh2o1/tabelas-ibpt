@@ -48,6 +48,27 @@ export interface IndiceAno {
   totalRegistros: number;
 }
 
+/** Totais de um ano ja construido, guardados para o build incremental */
+export interface AnoNoManifesto {
+  /** sha256 de cada ZIP do ano, no momento em que o ano foi construido */
+  hashes: Record<string, string>;
+  /** Codigos das versoes que geraram arquivos, na ordem do indice */
+  versoes: string[];
+  registros: number;
+  bytesCsv: number;
+  porTipo: Record<TipoTabela, { registros: number; ufs: number }>;
+  /** ZIPs do ano que falharam, para o build seguinte tornar a reclamar */
+  ignorados: string[];
+}
+
+/** Estado do ultimo build, usado para pular anos que nao mudaram */
+export interface Manifesto {
+  versao: number;
+  /** sha256 dos fontes do build; se mudar, o cache inteiro e descartado */
+  codigoHash: string;
+  anos: Record<string, AnoNoManifesto>;
+}
+
 /** Numeros do build, consumidos pela pagina para nao ter valor fixo no HTML */
 export interface Estatisticas {
   /** ISO 8601 do momento em que o build terminou */
