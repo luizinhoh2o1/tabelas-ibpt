@@ -48,9 +48,32 @@ export interface IndiceAno {
   totalRegistros: number;
 }
 
+/** Numeros do build, consumidos pela pagina para nao ter valor fixo no HTML */
+export interface Estatisticas {
+  /** ISO 8601 do momento em que o build terminou */
+  geradoEm: string;
+  duracaoSegundos: number;
+  /** Total de versoes (ZIPs) processadas */
+  tabelas: number;
+  anoInicial: number;
+  anoFinal: number;
+  totalRegistros: number;
+  /** Arquivos publicados em docs/api (json.gz, index.json, csv.gz e meta.json) */
+  arquivosGerados: number;
+  /** Soma dos CSVs extraidos dos ZIPs, antes da compressao */
+  bytesCsvBruto: number;
+  /** Soma dos arquivos publicados, ja comprimidos */
+  bytesComprimido: number;
+  /** Reducao percentual de bytesCsvBruto para bytesComprimido */
+  reducaoPercentual: number;
+  /** Media de registros por UF em cada tipo, sobre todas as versoes */
+  registrosPorUf: Record<TipoTabela, number>;
+}
+
 export interface MetaDados {
   anos: number[];
   tipos: Record<TipoTabela, string>;
   ufs: string[];
   versoes: Record<string, string[]>;
+  estatisticas: Estatisticas;
 }

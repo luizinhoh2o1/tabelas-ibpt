@@ -29,7 +29,7 @@ import {
   type FluxoCsvGz
 } from './geradorJson.js';
 import { UFS, ROTULO_TIPO, TIPOS } from './constantes.js';
-import type { Versao, TipoTabela, IndiceVersao, IndiceAno, MetaDados } from './tipos.js';
+import type { Versao, TipoTabela, IndiceVersao, IndiceAno, MetaDados, Estatisticas } from './tipos.js';
 
 const DIRETORIO_RAIZ = join(import.meta.dirname, '..');
 const DIRETORIO_REPO = join(DIRETORIO_RAIZ, 'repositorio-ibpt');
@@ -104,11 +104,19 @@ function contarArquivosEtamanho(diretorio: string): { arquivos: number; tamanho:
 
 // ─── Processamento principal ──────────────────────────────
 
+interface ResultadoVersao {
+  registros: number;
+  /** Soma dos CSVs extraidos do ZIP, antes de comprimir */
+  bytesCsv: number;
+  /** Por tipo: total de registros e quantas UFs geraram arquivo */
+  porTipo: Record<TipoTabela, { registros: number; ufs: number }>;
+}
+
 async function processarVersao(
   versao: Versao,
   diretorioApi: string,
   fluxoCsv: FluxoCsvGz
-): Promise<{ registros: number } | null> {
+): Promise<ResultadoVersao | null> {
   const diretorioExtracao = join(DIRETORIO_TEMP, versao.codigo);
   mkdirSync(diretorioExtracao, { recursive: true });
 
@@ -119,6 +127,10 @@ async function processarVersao(
   }
 
   const arquivosCsv = readdirSync(diretorioExtracao).filter(f => f.endsWith('.csv'));
+  const bytesCsv = arquivosCsv.reduce(
+    (soma, f) => soma + statSync(join(diretorioExtracao, f)).size,
+    0
+  );
   if (arquivosCsv.length === 0) {
     console.log(`  AVISO: Nenhum CSV em ${versao.arquivo}`);
     rmSync(diretorioExtracao, { recursive: true });
@@ -162,6 +174,7 @@ async function processarVersao(
     tipos: {} as IndiceVersao['tipos']
   };
   let totalRegistros = 0;
+  const porTipo = {} as ResultadoVersao['porTipo'];
 
   for (const tipo of TIPOS) {
     const contagemTipo = { total: 0, ufs: {} as Record<string, number> };
@@ -184,6 +197,7 @@ async function processarVersao(
     );
 
     indiceVersao.tipos[tipo] = contagemTipo;
+    porTipo[tipo] = { registros: contagemTipo.total, ufs: Object.keys(contagemTipo.ufs).length };
     totalRegistros += contagemTipo.total;
   }
 
@@ -195,7 +209,7 @@ async function processarVersao(
   // Limpar arquivos extraidos
   rmSync(diretorioExtracao, { recursive: true });
 
-  return { registros: totalRegistros };
+  return { registros: totalRegistros, bytesCsv, porTipo };
 }
 
 async function construir(): Promise<void> {
@@ -226,7 +240,18 @@ async function construir(): Promise<void> {
     anos: [],
     tipos: ROTULO_TIPO,
     ufs: [...UFS],
-    versoes: {}
+    versoes: {},
+    // Preenchido no fim, quando os totais do build sao conhecidos
+    estatisticas: {} as Estatisticas
+  };
+
+  let bytesCsvBruto = 0;
+  let totalRegistros = 0;
+  let versoesProcessadas = 0;
+  const acumuladoPorTipo: Record<TipoTabela, { registros: number; ufs: number }> = {
+    ncm: { registros: 0, ufs: 0 },
+    nbs: { registros: 0, ufs: 0 },
+    lc116: { registros: 0, ufs: 0 }
   };
 
   for (const ano of anos) {
@@ -245,6 +270,14 @@ async function construir(): Promise<void> {
       const resultado = await processarVersao(versao, DIRETORIO_API, fluxoCsv);
 
       if (resultado) {
+        bytesCsvBruto += resultado.bytesCsv;
+        totalRegistros += resultado.registros;
+        versoesProcessadas++;
+        for (const tipo of TIPOS) {
+          acumuladoPorTipo[tipo].registros += resultado.porTipo[tipo].registros;
+          acumuladoPorTipo[tipo].ufs += resultado.porTipo[tipo].ufs;
+        }
+
         indiceAno.versoes.push({
           tabela: versao.codigo,
           semestre: versao.semestre,
@@ -260,19 +293,48 @@ async function construir(): Promise<void> {
   }
 
   metaDados.anos.sort((a, b) => b - a);
-  await gerarMetaDados(DIRETORIO_API, metaDados);
 
   // Finalizar CSV consolidado
   await fluxoCsv.finalizar();
   console.log('CSV consolidado gerado: todos.csv.gz');
 
-  // Estatisticas finais
+  // Estatisticas finais. O meta.json ainda nao existe neste ponto, entao somamos
+  // 1 ao total de arquivos para contar o proprio meta.json escrito logo abaixo.
   const { arquivos, tamanho } = contarArquivosEtamanho(DIRETORIO_API);
-  const duracao = ((performance.now() - inicio) / 1000).toFixed(1);
+  const duracao = (performance.now() - inicio) / 1000;
+  const mediaPorUf = (tipo: TipoTabela) => {
+    const { registros, ufs } = acumuladoPorTipo[tipo];
+    return ufs > 0 ? Math.round(registros / ufs) : 0;
+  };
 
-  console.log(`\nConstrucao concluida em ${duracao}s!`);
-  console.log(`Arquivos JSON: ${arquivos}`);
-  console.log(`Tamanho total: ${(tamanho / 1024 / 1024).toFixed(1)} MB (comprimido com gzip)`);
+  metaDados.estatisticas = {
+    geradoEm: new Date().toISOString(),
+    duracaoSegundos: Number(duracao.toFixed(1)),
+    tabelas: versoesProcessadas,
+    anoInicial: anos[0],
+    anoFinal: anos[anos.length - 1],
+    totalRegistros,
+    arquivosGerados: arquivos + 1,
+    bytesCsvBruto,
+    bytesComprimido: tamanho,
+    reducaoPercentual: bytesCsvBruto > 0
+      ? Math.round((1 - tamanho / bytesCsvBruto) * 100)
+      : 0,
+    registrosPorUf: {
+      ncm: mediaPorUf('ncm'),
+      nbs: mediaPorUf('nbs'),
+      lc116: mediaPorUf('lc116')
+    }
+  };
+
+  await gerarMetaDados(DIRETORIO_API, metaDados);
+
+  console.log(`
+Construcao concluida em ${duracao.toFixed(1)}s!`);
+  console.log(`Arquivos gerados: ${metaDados.estatisticas.arquivosGerados}`);
+  console.log(`CSV bruto: ${(bytesCsvBruto / 1024 / 1024 / 1024).toFixed(2)} GB`);
+  console.log(`Tamanho total: ${(tamanho / 1024 / 1024).toFixed(1)} MB (gzip, -${metaDados.estatisticas.reducaoPercentual}%)`);
+  console.log(`Registros: ${totalRegistros.toLocaleString('pt-BR')}`);
 }
 
 construir().catch(erro => {

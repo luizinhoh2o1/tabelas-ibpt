@@ -33,7 +33,7 @@ repositorio-ibpt/   → ZIPs originais do IBPT (rastreados neste repo, nao e sub
 ## Endpoints da API
 
 ```
-/api/meta.json                         → Metadados (anos, versões, tipos, UFs)
+/api/meta.json                         → Metadados (anos, versões, tipos, UFs) + estatísticas do build
 /api/{ano}/index.json                  → Índice do ano
 /api/{ano}/{tabela}/index.json         → Índice da versão
 /api/{ano}/{tabela}/{tipo}/index.json  → Índice por tipo

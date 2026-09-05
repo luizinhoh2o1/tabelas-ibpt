@@ -54,7 +54,7 @@ Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca c
 
 | Endpoint | Descrição |
 |---|---|
-| `/api/meta.json` | Metadados: anos disponíveis, versões, tipos e UFs |
+| `/api/meta.json` | Metadados: anos disponíveis, versões, tipos, UFs e `estatisticas` do build |
 | `/api/{ano}/index.json` | Índice do ano com todas as versões |
 | `/api/{ano}/{tabela}/index.json` | Índice de uma versão/tabela específica |
 | `/api/{ano}/{tabela}/{tipo}/index.json` | Índice por tipo com contagem por UF |

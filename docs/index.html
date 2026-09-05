@@ -436,7 +436,7 @@
       <div class="features">
         <div class="feature-card">
           <h3>Compressão Gzip</h3>
-          <p>Dados comprimidos com gzip nível 9. De ~4,5 GB de CSV bruto para ~542 MB (88% de redução). Descompressão automática no navegador.</p>
+          <p>Dados comprimidos com gzip nível 9. De ~<span class="est-csv-bruto">4,5 GB</span> de CSV bruto para ~<span class="est-comprimido">542 MB</span> (<span class="est-reducao">88%</span> de redução). Descompressão automática no navegador.</p>
         </div>
         <div class="feature-card">
           <h3>100% Client-Side</h3>
@@ -444,7 +444,7 @@
         </div>
         <div class="feature-card">
           <h3>Todas as Versões</h3>
-          <p>99 tabelas de 2015 a 2026. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
+          <p><span class="est-tabelas">100</span> tabelas de <span class="est-ano-inicial">2015</span> a <span class="est-ano-final">2026</span>, <span class="est-registros">32.652.402</span> registros. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
         </div>
       </div>
     </div>
@@ -592,7 +592,7 @@ for item in dados['dados']:
         </ul>
 
         <h3><i class="fas fa-compress-alt"></i> Compressão</h3>
-        <p>Dados originais: ~4,5 GB de CSV bruto. Após gzip nível 9: ~542 MB (<strong>88% de redução</strong>).</p>
+        <p>Dados originais: ~<span class="est-csv-bruto">4,5 GB</span> de CSV bruto. Após gzip nível 9: ~<span class="est-comprimido">542 MB</span> (<strong><span class="est-reducao">88%</span> de redução</strong>) em <span class="est-arquivos">7.890</span> arquivos.</p>
         <ul>
           <li>Dados: <code>.json.gz</code> (comprimidos)</li>
           <li>Índices: <code>.json</code> (sem compressão)</li>
@@ -603,9 +603,9 @@ for item in dados['dados']:
         <ol>
           <li>Metadados carregados ao abrir a página (anos, versões, UFs, tipos).</li>
           <li>6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.</li>
-          <li>Arquivos buscados em lotes paralelos de 8, descomprimidos com DecompressionStream.</li>
-          <li>Consultas amplas (&gt;50 arquivos) usam o CSV consolidado <code>todos.csv.gz</code> via streaming.</li>
-          <li>Resultados em tabela com 12 colunas (incluindo vigência), paginados (100/página), ordenáveis, exportáveis como CSV.</li>
+          <li>Arquivos buscados em lotes paralelos de <span class="est-lote">8</span>, descomprimidos com DecompressionStream.</li>
+          <li>Consultas amplas (&gt;<span class="est-limite-arquivos">50</span> arquivos) usam o CSV consolidado <code>todos.csv.gz</code> via streaming.</li>
+          <li>Resultados em tabela com 12 colunas (incluindo vigência), paginados (<span class="est-pagina">100</span>/página), ordenáveis, exportáveis como CSV.</li>
         </ol>
 
         <h3><i class="fas fa-cubes"></i> Tipos de Dados</h3>
@@ -635,6 +635,8 @@ for item in dados['dados']:
       Dados: <a href="https://ibpt.com.br" target="_blank">IBPT</a>
       <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Licença: Apache 2.0
+      <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
+      Build: <span class="est-gerado-em">—</span>
       <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Powered by <a href="https://valraw.com.br" target="_blank" style="font-weight:600"><span class="gradient-text">VALRAW</span></a>
     </div>
@@ -681,6 +683,7 @@ for item in dados['dados']:
         metaDados = await resp.json();
         popularFiltros();
         mostrarEstatisticas();
+        preencherTextosDinamicos();
         document.getElementById('base-url-ep').textContent = location.origin + BASE;
       } catch (e) {
         console.error('Falha ao carregar metadados:', e);
@@ -727,6 +730,42 @@ for item in dados['dados']:
         <div class="stat-card"><div class="value">${metaDados.ufs.length}</div><div class="label">Estados</div></div>
         <div class="stat-card"><div class="value">3</div><div class="label">Tipos</div></div>
       `;
+    }
+
+    // ── Textos dinamicos (Home e Informacoes) ──
+    // Os valores no HTML sao apenas fallback; o meta.json gerado no build manda.
+    function preencherTextosDinamicos() {
+      const definir = (classe, valor) => {
+        document.querySelectorAll('.' + classe).forEach(el => { el.textContent = valor; });
+      };
+      const num = n => n.toLocaleString('pt-BR');
+
+      // Constantes da propria pagina, para a prosa nunca divergir do codigo
+      definir('est-lote', num(LOTE_ARQUIVOS));
+      definir('est-limite-arquivos', num(LIMITE_ARQUIVOS));
+      definir('est-pagina', num(TAMANHO_PAGINA));
+
+      const e = metaDados && metaDados.estatisticas;
+      if (!e) return;
+
+      const tamanho = bytes => bytes >= 1024 ** 3
+        ? (bytes / 1024 ** 3).toFixed(1).replace('.', ',') + ' GB'
+        : num(Math.round(bytes / 1024 ** 2)) + ' MB';
+
+      definir('est-csv-bruto', tamanho(e.bytesCsvBruto));
+      definir('est-comprimido', tamanho(e.bytesComprimido));
+      definir('est-reducao', e.reducaoPercentual + '%');
+      definir('est-tabelas', num(e.tabelas));
+      definir('est-ano-inicial', e.anoInicial);
+      definir('est-ano-final', e.anoFinal);
+      definir('est-registros', num(e.totalRegistros));
+      definir('est-arquivos', num(e.arquivosGerados));
+      definir('est-ncm-uf', num(e.registrosPorUf.ncm));
+      definir('est-nbs-uf', num(e.registrosPorUf.nbs));
+      definir('est-lc116-uf', num(e.registrosPorUf.lc116));
+      if (e.geradoEm) {
+        definir('est-gerado-em', new Date(e.geradoEm).toLocaleString('pt-BR'));
+      }
     }
 
     // ── Fetch ──
