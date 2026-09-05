@@ -1,4 +1,4 @@
-> **AVISO:** Os dados contidos neste repositório **não são atualizados em tempo real**. As tabelas são utilizadas apenas para **consulta histórica** e **não é recomendado o uso em sistemas reais de produção**, apesar dos documentos contidos no repositório serem tabelas oficiais publicadas pelo IBPT (Instituto Brasileiro de Planejamento e Tributação). Use por conta e risco em produção.
+> **AVISO:** Os dados contidos neste repositório **não são atualizados em tempo real**, apesar dos documentos contidos no repositório serem tabelas oficiais publicadas pelo IBPT (Instituto Brasileiro de Planejamento e Tributação). Use por conta e risco em produção.
 
 # Repositório de Tabelas IBPT - API Estática
 
@@ -30,7 +30,7 @@ Descompressão: navegador (nativo via `DecompressionStream`), terminal (`curl UR
 
 ### Pesquisa
 
-A pesquisa na página interativa é inteiramente **client-side** — não existe backend.
+A pesquisa na página interativa é inteiramente **client-side** - não existe backend.
 
 1. Metadados carregados ao abrir a página (anos, versões, UFs, tipos).
 2. 6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.
@@ -74,9 +74,9 @@ Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca c
 
 | Tipo | Nome | Descrição | Registros/UF |
 |---|---|---|---|
-| `ncm` | Nomenclatura Comum do Mercosul | Produtos — 8 dígitos | ~11.000 |
-| `nbs` | Nomenclatura Brasileira de Serviços | Serviços — 9 dígitos | ~860 |
-| `lc116` | Lei Complementar 116 | Serviços municipais — 4 dígitos | ~200 |
+| `ncm` | Nomenclatura Comum do Mercosul | Produtos - 8 dígitos | ~11.000 |
+| `nbs` | Nomenclatura Brasileira de Serviços | Serviços - 9 dígitos | ~860 |
+| `lc116` | Lei Complementar 116 | Serviços municipais - 4 dígitos | ~200 |
 
 ---
 
@@ -134,8 +134,8 @@ Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
 | 2023 | 23.1.A–G, 23.2.A–F | 13 |
 | 2024 | 24.1.A–F, 24.2.A–F | 12 |
 | 2025 | 25.1.A–F, 25.2.A–H | 14 |
-| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L | 7 |
-| **Total** | | **99** |
+| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A | 8 |
+| **Total** | | **100** |
 
 **UFs:** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO
 
@@ -168,8 +168,8 @@ O deploy é automático via **GitHub Actions**. A cada push na branch `main`/`ma
 
 Este projeto inclui arquivos de configuração para o [Claude Code](https://claude.com/claude-code), facilitando o uso de IA para desenvolvimento e manutenção:
 
-- **`CLAUDE.md`** — Guia principal com estrutura do projeto, convenções, comandos e regras
-- **`.claude/rules/`** — Regras automáticas de nomenclatura, tecnologias e padrões de código
+- **`CLAUDE.md`** - Guia principal com estrutura do projeto, convenções, comandos e regras
+- **`.claude/rules/`** - Regras automáticas de nomenclatura, tecnologias e padrões de código
 
 Ao abrir o projeto com Claude Code, essas configurações são carregadas automaticamente, garantindo que a IA siga as convenções do projeto (nomenclatura em português, compressão gzip, TypeScript ESM, etc.).
 

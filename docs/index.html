@@ -33,10 +33,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <!-- Google Fonts — carregamento não-bloqueante -->
+  <!-- Google Fonts - carregamento não-bloqueante -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap"></noscript>
-  <!-- Font Awesome — carregamento não-bloqueante -->
+  <!-- Font Awesome - carregamento não-bloqueante -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <style>
@@ -426,8 +426,6 @@
         <i class="fas fa-exclamation-triangle"></i>
         <div>
           <strong>AVISO:</strong> Os dados contidos neste repositório não são atualizados em tempo real.
-          As tabelas são utilizadas apenas para <strong>consulta histórica</strong> e não é recomendado
-          o uso em sistemas reais de produção.
         </div>
       </div>
 
@@ -511,10 +509,10 @@
                 <th onclick="ordenarPor(3)" data-tooltip="Unidade Federativa (estado brasileiro)"><i class="fas fa-map-marker-alt"></i> UF</th>
                 <th onclick="ordenarPor(4)" data-tooltip="Versão da tabela IBPTax (semestre.revisão)">Tabela</th>
                 <th onclick="ordenarPor(5)" data-tooltip="Descrição do produto ou serviço">Descrição</th>
-                <th onclick="ordenarPor(6)" class="num" data-tooltip="Alíquota Nacional Federal — tributos federais sobre produtos/serviços nacionais">Nac. Federal</th>
-                <th onclick="ordenarPor(7)" class="num" data-tooltip="Alíquota Importados Federal — tributos federais sobre produtos/serviços importados">Imp. Federal</th>
-                <th onclick="ordenarPor(8)" class="num" data-tooltip="Alíquota Estadual — ICMS e outros tributos estaduais">Estadual</th>
-                <th onclick="ordenarPor(9)" class="num" data-tooltip="Alíquota Municipal — ISS e outros tributos municipais">Municipal</th>
+                <th onclick="ordenarPor(6)" class="num" data-tooltip="Alíquota Nacional Federal - tributos federais sobre produtos/serviços nacionais">Nac. Federal</th>
+                <th onclick="ordenarPor(7)" class="num" data-tooltip="Alíquota Importados Federal - tributos federais sobre produtos/serviços importados">Imp. Federal</th>
+                <th onclick="ordenarPor(8)" class="num" data-tooltip="Alíquota Estadual - ICMS e outros tributos estaduais">Estadual</th>
+                <th onclick="ordenarPor(9)" class="num" data-tooltip="Alíquota Municipal - ISS e outros tributos municipais">Municipal</th>
                 <th onclick="ordenarPor(10)" data-tooltip="Data de início da vigência da tabela">Início Vig.</th>
                 <th onclick="ordenarPor(11)" data-tooltip="Data de fim da vigência da tabela">Fim Vig.</th>
               </tr></thead>
@@ -596,7 +594,7 @@ for item in dados['dados']:
         <ul>
           <li>Dados: <code>.json.gz</code> (comprimidos)</li>
           <li>Índices: <code>.json</code> (sem compressão)</li>
-          <li>Browser: <code>DecompressionStream('gzip')</code> — nativo (Chrome 80+, Firefox 113+, Safari 16.4+)</li>
+          <li>Browser: <code>DecompressionStream('gzip')</code> - nativo (Chrome 80+, Firefox 113+, Safari 16.4+)</li>
         </ul>
 
         <h3><i class="fas fa-search"></i> Pesquisa Client-Side</h3>
@@ -610,16 +608,16 @@ for item in dados['dados']:
 
         <h3><i class="fas fa-cubes"></i> Tipos de Dados</h3>
         <ul>
-          <li><span class="badge badge-ncm">NCM</span> <strong>Nomenclatura Comum do Mercosul</strong> — Produtos, 8 dígitos, ~11.000/UF</li>
-          <li><span class="badge badge-nbs">NBS</span> <strong>Nomenclatura Brasileira de Serviços</strong> — Serviços, 9 dígitos, ~860/UF</li>
-          <li><span class="badge badge-lc116">LC116</span> <strong>Lei Complementar 116</strong> — Serviços municipais, 4 dígitos, ~200/UF</li>
+          <li><span class="badge badge-ncm">NCM</span> <strong>Nomenclatura Comum do Mercosul</strong> - Produtos, 8 dígitos, ~<span class="est-ncm-uf">11.000</span>/UF</li>
+          <li><span class="badge badge-nbs">NBS</span> <strong>Nomenclatura Brasileira de Serviços</strong> - Serviços, 9 dígitos, ~<span class="est-nbs-uf">860</span>/UF</li>
+          <li><span class="badge badge-lc116">LC116</span> <strong>Lei Complementar 116</strong> - Serviços municipais, 4 dígitos, ~<span class="est-lc116-uf">200</span>/UF</li>
         </ul>
 
         <h3><i class="fas fa-robot"></i> Claude Code</h3>
         <p>Este projeto inclui arquivos de configuração para o <a href="https://claude.com/claude-code">Claude Code</a>:</p>
         <ul>
-          <li><code>CLAUDE.md</code> — Guia com estrutura, convenções e comandos do projeto</li>
-          <li><code>.claude/rules/</code> — Regras automáticas de nomenclatura e padrões</li>
+          <li><code>CLAUDE.md</code> - Guia com estrutura, convenções e comandos do projeto</li>
+          <li><code>.claude/rules/</code> - Regras automáticas de nomenclatura e padrões</li>
         </ul>
 
         <h3><i class="fas fa-balance-scale"></i> Licença</h3>
@@ -981,8 +979,8 @@ for item in dados['dados']:
   {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": "IBPT API – Tabelas IBPTax",
-    "description": "API estática com 99 tabelas IBPTax (2015–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
+    "name": "Tabelas IBPT",
+    "description": "API estática com 100 tabelas IBPTax (2015–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
     "url": "https://ibpt.valraw.com.br/",
     "creator": {
       "@type": "Organization",

@@ -25,7 +25,7 @@ globs: "**/*"
 ## Build e Deploy
 - `npm run build` gera todos os arquivos em `docs/api/`
 - GitHub Actions faz build e deploy automático no GitHub Pages
-- Arquivos em `docs/api/` são gitignored — nunca commitar
+- Arquivos em `docs/api/` são gitignored - nunca commitar
 
 ## Interface Web (docs/index.html)
 - Design System VALRAW UI light corporate (tokens em CSS vars no `<style>` do index.html)
@@ -54,14 +54,14 @@ globs: "**/*"
 
 ## Padrões de Código
 - CSV usa ponto-e-vírgula como separador
-- CSVs do IBPT usam encoding `latin1` (ISO-8859-1) — leitura com `encoding: 'latin1'`
+- CSVs do IBPT usam encoding `latin1` (ISO-8859-1) - leitura com `encoding: 'latin1'`
 - Processamento de CSVs via streaming (readline) para baixo consumo de memória
 - Escrita paralela de arquivos com Promise.all
 - CSV consolidado (`todos.csv.gz`) usa streaming gzip (createGzip) para não acumular em memória
 - CSV consolidado tem 13 colunas: ano;tabela;tipo;uf;codigo;excecao;descricao;4 alíquotas;vigenciaInicio;vigenciaFim
 
 ## Tabelas Disponíveis
-- 99 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou disponíveis no mirror do SVN ACBr)
+- 100 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou disponíveis no mirror do SVN ACBr)
 - Fonte dos ZIPs: portal De Olho no Imposto (IBPT) e SVN do Projeto ACBr (SourceForge / espelho GitHub `frones/ACBr`)
 - Tabelas 2015–2016 foram recuperadas do histórico de commits de `frones/ACBr` em `Exemplos/ACBrTCP/ACBrIBPTax/tabela` (o mirror git-svn começa em 2015-03-23)
 - O build detecta automaticamente novos ZIPs em `repositorio-ibpt/` - basta adicionar e rodar `npm run build`

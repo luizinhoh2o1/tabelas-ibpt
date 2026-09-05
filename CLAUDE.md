@@ -106,13 +106,13 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 - **Spinner de carregamento** ao lado do status de busca durante consultas
 - **Aviso de memória** na aba de pesquisa alertando que consultas sem filtro podem travar o navegador
 - **CSV consolidado** (`todos.csv.gz`) usado automaticamente quando consulta exigiria >50 arquivos individuais
-- **Sem limite de resultados** — todos os registros encontrados são exibidos
+- **Sem limite de resultados** - todos os registros encontrados são exibidos
 - Ícones via Font Awesome 6
 - Layout responsivo (mobile-first)
 
 ## Tabelas Disponíveis
 
-99 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
+100 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
 
 - **2015:** 15.1.B, 15.2.A
 - **2016:** 16.1.A, 16.2.A, 16.2.B
@@ -125,7 +125,7 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 - **2023:** 23.1.A–G, 23.2.A–F
 - **2024:** 24.1.A–F, 24.2.A–F
 - **2025:** 25.1.A–F, 25.2.A–H
-- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L
+- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A
 
 ## Regras Importantes
 
@@ -135,4 +135,4 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 - O `404.html` intercepta rotas sem extensão e descomprime/exibe o JSON no browser
 - Textos visíveis ao usuário (HTML, README) devem ter acentuação correta em português
 - O CSV consolidado (`todos.csv.gz`) é gerado via streaming (createGzip) para não acumular memória
-- CSVs do IBPT usam encoding `latin1` (ISO-8859-1) — o `processadorCsv.ts` lê com `encoding: 'latin1'`
+- CSVs do IBPT usam encoding `latin1` (ISO-8859-1) - o `processadorCsv.ts` lê com `encoding: 'latin1'`
