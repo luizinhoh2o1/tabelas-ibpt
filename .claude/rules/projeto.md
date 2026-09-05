@@ -28,7 +28,13 @@ globs: "**/*"
 - Arquivos em `docs/api/` são gitignored — nunca commitar
 
 ## Interface Web (docs/index.html)
-- Design System VALRAW UI (tokens em CSS vars)
+- Design System VALRAW UI light corporate (tokens em CSS vars no `<style>` do index.html)
+- Paleta propria (NAO usar o laranja da landing): azul `#000793` e verde `#05C700`, ambos amostrados do `logo.webp`
+- Verde `#05C700` so decorativo (barras, orbs, gradientes) - 2,3:1 sobre branco; para texto ou fundo com texto branco usar `--verde-escuro` `#037A00` (5,5:1)
+- Estrutura/componentes seguem `recuperaqui-landing` (`app/globals.css` + `lib/tokens.ts`), so as cores divergem
+- Neutros: slate `#1F2937`, fundo `#FFFFFF`/`#F7F9FC`, bordas `#EDF2F7`/`#E2E8F0`
+- Elevacao por sombra (`--sombra-card`, `--sombra-card-hover`), nao por glow
+- Logo em `docs/public/logo.webp`, favicons em `docs/public/favicon-*.png`
 - Fontes: Ubuntu (texto) + Ubuntu Mono (valores numéricos, código)
 - Ícones: Font Awesome 6
 - 4 abas: Home, Pesquisa, Endpoints, Informações

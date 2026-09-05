@@ -94,7 +94,8 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 
 ## Interface Web
 
-- **Design System VALRAW UI** — Cores, tipografia (Ubuntu/Ubuntu Mono), glassmorphism, glow, orbs
+- **Numeros da pagina vem do build** - `meta.json` carrega `estatisticas` (tamanhos, reducao, tabelas, registros, media por UF, data do build) e `preencherTextosDinamicos()` preenche todo `<span class="est-*">` das abas Home e Informacoes; o valor no HTML e so fallback. Nunca escrever numero fixo nesses trechos
+- **Design System VALRAW UI (light corporate)** - Estrutura portada de `recuperaqui-landing`, mas com paleta propria tirada do logo: azul `#000793` primario, verde `#05C700` acento (`#037A00` quando precisa de texto branco em cima), slate `#1F2937` neutro, fundos brancos/`#F7F9FC`, sombras suaves em vez de glow, tipografia Ubuntu/Ubuntu Mono
 - **4 abas:** Home (sobre a API), Pesquisa (filtros + tabela), Endpoints (documentação técnica), Informações (extras)
 - **6 filtros de pesquisa:** Ano, Versão, UF, Tipo, Código, Descrição
 - **Tooltips** nos cabeçalhos da tabela de resultados explicando cada coluna
