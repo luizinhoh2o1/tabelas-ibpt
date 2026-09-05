@@ -19,7 +19,7 @@ docs/
   api/              → Arquivos gerados pelo build (gitignored)
 .github/workflows/
   deploy.yml        → GitHub Actions: build + deploy no GitHub Pages
-repositorio-ibpt/   → Submodule com os ZIPs originais do IBPT
+repositorio-ibpt/   → ZIPs originais do IBPT (rastreados neste repo, nao e submodule)
 ```
 
 ## Convenções
@@ -126,8 +126,9 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 
 ## Regras Importantes
 
-- Arquivos em `docs/api/` são gerados pelo build e estão no `.gitignore` — nunca editar manualmente
-- O `repositorio-ibpt/` é um submodule Git com os ZIPs originais
+- Arquivos em `docs/api/` são gerados pelo build e estão no `.gitignore` - nunca editar manualmente
+- Os ZIPs em `repositorio-ibpt/` sao rastreados diretamente neste repositorio (nao ha `.gitmodules`)
+- **CSVs devem ficar na raiz do ZIP.** `construir.ts` le apenas o nivel raiz (`readdirSync` sem `recursive`), entao ZIP com CSV dentro de subpasta e pulado com `AVISO: Nenhum CSV em ...` e o build ainda sai com codigo 0. Ao adicionar um ZIP novo, conferir e achatar se preciso
 - O `404.html` intercepta rotas sem extensão e descomprime/exibe o JSON no browser
 - Textos visíveis ao usuário (HTML, README) devem ter acentuação correta em português
 - O CSV consolidado (`todos.csv.gz`) é gerado via streaming (createGzip) para não acumular memória
