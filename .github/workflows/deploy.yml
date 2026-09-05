@@ -33,6 +33,20 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Rodar testes
+        run: npm test
+
+      # Reaproveita os anos ja construidos: o build so reprocessa ano cujo ZIP
+      # mudou. A chave inclui o hash dos ZIPs para invalidar quando algum muda;
+      # restore-keys traz o cache anterior, de onde os anos inalterados vem.
+      - name: Restaurar cache do build
+        uses: actions/cache@v4
+        with:
+          path: docs/api
+          key: api-${{ hashFiles('repositorio-ibpt/*.zip') }}-${{ hashFiles('src/*.ts') }}
+          restore-keys: |
+            api-
+
       - name: Construir API (extrair ZIPs e gerar JSON comprimido)
         run: npm run build
 

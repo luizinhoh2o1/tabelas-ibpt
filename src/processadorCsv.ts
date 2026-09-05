@@ -13,7 +13,7 @@ const CODIGO_PONTO_VIRGULA = 59;    // ;
  * Remove aspas envolventes e desescapa "" → " (convencao CSV).
  * Fast path quando o campo nao comeca com aspas.
  */
-function pegarCampo(linha: string, inicio: number, fim: number): string {
+export function pegarCampo(linha: string, inicio: number, fim: number): string {
   if (inicio === fim) return '';
   if (linha.charCodeAt(inicio) !== CODIGO_ASPA) {
     return linha.slice(inicio, fim);
@@ -29,7 +29,7 @@ function pegarCampo(linha: string, inicio: number, fim: number): string {
  * respeitando campos entre aspas. Usa slice em vez de concat char-a-char
  * para evitar comportamento quadratico em linhas longas.
  */
-function analisarLinhaCsv(linha: string): string[] {
+export function analisarLinhaCsv(linha: string): string[] {
   const campos: string[] = [];
   const tamanho = linha.length;
   let inicio = 0;

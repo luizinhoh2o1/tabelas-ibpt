@@ -4,7 +4,8 @@
   "description": "API estatica IBPT - Consulta de aliquotas tributarias",
   "type": "module",
   "scripts": {
-    "build": "tsx src/construir.ts"
+    "build": "tsx src/construir.ts",
+    "test": "tsx --test src/*.test.ts"
   },
   "engines": {
     "node": ">=22.0.0"

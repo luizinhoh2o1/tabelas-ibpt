@@ -57,7 +57,8 @@ globs: "**/*"
 - CSVs do IBPT usam encoding `latin1` (ISO-8859-1) - leitura com `encoding: 'latin1'`
 - Processamento de CSVs via streaming (readline) para baixo consumo de memória
 - Escrita paralela de arquivos com Promise.all
-- CSV consolidado (`todos.csv.gz`) usa streaming gzip (createGzip) para não acumular em memória
+- CSV consolidado por ano (`todos-{ano}.csv.gz`) usa streaming gzip (createGzip) para não acumular em memória
+- A granularidade do cache incremental é o ANO, porque o CSV do ano cobre todas as versões dele: se um ZIP muda, o ano inteiro é reconstruído
 - CSV consolidado tem 13 colunas: ano;tabela;tipo;uf;codigo;excecao;descricao;4 alíquotas;vigenciaInicio;vigenciaFim
 
 ## Tabelas Disponíveis

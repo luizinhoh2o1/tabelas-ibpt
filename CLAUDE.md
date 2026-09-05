@@ -69,6 +69,7 @@ Cada registro contém 9 propriedades extraídas do CSV original do IBPT:
 ```bash
 npm install          # Instalar dependências
 npm run build        # Build: extrair ZIPs e gerar API estática
+npm test             # Testes do parser CSV (runner nativo do Node)
 ```
 
 ## Formato de Saída JSON
@@ -134,5 +135,5 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 - **CSVs devem ficar na raiz do ZIP.** `construir.ts` le apenas o nivel raiz (`readdirSync` sem `recursive`), entao ZIP com CSV dentro de subpasta e pulado com `AVISO: Nenhum CSV em ...` e o build ainda sai com codigo 0. Ao adicionar um ZIP novo, conferir e achatar se preciso
 - O `404.html` intercepta rotas sem extensão e descomprime/exibe o JSON no browser
 - Textos visíveis ao usuário (HTML, README) devem ter acentuação correta em português
-- O CSV consolidado (`todos.csv.gz`) é gerado via streaming (createGzip) para não acumular memória
+- Os CSVs consolidados (`todos-{ano}.csv.gz`) são gerados via streaming (createGzip), um por ano, para não acumular memória
 - CSVs do IBPT usam encoding `latin1` (ISO-8859-1) - o `processadorCsv.ts` lê com `encoding: 'latin1'`
