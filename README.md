@@ -21,22 +21,63 @@ Este repositório arquiva esses ZIPs desde 2015 e os converte em endpoints JSON 
 
 ## Consulta rápida
 
+Os arquivos de dados são servidos como gzip puro, sem `Content-Encoding`, então o cliente precisa descomprimir por conta própria. Os exemplos abaixo buscam a tabela de NCM de São Paulo na versão 26.2.A.
+
+**Linux, macOS ou WSL**
+
 ```bash
-# Alíquotas de NCM para São Paulo, tabela 26.2.A
-curl -s https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz | gunzip | jq '.dados[0]'
+url=https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz
+
+# Primeiro registro
+curl -s "$url" | gunzip | jq '.dados[0]'
+
+# Todos os códigos que começam com 0101
+curl -s "$url" | gunzip | jq -c '.dados[] | select(.codigo | startswith("0101"))'
+
+# Salvar a tabela descomprimida
+curl -s "$url" | gunzip > ncm-sp-26.2.A.json
 ```
+
+Sem `jq`, use `python3 -m json.tool` para formatar a saída.
+
+**Windows (PowerShell 5.1 ou 7+)**
+
+```powershell
+$url = 'https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz'
+
+$gz = [IO.Compression.GZipStream]::new(
+    [IO.MemoryStream]::new((Invoke-WebRequest $url).Content),
+    [IO.Compression.CompressionMode]::Decompress)
+$tabela = ([IO.StreamReader]::new($gz)).ReadToEnd() | ConvertFrom-Json
+
+# Primeiro registro
+$tabela.dados[0]
+
+# Todos os códigos que começam com 0101
+$tabela.dados | Where-Object codigo -like '0101*' |
+    Format-Table codigo, descricao, aliquotaEstadual
+
+# Salvar a tabela descomprimida
+$tabela | ConvertTo-Json -Depth 5 | Set-Content ncm-sp-26.2.A.json -Encoding utf8
+```
+
+`Invoke-WebRequest` não descomprime sozinho porque a resposta não declara `Content-Encoding: gzip`; daí o `GZipStream` explícito.
+
+**Python**
 
 ```python
 import gzip, json, urllib.request
 
 url = "https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz"
-dados = json.loads(gzip.decompress(urllib.request.urlopen(url).read()))
+tabela = json.loads(gzip.decompress(urllib.request.urlopen(url).read()))
 
-for item in dados["dados"][:5]:
+for item in tabela["dados"][:5]:
     print(item["codigo"], item["descricao"], item["aliquotaNacionalFederal"])
 ```
 
-No navegador, a descompressão é nativa:
+**Navegador**
+
+A descompressão é nativa, sem biblioteca:
 
 ```js
 const resp = await fetch('https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz');
