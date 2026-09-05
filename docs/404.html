@@ -3,38 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IBPT API</title>
+  <title>Tabelas IBPT</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/public/favicon-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180x180.png">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap"></noscript>
   <style>
-    :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --text-muted: #8b949e; --accent: #58a6ff; --green: #3fb950; }
+    /* Design System VALRAW UI - light corporate (mesma paleta de index.html) */
+    :root {
+      --fundo-principal: #FFFFFF;
+      --fundo-section: #F7F9FC;
+      --primaria: #000793;
+      --primaria-escura: #00055E;
+      --verde-escuro: #037A00;
+      --secundaria: #1F2937;
+      --secundaria-escura: #111827;
+      --borda-sutil: #EDF2F7;
+      --texto-principal: #1F2937;
+      --texto-secundario: #4A5568;
+      --texto-terciario: #718096;
+      --texto-inverso: #FFFFFF;
+      --erro: #E53E3E;
+      --sombra-card: 0 4px 24px rgba(15,23,42,0.06);
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'SFMono-Regular', Consolas, monospace; background: var(--bg); color: var(--text); padding: 24px; }
+    body {
+      font-family: 'Ubuntu Mono', 'SFMono-Regular', Consolas, monospace;
+      background: var(--fundo-principal);
+      color: var(--texto-principal);
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { color: var(--secundaria); background: rgba(5,199,0,0.22); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--fundo-section); }
+    ::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 6px; border: 2px solid var(--fundo-section); }
     .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-    .header a { color: var(--accent); text-decoration: none; font-size: 14px; }
-    .header a:hover { text-decoration: underline; }
-    .method { background: var(--green); color: var(--bg); padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; }
-    .path { color: var(--accent); font-size: 14px; }
-    .status { font-size: 13px; color: var(--text-muted); }
-    .error { color: #f85149; }
+    .header a { color: var(--primaria); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .header a:hover { color: var(--primaria-escura); text-decoration: underline; }
+    .method { background: var(--verde-escuro); color: var(--texto-inverso); padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+    .path { color: var(--primaria-escura); font-size: 14px; word-break: break-all; }
+    .status { font-size: 13px; color: var(--texto-terciario); }
+    .error { color: var(--erro); }
     pre {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
+      background: var(--secundaria-escura);
+      border: 1px solid var(--secundaria);
+      border-radius: 16px;
+      padding: 20px;
+      color: #E2E8F0;
       overflow: auto;
       max-height: calc(100vh - 120px);
       font-size: 13px;
       line-height: 1.5;
       white-space: pre-wrap;
       word-break: break-word;
+      box-shadow: var(--sombra-card);
     }
     .not-found {
       text-align: center;
       padding: 80px 20px;
-      color: var(--text-muted);
+      color: var(--texto-terciario);
+      font-family: 'Ubuntu', system-ui, sans-serif;
     }
-    .not-found h1 { font-size: 48px; color: var(--text); margin-bottom: 12px; }
-    .not-found p { font-size: 16px; margin-bottom: 24px; }
-    .not-found a { color: var(--accent); }
+    .not-found h1 {
+      font-size: 64px; line-height: 1; margin-bottom: 12px; font-weight: 700;
+      background: linear-gradient(135deg, #000793 0%, #05C700 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .not-found p { font-size: 16px; margin-bottom: 24px; color: var(--texto-secundario); }
+    .not-found a { color: var(--primaria); text-decoration: none; font-weight: 500; }
+    .not-found a:hover { color: var(--primaria-escura); text-decoration: underline; }
+    .not-found code {
+      display: inline-block; margin-top: 6px;
+      background: var(--fundo-section); border: 1px solid var(--borda-sutil);
+      padding: 3px 10px; border-radius: 6px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 13px; color: var(--primaria-escura);
+    }
   </style>
 </head>
 <body>

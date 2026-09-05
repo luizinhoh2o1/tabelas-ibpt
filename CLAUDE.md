@@ -19,7 +19,7 @@ docs/
   api/              → Arquivos gerados pelo build (gitignored)
 .github/workflows/
   deploy.yml        → GitHub Actions: build + deploy no GitHub Pages
-repositorio-ibpt/   → Submodule com os ZIPs originais do IBPT
+repositorio-ibpt/   → ZIPs originais do IBPT (rastreados neste repo, nao e submodule)
 ```
 
 ## Convenções
@@ -33,12 +33,12 @@ repositorio-ibpt/   → Submodule com os ZIPs originais do IBPT
 ## Endpoints da API
 
 ```
-/api/meta.json                         → Metadados (anos, versões, tipos, UFs)
+/api/meta.json                         → Metadados (anos, versões, tipos, UFs) + estatísticas do build
 /api/{ano}/index.json                  → Índice do ano
 /api/{ano}/{tabela}/index.json         → Índice da versão
 /api/{ano}/{tabela}/{tipo}/index.json  → Índice por tipo
 /api/{ano}/{tabela}/{tipo}/{uf}.json.gz → Dados comprimidos
-/api/todos.csv.gz                      → CSV consolidado com todos os registros
+/api/todos-{ano}.csv.gz                → CSV consolidado de um ano (todas as versões/tipos/UFs)
 /api/{ano}/{tabela}/{tipo}/{uf}        → Rota sem extensão (404.html descomprime e exibe)
 ```
 
@@ -69,6 +69,7 @@ Cada registro contém 9 propriedades extraídas do CSV original do IBPT:
 ```bash
 npm install          # Instalar dependências
 npm run build        # Build: extrair ZIPs e gerar API estática
+npm test             # Testes do parser CSV (runner nativo do Node)
 ```
 
 ## Formato de Saída JSON
@@ -94,22 +95,25 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 
 ## Interface Web
 
-- **Design System VALRAW UI** — Cores, tipografia (Ubuntu/Ubuntu Mono), glassmorphism, glow, orbs
+- **Numeros da pagina vem do build** - `meta.json` carrega `estatisticas` (tamanhos, reducao, tabelas, registros, media por UF, data do build) e `preencherTextosDinamicos()` preenche todo `<span class="est-*">` das abas Home e Informacoes; o valor no HTML e so fallback. Nunca escrever numero fixo nesses trechos
+- **Design System VALRAW UI (light corporate)** - Estrutura portada de `recuperaqui-landing`, mas com paleta propria tirada do logo: azul `#000793` primario, verde `#05C700` acento (`#037A00` quando precisa de texto branco em cima), slate `#1F2937` neutro, fundos brancos/`#F7F9FC`, sombras suaves em vez de glow, tipografia Ubuntu/Ubuntu Mono
 - **4 abas:** Home (sobre a API), Pesquisa (filtros + tabela), Endpoints (documentação técnica), Informações (extras)
 - **6 filtros de pesquisa:** Ano, Versão, UF, Tipo, Código, Descrição
 - **Tooltips** nos cabeçalhos da tabela de resultados explicando cada coluna
 - **12 colunas na tabela:** Código, Ex, Tipo, UF, Tabela, Descrição, 4 alíquotas, Início Vig., Fim Vig.
-- **Tabela sempre visível** com estados de vazio ("Nenhum dado para exibir") e carregamento ("Buscando dados…")
+- **Consulta cancelavel** - `controleConsulta` (`AbortController`) e criado em `consultar()`/`consultarViaCsv()` e abortado por `limparFiltros()` ou por uma nova consulta; todo `fetch` da consulta recebe o `signal` (o `meta.json` da carga inicial fica de fora)
+- **Bloco de resultados oculto** (`#resultados` com `hidden`) até a primeira consulta; reaparece em `consultar()`/`consultarViaCsv()` e volta a ocultar em `limparFiltros()`
+- Estados de vazio ("Nenhum dado para exibir") e carregamento ("Buscando dados…") dentro da tabela
 - **Spinner de carregamento** ao lado do status de busca durante consultas
 - **Aviso de memória** na aba de pesquisa alertando que consultas sem filtro podem travar o navegador
-- **CSV consolidado** (`todos.csv.gz`) usado automaticamente quando consulta exigiria >50 arquivos individuais
-- **Sem limite de resultados** — todos os registros encontrados são exibidos
+- **CSVs consolidados por ano** (`todos-{ano}.csv.gz`) usados automaticamente quando a consulta exigiria >50 arquivos individuais; com filtro de ano, só um arquivo é baixado
+- **Sem limite de resultados** - todos os registros encontrados são exibidos
 - Ícones via Font Awesome 6
 - Layout responsivo (mobile-first)
 
 ## Tabelas Disponíveis
 
-99 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
+100 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
 
 - **2015:** 15.1.B, 15.2.A
 - **2016:** 16.1.A, 16.2.A, 16.2.B
@@ -122,13 +126,16 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 - **2023:** 23.1.A–G, 23.2.A–F
 - **2024:** 24.1.A–F, 24.2.A–F
 - **2025:** 25.1.A–F, 25.2.A–H
-- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L
+- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A
 
 ## Regras Importantes
 
-- Arquivos em `docs/api/` são gerados pelo build e estão no `.gitignore` — nunca editar manualmente
-- O `repositorio-ibpt/` é um submodule Git com os ZIPs originais
+- Arquivos em `docs/api/` são gerados pelo build e estão no `.gitignore` - nunca editar manualmente
+- Os ZIPs em `repositorio-ibpt/` sao rastreados diretamente neste repositorio (nao ha `.gitmodules`)
+- **Parser CSV coberto por testes** em `src/processadorCsv.test.ts` (`node:test` + `node:assert`, sem dependencia extra). Roda no CI antes do build. Ao mexer em `analisarLinhaCsv`/`pegarCampo`, rodar `npm test`
+- **Extracao dos ZIPs em JS puro** (`fflate`), sem depender do binario `unzip` do sistema; o diretorio temporario vem de `os.tmpdir()`. Cada entrada e gravada pelo nome-base, entao ZIP com CSV dentro de subpasta e achatado na extracao
+- **ZIP que nao gera dados nao entra no `meta.json`** e faz o build sair com codigo 1. `metaDados.versoes` e montado a partir do que virou arquivo, nunca da listagem de ZIPs - caso contrario a pagina oferece no filtro uma versao cujos endpoints respondem 404
 - O `404.html` intercepta rotas sem extensão e descomprime/exibe o JSON no browser
 - Textos visíveis ao usuário (HTML, README) devem ter acentuação correta em português
-- O CSV consolidado (`todos.csv.gz`) é gerado via streaming (createGzip) para não acumular memória
-- CSVs do IBPT usam encoding `latin1` (ISO-8859-1) — o `processadorCsv.ts` lê com `encoding: 'latin1'`
+- Os CSVs consolidados (`todos-{ano}.csv.gz`) são gerados via streaming (createGzip), um por ano, para não acumular memória
+- CSVs do IBPT usam encoding `latin1` (ISO-8859-1) - o `processadorCsv.ts` lê com `encoding: 'latin1'`

@@ -1,92 +1,127 @@
-> **AVISO:** Os dados contidos neste repositório **não são atualizados em tempo real**. As tabelas são utilizadas apenas para **consulta histórica** e **não é recomendado o uso em sistemas reais de produção**, apesar dos documentos contidos no repositório serem tabelas oficiais publicadas pelo IBPT (Instituto Brasileiro de Planejamento e Tributação). Use por conta e risco em produção.
+<p align="center">
+  <img src="docs/public/logo.webp" alt="Tabelas IBPT" width="320">
+</p>
 
-# Repositório de Tabelas IBPT - API Estática
+<p align="center">
+  API estática das Tabelas IBPTax, hospedada no GitHub Pages.<br>
+  Sem cadastro, sem token, sem backend.
+</p>
 
-Repositório destinado ao armazenamento e versionamento das **Tabelas IBPTax** (Instituto Brasileiro de Planejamento e Tributação). Essas tabelas contêm as alíquotas aproximadas dos tributos incidentes sobre produtos e serviços, conforme a Lei da Transparência Fiscal (Lei 12.741/2012).
-
-Este repositório disponibiliza uma **API estática via GitHub Pages** para consulta das alíquotas tributárias, com **todas as versões/tabelas** de cada ano (1º e 2º semestre, revisões A, B, C, etc.).
+<p align="center">
+  <a href="https://ibpt.valraw.com.br/"><strong>Consultar no navegador</strong></a>
+</p>
 
 ---
 
-## Como Funciona o Sistema
+As Tabelas IBPTax, publicadas pelo Instituto Brasileiro de Planejamento e Tributação, trazem a carga tributária aproximada de produtos e serviços exigida pela Lei da Transparência Fiscal (Lei 12.741/2012). O IBPT distribui essas tabelas como arquivos ZIP semestrais, um CSV por estado, e não oferece um histórico consolidado.
 
-| Etapa | Descrição |
+Este repositório arquiva esses ZIPs desde 2015 e os converte em endpoints JSON estáticos, servidos pelo GitHub Pages. São 100 tabelas, 32,3 milhões de registros e todas as 27 UFs.
+
+> **Atenção:** os dados aqui não são atualizados em tempo real. As tabelas são as oficiais publicadas pelo IBPT, mas a atualização deste repositório é manual. Confira a vigência antes de usar em produção.
+
+## Consulta rápida
+
+Os arquivos de dados são servidos como gzip puro, sem `Content-Encoding`, então o cliente precisa descomprimir por conta própria. Os exemplos abaixo buscam a tabela de NCM de São Paulo na versão 26.2.A.
+
+**Linux, macOS ou WSL**
+
+```bash
+url=https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz
+
+# Primeiro registro
+curl -s "$url" | gunzip | jq '.dados[0]'
+
+# Todos os códigos que começam com 0101
+curl -s "$url" | gunzip | jq -c '.dados[] | select(.codigo | startswith("0101"))'
+
+# Salvar a tabela descomprimida
+curl -s "$url" | gunzip > ncm-sp-26.2.A.json
+```
+
+Sem `jq`, use `python3 -m json.tool` para formatar a saída.
+
+**Windows (PowerShell 5.1 ou 7+)**
+
+```powershell
+$url = 'https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz'
+
+$gz = [IO.Compression.GZipStream]::new(
+    [IO.MemoryStream]::new((Invoke-WebRequest $url).Content),
+    [IO.Compression.CompressionMode]::Decompress)
+$tabela = ([IO.StreamReader]::new($gz)).ReadToEnd() | ConvertFrom-Json
+
+# Primeiro registro
+$tabela.dados[0]
+
+# Todos os códigos que começam com 0101
+$tabela.dados | Where-Object codigo -like '0101*' |
+    Format-Table codigo, descricao, aliquotaEstadual
+
+# Salvar a tabela descomprimida
+$tabela | ConvertTo-Json -Depth 5 | Set-Content ncm-sp-26.2.A.json -Encoding utf8
+```
+
+`Invoke-WebRequest` não descomprime sozinho porque a resposta não declara `Content-Encoding: gzip`; daí o `GZipStream` explícito.
+
+**Python**
+
+```python
+import gzip, json, urllib.request
+
+url = "https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz"
+tabela = json.loads(gzip.decompress(urllib.request.urlopen(url).read()))
+
+for item in tabela["dados"][:5]:
+    print(item["codigo"], item["descricao"], item["aliquotaNacionalFederal"])
+```
+
+**Navegador**
+
+A descompressão é nativa, sem biblioteca:
+
+```js
+const resp = await fetch('https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz');
+const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip'));
+const { dados } = await new Response(fluxo).json();
+```
+
+## Endpoints
+
+Base: `https://ibpt.valraw.com.br/api`
+
+| Endpoint | Retorno |
 |---|---|
-| **1. Construção** | Arquivos ZIP com CSVs do IBPT são extraídos, agrupados por ano/versão/tipo/UF, convertidos para JSON e comprimidos com gzip |
-| **2. Publicação** | GitHub Actions executa o build e publica no GitHub Pages como arquivos `.json.gz` acessíveis via URL |
-| **3. Consulta** | Página interativa no navegador ou acesso direto via cURL/Python/qualquer linguagem |
+| `/meta.json` | Anos, versões, tipos, UFs e estatísticas do último build |
+| `/{ano}/index.json` | Versões publicadas naquele ano |
+| `/{ano}/{tabela}/index.json` | Contagem de registros por tipo e UF |
+| `/{ano}/{tabela}/{tipo}/index.json` | Contagem por UF de um tipo |
+| `/{ano}/{tabela}/{tipo}/{uf}.json.gz` | Os registros (gzip) |
+| `/todos-{ano}.csv.gz` | Todos os registros de um ano em CSV (gzip) |
 
-### Compressão
-
-Os dados originais somam ~4,5 GB de CSV bruto. Com gzip nível 9, reduzem para ~542 MB (88% de redução).
-
-| Formato | Extensão | Compressão |
-|---|---|---|
-| Dados | `.json.gz` | gzip nível 9 |
-| Índices | `.json` | Sem compressão |
-| CSV consolidado | `.csv.gz` | gzip nível 9 |
-
-Descompressão: navegador (nativo via `DecompressionStream`), terminal (`curl URL \| gunzip`), Python (`gzip.decompress()`).
-
-### Pesquisa
-
-A pesquisa na página interativa é inteiramente **client-side** — não existe backend.
-
-1. Metadados carregados ao abrir a página (anos, versões, UFs, tipos).
-2. 6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.
-3. Arquivos baixados em lotes paralelos de 8, descomprimidos com `DecompressionStream`.
-4. Consultas amplas (>50 arquivos) usam o CSV consolidado `todos.csv.gz` via streaming.
-5. Resultados em tabela com 12 colunas, paginados (100/página), ordenáveis, exportáveis como CSV.
-
-Quanto mais filtros você selecionar, mais rápida será a consulta. Uma busca com ano + versão + tipo + UF específicos baixa apenas 1 arquivo (~190 KB).
-
----
-
-## Página de Consulta
-
-> **[Acessar Consulta](https://ibpt.valraw.com.br/)**
-
----
-
-## API - Endpoints
-
-**Base URL:** `https://ibpt.valraw.com.br/api`
-
-| Endpoint | Descrição |
-|---|---|
-| `/api/meta.json` | Metadados: anos disponíveis, versões, tipos e UFs |
-| `/api/{ano}/index.json` | Índice do ano com todas as versões |
-| `/api/{ano}/{tabela}/index.json` | Índice de uma versão/tabela específica |
-| `/api/{ano}/{tabela}/{tipo}/index.json` | Índice por tipo com contagem por UF |
-| `/api/{ano}/{tabela}/{tipo}/{uf}.json.gz` | Dados completos (gzip) |
-| `/api/todos.csv.gz` | CSV consolidado com todos os registros (gzip) |
-
-### Parâmetros
+Os índices são JSON puro; os dados vêm comprimidos. Um arquivo típico de NCM tem 211 KB comprimidos.
 
 | Parâmetro | Valores | Exemplo |
 |---|---|---|
 | `{ano}` | 2015 a 2026 | `2026` |
-| `{tabela}` | Código da versão | `26.1.G` |
-| `{tipo}` | `ncm`, `nbs` ou `lc116` | `ncm` |
-| `{uf}` | Sigla do estado (27 UFs) | `SP` |
+| `{tabela}` | Código da versão | `26.2.A` |
+| `{tipo}` | `ncm`, `nbs`, `lc116` | `ncm` |
+| `{uf}` | As 27 siglas | `SP` |
 
-### Tipos de Dados
+Rotas sem extensão (`/api/2026/26.2.A/ncm/SP`) são interceptadas pelo `404.html`, que descomprime e exibe o JSON formatado no navegador. Prático para inspecionar, não para consumir por código.
 
-| Tipo | Nome | Descrição | Registros/UF |
+### Tipos de tabela
+
+| Tipo | Nome | Conteúdo | Registros por UF |
 |---|---|---|---|
-| `ncm` | Nomenclatura Comum do Mercosul | Produtos — 8 dígitos | ~11.000 |
-| `nbs` | Nomenclatura Brasileira de Serviços | Serviços — 9 dígitos | ~860 |
-| `lc116` | Lei Complementar 116 | Serviços municipais — 4 dígitos | ~200 |
+| `ncm` | Nomenclatura Comum do Mercosul | Produtos, código de 8 dígitos | ~10.900 |
+| `nbs` | Nomenclatura Brasileira de Serviços | Serviços, 9 dígitos | ~860 |
+| `lc116` | Lei Complementar 116 | Serviços municipais, 4 dígitos | ~200 |
 
----
-
-## Formato de Resposta
-
-Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
+## Formato
 
 ```json
 {
-  "tabela": "26.1.G",
+  "tabela": "26.2.A",
   "dados": [
     {
       "codigo": "01012100",
@@ -96,30 +131,38 @@ Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
       "aliquotaImportadosFederal": 15.45,
       "aliquotaEstadual": 18.00,
       "aliquotaMunicipal": 0.00,
-      "vigenciaInicio": "01/04/2026",
-      "vigenciaFim": "30/06/2026"
+      "vigenciaInicio": "20/08/2026",
+      "vigenciaFim": "30/09/2026"
     }
   ]
 }
 ```
 
-### Campos do Registro
-
 | Campo | Tipo | Descrição |
 |---|---|---|
-| `codigo` | string | Código NCM/NBS/LC116 |
-| `excecao` | string | Exceção tarifária |
+| `codigo` | string | Código NCM, NBS ou LC116 |
+| `excecao` | string | Exceção tarifária, quando houver |
 | `descricao` | string | Descrição do produto ou serviço |
-| `aliquotaNacionalFederal` | number | Alíquota federal (nacionais) % |
-| `aliquotaImportadosFederal` | number | Alíquota federal (importados) % |
-| `aliquotaEstadual` | number | Alíquota estadual (ICMS) % |
-| `aliquotaMunicipal` | number | Alíquota municipal (ISS) % |
-| `vigenciaInicio` | string | Início da vigência (dd/mm/aaaa) |
-| `vigenciaFim` | string | Fim da vigência (dd/mm/aaaa) |
+| `aliquotaNacionalFederal` | number | Tributos federais sobre itens nacionais, em % |
+| `aliquotaImportadosFederal` | number | Tributos federais sobre itens importados, em % |
+| `aliquotaEstadual` | number | ICMS e demais tributos estaduais, em % |
+| `aliquotaMunicipal` | number | ISS e demais tributos municipais, em % |
+| `vigenciaInicio` | string | Início da vigência, `dd/mm/aaaa` |
+| `vigenciaFim` | string | Fim da vigência, `dd/mm/aaaa` |
 
----
+As alíquotas usam ponto como separador decimal. O CSV consolidado usa ponto e vírgula como separador de campo e acrescenta quatro colunas na frente: `ano`, `tabela`, `tipo` e `uf`.
 
-## Versões Disponíveis
+## Como funciona
+
+O build lê os ZIPs em `repositorio-ibpt/`, extrai os CSVs, converte cada combinação de ano, versão, tipo e UF em um JSON comprimido, e monta os índices. O GitHub Actions roda isso a cada push na branch principal e publica `docs/` no Pages.
+
+Os CSVs originais somam 4,55 GB. Depois do gzip nível 9, a API publicada ocupa 1,1 GB em 8.496 arquivos, uma redução de 76%. Os CSVs do IBPT vêm em latin1 e são lidos por streaming, linha a linha, para o build não carregar tudo na memória.
+
+A página de consulta roda inteiramente no navegador. Ela carrega o `meta.json` para montar os filtros e depois busca só os arquivos que a combinação escolhida exige, em lotes de 8 requisições paralelas. Quanto mais específico o filtro, menos dados trafegam: ano, versão, tipo e UF definidos baixam um único arquivo de 211 KB.
+
+Consultas amplas seguem outro caminho. Acima de 50 arquivos, a página passa a usar os CSVs consolidados por ano e os lê por streaming, descartando as linhas que não casam com o filtro sem acumular nada em memória. Com filtro de ano, é um arquivo só.
+
+## Versões disponíveis
 
 | Ano | Versões | Qtd |
 |---|---|---|
@@ -134,65 +177,64 @@ Os endpoints de dados (`.json.gz`) retornam JSON comprimido com gzip:
 | 2023 | 23.1.A–G, 23.2.A–F | 13 |
 | 2024 | 24.1.A–F, 24.2.A–F | 12 |
 | 2025 | 25.1.A–F, 25.2.A–H | 14 |
-| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L | 7 |
-| **Total** | | **99** |
+| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A | 8 |
+| **Total** | | **100** |
 
-**UFs:** AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO
+As tabelas de 2015 e 2016 foram recuperadas do histórico do Projeto ACBr, já que o portal do IBPT não disponibiliza versões antigas. UFs cobertas: AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO.
 
----
+## Rodando localmente
 
-## Build Local
-
-Requisitos: Node.js >= 22 (LTS)
+Requer Node.js 22 ou superior.
 
 ```bash
 npm install
-npm run build
+npm test                     # testes do parser CSV
+npm run build                # build incremental
+npm run build -- --completo  # ignora o cache e reconstrói tudo
 ```
 
-Os arquivos serão gerados em `docs/api/`.
+A saída vai para `docs/api/`, que está no `.gitignore` e nunca deve ser commitada.
 
----
+O build é incremental por ano. O arquivo `docs/api/_manifesto.json` guarda o hash dos ZIPs de cada ano e os totais do último build; um ano cujos ZIPs não mudaram é reaproveitado inteiro. Um build do zero leva alguns minutos, um build sem alterações leva poucos segundos.
+
+Para adicionar uma tabela nova, coloque o ZIP em `repositorio-ibpt/` seguindo o padrão `TabelaIBPTax_{versão}.zip` e rode o build. Os CSVs precisam estar no arquivo; se um ZIP não produzir dados, o build avisa quais foram e termina com erro, em vez de publicar uma API incompleta em silêncio.
+
+## Estrutura
+
+```
+src/
+  construir.ts       Orquestra o build e o cache incremental
+  processadorCsv.ts  Parser CSV por streaming, em latin1
+  geradorJson.ts     Escrita dos JSON, índices e CSVs comprimidos
+  constantes.ts      UFs e tipos de tabela
+  tipos.ts           Interfaces TypeScript
+docs/
+  index.html         Página de consulta
+  404.html           Intercepta rotas sem extensão
+  public/            Logo e favicons
+  api/               Gerado pelo build (gitignored)
+repositorio-ibpt/    ZIPs originais do IBPT
+```
 
 ## Deploy
 
-O deploy é automático via **GitHub Actions**. A cada push na branch `main`/`master`, o workflow executa o build e publica no GitHub Pages.
+O deploy é automático. Cada push na branch principal dispara o workflow em `.github/workflows/deploy.yml`, que roda os testes, executa o build e publica no GitHub Pages.
 
-1. Vá em **Settings > Pages** no repositório
-2. Em **Source**, selecione **GitHub Actions**
-3. Faça push na branch principal
-
----
+Para configurar em um fork: em **Settings > Pages**, selecione **GitHub Actions** como origem e faça push na branch principal.
 
 ## Claude Code
 
-Este projeto inclui arquivos de configuração para o [Claude Code](https://claude.com/claude-code), facilitando o uso de IA para desenvolvimento e manutenção:
-
-- **`CLAUDE.md`** — Guia principal com estrutura do projeto, convenções, comandos e regras
-- **`.claude/rules/`** — Regras automáticas de nomenclatura, tecnologias e padrões de código
-
-Ao abrir o projeto com Claude Code, essas configurações são carregadas automaticamente, garantindo que a IA siga as convenções do projeto (nomenclatura em português, compressão gzip, TypeScript ESM, etc.).
-
----
+O repositório traz configuração para o [Claude Code](https://claude.com/claude-code). O `CLAUDE.md` documenta estrutura, convenções e armadilhas conhecidas do build; `.claude/rules/` guarda as regras de nomenclatura e os padrões de código. As duas coisas são carregadas automaticamente ao abrir o projeto.
 
 ## Licença
 
-Este projeto está licenciado sob os termos do arquivo [LICENSE](LICENSE) (Apache 2.0).
+Código sob [Apache 2.0](LICENSE): livre para usar, modificar, distribuir e comercializar.
 
-O código fonte é de **uso livre**: qualquer pessoa pode baixar, modificar, distribuir e comercializar sem restrições.
+Os dados são de autoria do [IBPT](https://ibpt.com.br) / empresometro.com.br e seguem os termos do instituto.
 
-## < -- Keywords -- >
-## Tabela IBPT, TabelaIBPTax, IBPT histórico, alíquota IBPT, IBPT NCM, IBPT NBS, IBPT LC116,
-## tabela de impostos Brasil, De Olho no Imposto, Lei 12.741, valor aproximado de tributos,
-## carga tributária NCM, alíquota federal nacional, alíquota federal importado, alíquota estadual,
-## alíquota municipal, IBPT 2015, IBPT 2016, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020,
-## IBPT 2021, IBPT 2022, IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT,
-## auditoria fiscal NF-e, auditoria retroativa tributária, recuperação de créditos tributários,
-## nota fiscal eletrônica impostos, NF-e tributos, NFC-e IBPT, ERP fiscal Brasil,
-## Simples Nacional alíquota, NCM impostos, NCM alíquota, classificação fiscal NCM,
-## ibpt.valraw.com.br, VALRAW, API IBPT, API fiscal brasileira, API NCM, API tributária,
-## tabela IBPT JSON, tabela IBPT CSV, tabela IBPT open source, tabela IBPT gratuita,
-## IBPT API estática, IBPT GitHub Pages, IBPT sem cadastro, IBPT sem token,
-## IBPT todas as versões, IBPT semestral, IBPT vigência, IBPT revisões A B C,
-## deolhonoimposto, iws.ibpt.org.br, apidoni.ibpt.org.br,
-## imposto nota fiscal consumidor, transparência tributária, Lei de Transparência Fiscal
+<details>
+<summary>Termos relacionados</summary>
+
+Tabela IBPT, TabelaIBPTax, IBPT histórico, alíquota IBPT, IBPT NCM, IBPT NBS, IBPT LC116, tabela de impostos Brasil, De Olho no Imposto, Lei 12.741, valor aproximado de tributos, carga tributária NCM, alíquota federal nacional, alíquota federal importado, alíquota estadual, alíquota municipal, IBPT 2015, IBPT 2016, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020, IBPT 2021, IBPT 2022, IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT, auditoria fiscal NF-e, auditoria retroativa tributária, recuperação de créditos tributários, nota fiscal eletrônica impostos, NF-e tributos, NFC-e IBPT, ERP fiscal Brasil, Simples Nacional alíquota, NCM impostos, NCM alíquota, classificação fiscal NCM, ibpt.valraw.com.br, VALRAW, API IBPT, API fiscal brasileira, API NCM, API tributária, tabela IBPT JSON, tabela IBPT CSV, tabela IBPT open source, tabela IBPT gratuita, IBPT API estática, IBPT GitHub Pages, IBPT sem cadastro, IBPT sem token, IBPT todas as versões, IBPT semestral, IBPT vigência, IBPT revisões A B C, deolhonoimposto, iws.ibpt.org.br, apidoni.ibpt.org.br, imposto nota fiscal consumidor, transparência tributária, Lei de Transparência Fiscal
+
+</details>

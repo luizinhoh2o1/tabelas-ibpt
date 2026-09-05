@@ -3,61 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IBPT API - Consulta de Alíquotas Tributárias</title>
-  <meta name="description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
+  <title>Tabelas IBPT</title>
+  <meta name="description" content="API estática com 100 tabelas IBPTax (2015–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ibpt.valraw.com.br/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ibpt.valraw.com.br/">
-  <meta property="og:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta property="og:description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="IBPT API - Consulta de Alíquotas Tributárias">
-  <meta name="twitter:description" content="API estática com 99 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <meta property="og:title" content="Tabelas IBPT">
+  <meta property="og:description" content="API estática com 100 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
+  <meta property="og:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta property="og:image:width" content="2000">
+  <meta property="og:image:height" content="1000">
+  <meta property="og:image:alt" content="Logo Tabelas IBPT">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta name="twitter:title" content="Tabelas IBPT">
+  <meta name="twitter:description" content="API estática com 100 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/public/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/public/favicon-64x64.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/public/favicon-128x128.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/public/favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="/public/favicon-256x256.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/public/favicon-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180x180.png">
   <!-- Preconnect para fontes e ícones -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <!-- Google Fonts — carregamento não-bloqueante -->
+  <!-- Google Fonts - carregamento não-bloqueante -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&family=Ubuntu+Mono:wght@400;700&display=swap"></noscript>
-  <!-- Font Awesome — carregamento não-bloqueante -->
+  <!-- Font Awesome - carregamento não-bloqueante -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <style>
+    /* Design System VALRAW UI - light corporate (portado de recuperaqui-landing) */
     :root {
-      --fundo-principal: #13171B;
-      --fundo-cartao: rgb(0 0 0 / 6%);
-      --fundo-hover: rgba(255,255,255,0.04);
-      --fundo-section: #1A1F24;
-      --fundo-input: #1E2530;
-      --fundo-base: #0F1419;
-      --primaria: #2979FF;
-      --primaria-clara: #448AFF;
-      --primaria-hover: #3D82FF;
-      --primaria-dim: rgba(41,121,255,0.10);
-      --primaria-border: rgba(41,121,255,0.20);
-      --primaria-border-30: rgba(41,121,255,0.30);
-      --primaria-glow: rgba(41,121,255,0.15);
-      --secundaria: #7C4DFF;
-      --secundaria-clara: #B388FF;
-      --secundaria-dim: rgba(124,77,255,0.10);
-      --secundaria-border: rgba(124,77,255,0.20);
-      --acento-verde: #00E676;
-      --acento-verde-claro: #69F0AE;
-      --verde-dim: rgba(0,230,118,0.08);
-      --verde-border: rgba(0,230,118,0.20);
-      --acento-amarelo: #FFD600;
-      --amarelo-dim: rgba(255,214,0,0.10);
-      --borda-sutil: rgba(55,71,79,0.50);
-      --borda-padrao: #37474F;
-      --borda-forte: #546E7A;
-      --borda-foco: #2979FF;
-      --texto-principal: #FFFFFF;
-      --texto-secundario: #E0E0E0;
-      --texto-terciario: #9E9E9E;
-      --texto-mutado: #757575;
-      --texto-inverso: #0F1419;
+      --fundo-principal: #FFFFFF;
+      --fundo-cartao: #FFFFFF;
+      --fundo-hover: #F1F5F9;
+      --fundo-section: #F7F9FC;
+      --fundo-input: #F7F9FC;
+      --fundo-base: #F7F9FC;
+      --primaria: #000793;
+      --primaria-escura: #00055E;
+      --primaria-hover: #00055E;
+      --primaria-dim: rgba(0,7,147,0.06);
+      --primaria-border: rgba(0,7,147,0.20);
+      --acento-verde: #05C700;
+      --verde-escuro: #037A00;
+      --verde-dim: rgba(5,199,0,0.10);
+      --verde-border: rgba(5,199,0,0.35);
+      --secundaria: #1F2937;
+      --secundaria-escura: #111827;
+      --acento-amarelo: #C68C00;
+      --amarelo-dim: rgba(255,180,0,0.10);
+      --amarelo-border: rgba(255,180,0,0.30);
+      --borda-sutil: #EDF2F7;
+      --borda-padrao: #E2E8F0;
+      --borda-forte: #CBD5E0;
+      --borda-foco: #000793;
+      --texto-principal: #1F2937;
+      --texto-secundario: #4A5568;
+      --texto-terciario: #718096;
+      --texto-mutado: #A0AEC0;
+      --texto-inverso: #FFFFFF;
+      --sombra-card: 0 4px 24px rgba(15,23,42,0.06);
+      --sombra-card-hover: 0 12px 36px rgba(15,23,42,0.12);
+      --sombra-sticky: 0 2px 12px rgba(15,23,42,0.04);
+      --sombra-cta: 0 8px 24px rgba(0,7,147,0.22);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; height: 100%; }
@@ -67,17 +84,19 @@
       color: var(--texto-principal);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
       min-height: 100%;
       display: flex;
       flex-direction: column;
     }
-    ::selection { color: #fff; background: rgba(41,121,255,0.3); }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--fundo-principal); }
-    ::-webkit-scrollbar-thumb { background: var(--borda-padrao); border-radius: 3px; }
-    a { color: var(--primaria-clara); text-decoration: none; transition: color 0.2s; }
-    a:hover { color: var(--acento-verde-claro); }
+    ::selection { color: var(--secundaria); background: rgba(5,199,0,0.22); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--fundo-section); }
+    ::-webkit-scrollbar-thumb { background: var(--borda-forte); border-radius: 6px; border: 2px solid var(--fundo-section); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--texto-terciario); }
+    a { color: var(--primaria); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--primaria-hover); }
     .container { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
     main { flex: 1 0 auto; width: 100%; }
     @media (min-width: 640px) { .container { padding: 0 24px; } }
@@ -86,79 +105,78 @@
     /* ── Header ── */
     header {
       position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-      background: rgba(15,20,25,0.85);
+      background: rgba(255,255,255,0.88);
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--borda-sutil);
+      box-shadow: var(--sombra-sticky);
     }
-    header .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-    @media (min-width: 768px) { header .container { height: 72px; } }
-    header h1 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    header h1 .logo-icon {
-      width: 32px; height: 32px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--primaria), var(--secundaria));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: #fff;
-    }
-    header h1 span { color: var(--texto-terciario); font-weight: 400; }
+    header .container { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    header h1 { display: flex; align-items: center; }
+    header h1 .logo { height: 38px; width: auto; display: block; }
 
     /* ── Tabs ── */
     .tabs {
-      display: flex; gap: 2px; overflow-x: auto;
-      border-radius: 12px; padding: 4px;
-      margin: 80px auto 0; max-width: 900px;
+      display: flex; gap: 4px; overflow-x: auto;
+      border-radius: 14px; padding: 4px;
+      background: var(--fundo-section); border: 1px solid var(--borda-sutil);
+      margin: 76px auto 0; max-width: 900px;
     }
     .tab-btn {
       flex: 1; min-width: 0;
-      padding: 10px 16px; border: none; border-radius: 10px;
+      padding: 10px 16px; border: 1px solid transparent; border-radius: 10px;
       background: transparent; color: var(--texto-terciario);
       font-family: 'Ubuntu', sans-serif; font-size: 13px; font-weight: 500;
       cursor: pointer; transition: all 0.2s;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       white-space: nowrap;
     }
-    .tab-btn:hover { color: var(--texto-principal); background: rgba(255,255,255,0.04); }
+    .tab-btn:hover { color: var(--texto-principal); background: var(--fundo-hover); }
     .tab-btn.active {
-      background: var(--primaria-dim); color: var(--primaria-clara);
-      border: 1px solid var(--primaria-border);
-      box-shadow: 0 0 20px var(--primaria-glow);
+      background: var(--fundo-cartao); color: var(--primaria);
+      border-color: var(--borda-sutil);
+      box-shadow: var(--sombra-sticky);
     }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
     /* ── Hero (Home) ── */
-    .hero { position: relative; padding: 48px 0 32px; text-align: center; overflow: hidden; }
+    .hero { position: relative; padding: 56px 0 32px; text-align: center; overflow: hidden; }
     .hero-bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
     .hero-grid {
-      position: absolute; inset: 0; opacity: 0.03;
-      background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+      position: absolute; inset: 0; opacity: 0.5;
+      background-image: linear-gradient(rgba(31,41,55,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,41,55,0.05) 1px, transparent 1px);
       background-size: 60px 60px;
     }
     .hero-orb { position: absolute; border-radius: 50%; }
-    .hero-orb-blue { top: 20%; left: 30%; width: 500px; height: 500px; background: var(--primaria); filter: blur(140px); opacity: 0.10; transform: translate(-50%, -50%); }
-    .hero-orb-green { bottom: 20%; right: 20%; width: 350px; height: 350px; background: var(--acento-verde); filter: blur(120px); opacity: 0.06; }
+    .hero-orb-blue { top: 20%; left: 30%; width: 500px; height: 500px; background: var(--primaria); filter: blur(140px); opacity: 0.14; transform: translate(-50%, -50%); }
+    .hero-orb-green { bottom: 20%; right: 20%; width: 350px; height: 350px; background: var(--acento-verde); filter: blur(120px); opacity: 0.14; }
     .hero-fade { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, transparent 60%, var(--fundo-principal)); }
     .hero-content { position: relative; z-index: 1; }
-    .hero h2 { font-size: 32px; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
+    .hero h2 { font-size: 32px; font-weight: 700; margin-bottom: 12px; line-height: 1.2; letter-spacing: -0.02em; }
     @media (min-width: 640px) { .hero h2 { font-size: 42px; } }
     @media (min-width: 1024px) { .hero h2 { font-size: 48px; } }
     .gradient-text {
-      background: linear-gradient(135deg, var(--primaria-clara), var(--secundaria-clara));
+      background: linear-gradient(135deg, #000793 0%, #05C700 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
     .gradient-text-green {
-      background: linear-gradient(135deg, var(--acento-verde), var(--primaria-clara));
+      background: linear-gradient(135deg, #037A00 0%, #000793 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
     .hero p { color: var(--texto-terciario); font-size: 16px; max-width: 600px; margin: 0 auto 24px; }
 
     /* ── Aviso ── */
     .aviso {
-      background: var(--amarelo-dim); border: 1px solid rgba(255,214,0,0.20);
+      background: var(--amarelo-dim); border: 1px solid var(--amarelo-border);
       border-radius: 12px; padding: 14px 20px; margin: 0 auto 32px; max-width: 900px;
       font-size: 13px; color: var(--acento-amarelo); display: flex; align-items: flex-start; gap: 10px;
+      text-align: left;
     }
     .aviso i { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+    /* Variante de uma linha só: icone + texto centralizados */
+    .aviso-centro { align-items: center; justify-content: center; text-align: center; }
+    .aviso-centro i { margin-top: 0; }
 
     /* ── Stats ── */
     .stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin: 0 auto 32px; max-width: 900px; }
@@ -166,37 +184,45 @@
     .stat-card {
       background: var(--fundo-cartao); border: 1px solid var(--borda-sutil);
       border-radius: 16px; padding: 20px; text-align: center;
-      backdrop-filter: blur(8px); transition: all 0.3s;
+      box-shadow: var(--sombra-card);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
     }
-    .stat-card:hover { border-color: var(--primaria-border-30); box-shadow: 0 0 40px var(--primaria-glow); }
+    .stat-card:hover { transform: translateY(-4px); border-color: var(--borda-padrao); box-shadow: var(--sombra-card-hover); }
     .stat-card .value {
       font-family: 'Ubuntu Mono', monospace; font-size: 32px; font-weight: 700;
-      background: linear-gradient(135deg, var(--primaria-clara), var(--acento-verde));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      color: var(--primaria); line-height: 1;
     }
-    .stat-card .label { font-size: 11px; color: var(--texto-terciario); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+    .stat-card .label { font-size: 11px; color: var(--texto-terciario); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
 
     /* ── Feature Cards (Home) ── */
     .features { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 900px; margin: 0 auto 48px; }
     @media (min-width: 640px) { .features { grid-template-columns: repeat(2,1fr); } }
     @media (min-width: 768px) { .features { grid-template-columns: repeat(3,1fr); } }
     .feature-card {
-      background: rgb(0 0 0 / 6%); border: 1px solid var(--borda-sutil);
-      border-radius: 16px; padding: 24px; transition: all 0.3s;
+      background: var(--fundo-cartao); border: 1px solid var(--borda-sutil);
+      border-radius: 16px; padding: 24px; box-shadow: var(--sombra-card);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
     }
-    .feature-card:hover { border-color: var(--primaria-border-30); box-shadow: 0 0 40px var(--primaria-glow); }
-    .feature-card .icon-box {
-      width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px; font-size: 18px;
+    .feature-card:hover { transform: translateY(-4px); border-color: var(--borda-padrao); box-shadow: var(--sombra-card-hover); }
+    .feature-card h3 {
+      font-size: 17px; font-weight: 600; color: var(--secundaria);
+      letter-spacing: -0.01em; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
     }
-    .feature-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-    .feature-card p { font-size: 13px; color: var(--texto-terciario); line-height: 1.5; }
+    .feature-card h3::before {
+      content: ''; flex-shrink: 0;
+      width: 4px; height: 18px; border-radius: 2px;
+      background: linear-gradient(to bottom, var(--acento-verde), var(--primaria));
+      transition: height .25s ease;
+    }
+    .feature-card:hover h3::before { height: 26px; }
+    .feature-card p { font-size: 13px; color: var(--texto-secundario); line-height: 1.5; }
 
     /* ── Search Box ── */
     .search-box {
       background: var(--fundo-cartao); border: 1px solid var(--borda-sutil);
       border-radius: 24px; padding: 28px; margin: 24px auto 40px; max-width: 900px;
-      backdrop-filter: blur(12px); box-shadow: 0 0 60px rgba(41,121,255,0.06);
+      box-shadow: var(--sombra-card);
     }
     .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
     @media (min-width: 640px) { .filters { grid-template-columns: repeat(4,1fr); } }
@@ -207,15 +233,16 @@
       font-size: 11px; color: var(--texto-terciario); margin-bottom: 6px;
       text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500;
     }
-    .filter-group label i { font-size: 10px; color: var(--primaria-clara); }
+    .filter-group label i { font-size: 10px; color: var(--primaria); }
     .filter-group select, .filter-group input {
       width: 100%; padding: 10px 14px; background: var(--fundo-input);
-      border: 1px solid var(--borda-sutil); border-radius: 10px;
+      border: 1px solid var(--borda-padrao); border-radius: 10px;
       color: var(--texto-principal); font-family: 'Ubuntu', sans-serif; font-size: 14px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
     .filter-group select:focus, .filter-group input:focus {
-      outline: none; border-color: var(--borda-foco); box-shadow: 0 0 0 3px rgba(41,121,255,0.15);
+      outline: none; border-color: var(--borda-foco); background: var(--fundo-cartao);
+      box-shadow: 0 0 0 3px rgba(0,7,147,0.14);
     }
     .filter-group select { cursor: pointer; }
     .filter-group input::placeholder { color: var(--texto-mutado); }
@@ -224,18 +251,18 @@
     /* ── Botões ── */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 10px 24px; border-radius: 10px; border: none;
+      padding: 11px 24px; border-radius: 10px; border: 1px solid transparent;
       font-family: 'Ubuntu', sans-serif; font-size: 14px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s;
+      cursor: pointer; transition: background .2s ease, box-shadow .2s ease, transform .2s ease, border-color .2s ease, color .2s ease;
     }
     .btn:active { transform: scale(0.98); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-primary { background: #1565C0; color: #fff; border: 1px solid var(--primaria); box-shadow: 0 0 20px rgba(41,121,255,0.2); }
-    .btn-primary:hover { background: #1976D2; box-shadow: 0 0 30px rgba(41,121,255,0.3); }
-    .btn-ghost { background: transparent; color: var(--texto-terciario); border: 1px solid var(--borda-forte); }
-    .btn-ghost:hover { border-color: var(--primaria); color: var(--texto-principal); background: rgb(0 0 0 / 6%); }
+    .btn-primary { background: var(--primaria); color: var(--texto-inverso); font-weight: 500; }
+    .btn-primary:hover:not(:disabled) { background: var(--primaria-hover); box-shadow: var(--sombra-cta); transform: translateY(-1px); }
+    .btn-ghost { background: transparent; color: var(--secundaria); border-color: var(--borda-padrao); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--primaria); background: var(--primaria-dim); color: var(--primaria); }
     .search-status { font-family: 'Ubuntu Mono', monospace; font-size: 13px; color: var(--texto-terciario); margin-left: auto; display: flex; align-items: center; gap: 8px; }
-    .spinner { width: 14px; height: 14px; border: 2px solid var(--borda-sutil); border-top-color: var(--primaria); border-radius: 50%; animation: spin .6s linear infinite; display: none; flex-shrink: 0; }
+    .spinner { width: 14px; height: 14px; border: 2px solid var(--borda-padrao); border-top-color: var(--primaria); border-radius: 50%; animation: spin .6s linear infinite; display: none; flex-shrink: 0; }
     .spinner.ativo { display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -243,41 +270,41 @@
     .endpoint-url {
       background: var(--fundo-input); border: 1px solid var(--borda-sutil); border-radius: 10px;
       padding: 10px 16px; font-family: 'Ubuntu Mono', monospace; font-size: 13px;
-      color: var(--acento-verde); margin-top: 16px; word-break: break-all;
+      color: var(--secundaria); margin-top: 16px; word-break: break-all;
       display: flex; align-items: center; gap: 10px;
     }
     .endpoint-url .method {
-      background: var(--acento-verde); color: var(--texto-inverso);
+      background: var(--verde-escuro); color: var(--texto-inverso);
       padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; flex-shrink: 0;
     }
 
     /* ── Progress ── */
-    .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 9999px; margin-top: 12px; overflow: hidden; }
+    .progress-bar { width: 100%; height: 4px; background: var(--borda-sutil); border-radius: 9999px; margin-top: 12px; overflow: hidden; }
     .progress-bar .fill { height: 100%; background: linear-gradient(to right, var(--primaria), var(--acento-verde)); border-radius: 9999px; transition: width 0.3s; }
 
     /* ── Results Table ── */
     .results { max-width: 900px; margin: 0 auto 64px; }
     .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     .results-header h3 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .results-header h3 i { color: var(--primaria-clara); }
+    .results-header h3 i { color: var(--primaria); }
     .table-wrapper {
       overflow-x: auto; border: 1px solid var(--borda-sutil); border-radius: 16px;
       max-height: 600px; overflow-y: auto; background: var(--fundo-cartao);
-      backdrop-filter: blur(8px); box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      box-shadow: var(--sombra-card);
     }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     thead th {
-      background: rgb(0 0 0 / 6%); padding: 12px 14px; text-align: left;
+      background: var(--fundo-section); padding: 12px 14px; text-align: left;
       font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
-      color: var(--texto-terciario); border-bottom: 1px solid var(--borda-sutil);
+      color: var(--texto-terciario); border-bottom: 1px solid var(--borda-padrao);
       position: sticky; top: 0; cursor: pointer; transition: color 0.2s; white-space: nowrap;
     }
-    thead th:hover { color: var(--primaria-clara); }
-    tbody td { padding: 10px 14px; border-bottom: 1px solid rgba(55,71,79,0.30); }
+    thead th:hover { color: var(--primaria); }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid var(--borda-sutil); }
     tbody tr { transition: background 0.15s; }
-    tbody tr:hover { background: rgba(41,121,255,0.04); }
+    tbody tr:hover { background: var(--primaria-dim); }
     .num { text-align: right; font-family: 'Ubuntu Mono', monospace; font-variant-numeric: tabular-nums; }
-    .code { font-family: 'Ubuntu Mono', monospace; font-weight: 500; color: var(--primaria-clara); }
+    .code { font-family: 'Ubuntu Mono', monospace; font-weight: 500; color: var(--primaria-escura); }
     .desc { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--texto-secundario); }
 
     /* ── Tooltips ── */
@@ -285,21 +312,21 @@
     [data-tooltip]:hover::after {
       content: attr(data-tooltip);
       position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-      background: var(--fundo-base); color: var(--texto-secundario); border: 1px solid var(--borda-sutil);
+      background: var(--secundaria); color: var(--texto-inverso); border: 1px solid var(--secundaria-escura);
       padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 400;
       text-transform: none; letter-spacing: 0; white-space: nowrap; z-index: 10;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      box-shadow: var(--sombra-card-hover);
     }
 
     /* ── Pagination ── */
     .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 20px; font-size: 14px; }
     .pagination button {
-      padding: 8px 16px; border-radius: 10px; border: 1px solid var(--borda-sutil);
+      padding: 8px 16px; border-radius: 10px; border: 1px solid var(--borda-padrao);
       background: var(--fundo-cartao); color: var(--texto-principal); cursor: pointer;
       font-family: 'Ubuntu', sans-serif; transition: all 0.2s;
     }
-    .pagination button:hover:not(:disabled) { border-color: var(--primaria-border-30); background: var(--primaria-dim); }
-    .pagination button:disabled { opacity: 0.3; cursor: default; }
+    .pagination button:hover:not(:disabled) { border-color: var(--primaria); background: var(--primaria-dim); color: var(--primaria); }
+    .pagination button:disabled { opacity: 0.4; cursor: default; }
     .pagination span { color: var(--texto-terciario); font-family: 'Ubuntu Mono', monospace; }
 
     /* ── Badges ── */
@@ -308,32 +335,33 @@
       border-radius: 9999px; font-size: 10px; font-weight: 600;
       font-family: 'Ubuntu Mono', monospace; text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .badge-ncm { background: var(--primaria-dim); color: var(--primaria-clara); border: 1px solid var(--primaria-border); }
-    .badge-nbs { background: var(--verde-dim); color: var(--acento-verde); border: 1px solid var(--verde-border); }
-    .badge-lc116 { background: var(--secundaria-dim); color: var(--secundaria-clara); border: 1px solid var(--secundaria-border); }
+    .badge-ncm { background: var(--primaria-dim); color: var(--primaria-escura); border: 1px solid var(--primaria-border); }
+    .badge-nbs { background: var(--verde-dim); color: var(--verde-escuro); border: 1px solid var(--verde-border); }
+    .badge-lc116 { background: var(--amarelo-dim); color: var(--acento-amarelo); border: 1px solid var(--amarelo-border); }
 
     /* ── Docs ── */
     .docs { max-width: 900px; margin: 0 auto; padding: 32px 0 64px; }
     .docs h2 { font-size: 24px; font-weight: 700; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--borda-sutil); display: flex; align-items: center; gap: 12px; }
-    .docs h2 i { color: var(--primaria-clara); }
+    .docs h2 i { color: var(--primaria); }
     .docs h3 { font-size: 17px; font-weight: 600; margin: 32px 0 14px; display: flex; align-items: center; gap: 8px; }
-    .docs h3 i { color: var(--acento-verde); font-size: 14px; }
+    .docs h3 i { color: var(--primaria); font-size: 14px; }
     .docs p, .docs li { color: var(--texto-secundario); margin-bottom: 10px; line-height: 1.7; }
     .docs ul, .docs ol { padding-left: 20px; }
-    .docs code { background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px; font-family: 'Ubuntu Mono', monospace; font-size: 13px; color: var(--acento-verde); }
-    .docs pre { background: var(--fundo-base); border: 1px solid var(--borda-sutil); border-radius: 16px; padding: 20px; overflow-x: auto; margin: 16px 0; font-size: 13px; }
-    .docs pre code { background: none; padding: 0; }
+    .docs code { background: var(--fundo-input); border: 1px solid var(--borda-sutil); padding: 2px 8px; border-radius: 6px; font-family: 'Ubuntu Mono', monospace; font-size: 13px; color: var(--primaria-escura); }
+    .docs pre { background: var(--secundaria-escura); border: 1px solid var(--secundaria); border-radius: 16px; padding: 20px; overflow-x: auto; margin: 16px 0; font-size: 13px; color: #E2E8F0; }
+    .docs pre code { background: none; border: none; padding: 0; color: inherit; }
 
     /* ── Endpoint List ── */
     .endpoint-list { list-style: none; padding: 0; }
     .endpoint-list li {
       background: var(--fundo-cartao); border: 1px solid var(--borda-sutil);
       border-radius: 16px; padding: 16px 20px; margin-bottom: 10px;
-      display: flex; align-items: flex-start; gap: 14px;
-      backdrop-filter: blur(8px); transition: all 0.2s;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: var(--sombra-card);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
     }
-    .endpoint-list li:hover { border-color: var(--primaria-border-30); box-shadow: 0 0 30px var(--primaria-glow); }
-    .endpoint-list .method { background: var(--acento-verde); color: var(--texto-inverso); padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; font-family: 'Ubuntu Mono', monospace; flex-shrink: 0; margin-top: 2px; }
+    .endpoint-list li:hover { transform: translateY(-3px); border-color: var(--borda-padrao); box-shadow: var(--sombra-card-hover); }
+    .endpoint-list .method { background: var(--verde-escuro); color: var(--texto-inverso); padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; font-family: 'Ubuntu Mono', monospace; flex-shrink: 0; }
     .endpoint-list .path { font-family: 'Ubuntu Mono', monospace; color: var(--texto-principal); font-size: 14px; }
     .endpoint-list .path-desc { color: var(--texto-terciario); font-size: 13px; margin-top: 6px; }
 
@@ -343,8 +371,8 @@
       padding: 32px 0; text-align: center; font-size: 13px; color: var(--texto-terciario);
       flex-shrink: 0;
     }
-    footer a { color: var(--texto-terciario); }
-    footer a:hover { color: var(--primaria-clara); }
+    footer a { color: var(--texto-secundario); }
+    footer a:hover { color: var(--primaria); }
 
     /* ── Responsive ── */
     @media (max-width: 640px) {
@@ -355,13 +383,18 @@
       .tab-btn { font-size: 12px; padding: 8px 10px; }
       .tab-btn span { display: none; }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stat-card, .feature-card, .endpoint-list li, .btn { transition: none !important; }
+      .stat-card:hover, .feature-card:hover, .endpoint-list li:hover, .btn-primary:hover:not(:disabled) { transform: none; }
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
       <h1>
-        IBPT API <span>/ Alíquotas</span>
+        <img class="logo" src="/public/logo.webp" alt="Tabelas IBPT" width="2000" height="1000">
       </h1>
       <a href="https://github.com/luizinhoh2o1/tabelas-ibpt" target="_blank" aria-label="Ver no GitHub" style="color:var(--texto-terciario);font-size:20px;transition:color 0.2s;"><i class="fab fa-github" aria-hidden="true"></i></a>
     </div>
@@ -389,12 +422,10 @@
         </div>
       </div>
 
-      <div class="aviso">
+      <div class="aviso aviso-centro">
         <i class="fas fa-exclamation-triangle"></i>
         <div>
           <strong>AVISO:</strong> Os dados contidos neste repositório não são atualizados em tempo real.
-          As tabelas são utilizadas apenas para <strong>consulta histórica</strong> e não é recomendado
-          o uso em sistemas reais de produção.
         </div>
       </div>
 
@@ -402,25 +433,16 @@
 
       <div class="features">
         <div class="feature-card">
-          <div class="icon-box" style="color:var(--primaria-clara);">
-            <i class="fas fa-compress-alt" aria-hidden="true"></i>
-          </div>
           <h3>Compressão Gzip</h3>
-          <p>Dados comprimidos com gzip nível 9. De ~4,5 GB de CSV bruto para ~542 MB (88% de redução). Descompressão automática no navegador.</p>
+          <p>Dados comprimidos com gzip nível 9. De ~<span class="est-csv-bruto">4,5 GB</span> de CSV bruto para ~<span class="est-comprimido">542 MB</span> (<span class="est-reducao">88%</span> de redução). Descompressão automática no navegador.</p>
         </div>
         <div class="feature-card">
-          <div class="icon-box" style="color:var(--acento-verde);">
-            <i class="fas fa-bolt" aria-hidden="true"></i>
-          </div>
           <h3>100% Client-Side</h3>
           <p>Sem backend. Os dados são buscados, descomprimidos e filtrados diretamente no navegador via DecompressionStream.</p>
         </div>
         <div class="feature-card">
-          <div class="icon-box" style="color:var(--secundaria-clara);">
-            <i class="fas fa-layer-group" aria-hidden="true"></i>
-          </div>
           <h3>Todas as Versões</h3>
-          <p>99 tabelas de 2015 a 2026. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
+          <p><span class="est-tabelas">100</span> tabelas de <span class="est-ano-inicial">2015</span> a <span class="est-ano-final">2026</span>, <span class="est-registros">32.652.402</span> registros. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
         </div>
       </div>
     </div>
@@ -473,13 +495,13 @@
           <div class="endpoint-url" id="endpoint-display" style="display:none"><span class="method">GET</span><span id="endpoint-path"></span></div>
         </div>
 
-        <div id="resultados" class="results">
+        <div id="resultados" class="results" hidden>
           <div class="results-header">
             <h3><i class="fas fa-table"></i> <span id="titulo-resultados">Resultados</span></h3>
             <button class="btn btn-ghost" onclick="exportarCsv()" style="font-size:12px;width:auto"><i class="fas fa-download" aria-hidden="true"></i> Exportar CSV</button>
           </div>
           <div class="table-wrapper">
-            <table>
+            <table id="tabela-resultados">
               <thead><tr>
                 <th onclick="ordenarPor(0)" data-tooltip="Código NCM, NBS ou LC116 do produto/serviço"><i class="fas fa-barcode"></i> Código</th>
                 <th onclick="ordenarPor(1)" data-tooltip="Exceção tarifária (se aplicável)">Ex</th>
@@ -487,10 +509,10 @@
                 <th onclick="ordenarPor(3)" data-tooltip="Unidade Federativa (estado brasileiro)"><i class="fas fa-map-marker-alt"></i> UF</th>
                 <th onclick="ordenarPor(4)" data-tooltip="Versão da tabela IBPTax (semestre.revisão)">Tabela</th>
                 <th onclick="ordenarPor(5)" data-tooltip="Descrição do produto ou serviço">Descrição</th>
-                <th onclick="ordenarPor(6)" class="num" data-tooltip="Alíquota Nacional Federal — tributos federais sobre produtos/serviços nacionais">Nac. Federal</th>
-                <th onclick="ordenarPor(7)" class="num" data-tooltip="Alíquota Importados Federal — tributos federais sobre produtos/serviços importados">Imp. Federal</th>
-                <th onclick="ordenarPor(8)" class="num" data-tooltip="Alíquota Estadual — ICMS e outros tributos estaduais">Estadual</th>
-                <th onclick="ordenarPor(9)" class="num" data-tooltip="Alíquota Municipal — ISS e outros tributos municipais">Municipal</th>
+                <th onclick="ordenarPor(6)" class="num" data-tooltip="Alíquota Nacional Federal - tributos federais sobre produtos/serviços nacionais">Nac. Federal</th>
+                <th onclick="ordenarPor(7)" class="num" data-tooltip="Alíquota Importados Federal - tributos federais sobre produtos/serviços importados">Imp. Federal</th>
+                <th onclick="ordenarPor(8)" class="num" data-tooltip="Alíquota Estadual - ICMS e outros tributos estaduais">Estadual</th>
+                <th onclick="ordenarPor(9)" class="num" data-tooltip="Alíquota Municipal - ISS e outros tributos municipais">Municipal</th>
                 <th onclick="ordenarPor(10)" data-tooltip="Data de início da vigência da tabela">Início Vig.</th>
                 <th onclick="ordenarPor(11)" data-tooltip="Data de fim da vigência da tabela">Fim Vig.</th>
               </tr></thead>
@@ -515,7 +537,7 @@
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/index.json</div><div class="path-desc">Índice de uma versão/tabela. Ex: <code>/api/2026/26.1.H/index.json</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/index.json</div><div class="path-desc">Índice por tipo com contagem por UF. Ex: <code>/api/2026/26.1.H/ncm/index.json</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/{uf}.json.gz</div><div class="path-desc">Dados completos (gzip). Ex: <code>/api/2026/26.1.H/ncm/SP.json.gz</code></div></div></li>
-          <li><span class="method">GET</span><div><div class="path">/api/todos.csv.gz</div><div class="path-desc">CSV consolidado com todos os registros (gzip). Usado para consultas amplas.</div></div></li>
+          <li><span class="method">GET</span><div><div class="path">/api/todos-{ano}.csv.gz</div><div class="path-desc">CSV consolidado de um ano, com todas as versões, tipos e UFs (gzip). Usado nas consultas amplas. Ex: <code>/api/todos-2026.csv.gz</code></div></div></li>
         </ul>
 
         <h3><i class="fas fa-code"></i> Formato de Resposta</h3>
@@ -568,34 +590,34 @@ for item in dados['dados']:
         </ul>
 
         <h3><i class="fas fa-compress-alt"></i> Compressão</h3>
-        <p>Dados originais: ~4,5 GB de CSV bruto. Após gzip nível 9: ~542 MB (<strong>88% de redução</strong>).</p>
+        <p>Dados originais: ~<span class="est-csv-bruto">4,5 GB</span> de CSV bruto. Após gzip nível 9: ~<span class="est-comprimido">542 MB</span> (<strong><span class="est-reducao">88%</span> de redução</strong>) em <span class="est-arquivos">7.890</span> arquivos.</p>
         <ul>
           <li>Dados: <code>.json.gz</code> (comprimidos)</li>
           <li>Índices: <code>.json</code> (sem compressão)</li>
-          <li>Browser: <code>DecompressionStream('gzip')</code> — nativo (Chrome 80+, Firefox 113+, Safari 16.4+)</li>
+          <li>Browser: <code>DecompressionStream('gzip')</code> - nativo (Chrome 80+, Firefox 113+, Safari 16.4+)</li>
         </ul>
 
         <h3><i class="fas fa-search"></i> Pesquisa Client-Side</h3>
         <ol>
           <li>Metadados carregados ao abrir a página (anos, versões, UFs, tipos).</li>
           <li>6 filtros disponíveis: ano, versão, UF, tipo, código e descrição.</li>
-          <li>Arquivos buscados em lotes paralelos de 8, descomprimidos com DecompressionStream.</li>
-          <li>Consultas amplas (&gt;50 arquivos) usam o CSV consolidado <code>todos.csv.gz</code> via streaming.</li>
-          <li>Resultados em tabela com 12 colunas (incluindo vigência), paginados (100/página), ordenáveis, exportáveis como CSV.</li>
+          <li>Arquivos buscados em lotes paralelos de <span class="est-lote">8</span>, descomprimidos com DecompressionStream.</li>
+          <li>Consultas amplas (&gt;<span class="est-limite-arquivos">50</span> arquivos) usam os CSVs consolidados por ano (<code>todos-{ano}.csv.gz</code>) via streaming: com filtro de ano, só um arquivo é baixado.</li>
+          <li>Resultados em tabela com 12 colunas (incluindo vigência), paginados (<span class="est-pagina">100</span>/página), ordenáveis, exportáveis como CSV.</li>
         </ol>
 
         <h3><i class="fas fa-cubes"></i> Tipos de Dados</h3>
         <ul>
-          <li><span class="badge badge-ncm">NCM</span> <strong>Nomenclatura Comum do Mercosul</strong> — Produtos, 8 dígitos, ~11.000/UF</li>
-          <li><span class="badge badge-nbs">NBS</span> <strong>Nomenclatura Brasileira de Serviços</strong> — Serviços, 9 dígitos, ~860/UF</li>
-          <li><span class="badge badge-lc116">LC116</span> <strong>Lei Complementar 116</strong> — Serviços municipais, 4 dígitos, ~200/UF</li>
+          <li><span class="badge badge-ncm">NCM</span> <strong>Nomenclatura Comum do Mercosul</strong> - Produtos, 8 dígitos, ~<span class="est-ncm-uf">11.000</span>/UF</li>
+          <li><span class="badge badge-nbs">NBS</span> <strong>Nomenclatura Brasileira de Serviços</strong> - Serviços, 9 dígitos, ~<span class="est-nbs-uf">860</span>/UF</li>
+          <li><span class="badge badge-lc116">LC116</span> <strong>Lei Complementar 116</strong> - Serviços municipais, 4 dígitos, ~<span class="est-lc116-uf">200</span>/UF</li>
         </ul>
 
         <h3><i class="fas fa-robot"></i> Claude Code</h3>
         <p>Este projeto inclui arquivos de configuração para o <a href="https://claude.com/claude-code">Claude Code</a>:</p>
         <ul>
-          <li><code>CLAUDE.md</code> — Guia com estrutura, convenções e comandos do projeto</li>
-          <li><code>.claude/rules/</code> — Regras automáticas de nomenclatura e padrões</li>
+          <li><code>CLAUDE.md</code> - Guia com estrutura, convenções e comandos do projeto</li>
+          <li><code>.claude/rules/</code> - Regras automáticas de nomenclatura e padrões</li>
         </ul>
 
         <h3><i class="fas fa-balance-scale"></i> Licença</h3>
@@ -607,10 +629,12 @@ for item in dados['dados']:
 
   <footer>
     <div class="container" style="display:flex;align-items:center;justify-content:center;gap:8px;">
-      <i class="fas fa-database" aria-hidden="true" style="color:var(--primaria-clara)"></i>
+      <i class="fas fa-database" aria-hidden="true" style="color:var(--primaria)"></i>
       Dados: <a href="https://ibpt.com.br" target="_blank">IBPT</a>
       <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Licença: Apache 2.0
+      <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
+      Build: <span class="est-gerado-em">—</span>
       <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Powered by <a href="https://valraw.com.br" target="_blank" style="font-weight:600"><span class="gradient-text">VALRAW</span></a>
     </div>
@@ -623,8 +647,12 @@ for item in dados['dados']:
     let todosResultados = [];
     let paginaAtual = 1;
     const TAMANHO_PAGINA = 100;
+    const LOTE_ARQUIVOS = 8;      // requisicoes paralelas por lote
+    const LIMITE_ARQUIVOS = 50;   // acima disso, usa o CSV consolidado
+    const csvDoAno = ano => `todos-${ano}.csv.gz`;
     let colunaOrdenada = -1;
     let ordemCrescente = true;
+    let controleConsulta = null;
 
     function mostrarStatus(texto, carregando) {
       document.getElementById('texto-status').textContent = texto;
@@ -638,13 +666,17 @@ for item in dados['dados']:
     }
 
     // ── Tabs ──
-    function trocarAba(id, btn) {
+    function trocarAba(id, botao) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('active'); el.setAttribute('aria-selected', 'false'); });
       document.getElementById('aba-' + id).classList.add('active');
-      const alvo = btn || event.currentTarget;
+
+      // Sem `event` implicito: quem chama de fora do onclick (o botao da Home)
+      // nao passa botao nenhum, entao caimos na aba correspondente pelo id.
+      const alvo = botao || document.querySelector(`.tab-btn[aria-controls="aba-${id}"]`);
+      if (!alvo) return;
       alvo.classList.add('active');
-      if (alvo.hasAttribute('aria-selected')) alvo.setAttribute('aria-selected', 'true');
+      alvo.setAttribute('aria-selected', 'true');
     }
 
     // ── Init ──
@@ -654,6 +686,7 @@ for item in dados['dados']:
         metaDados = await resp.json();
         popularFiltros();
         mostrarEstatisticas();
+        preencherTextosDinamicos();
         document.getElementById('base-url-ep').textContent = location.origin + BASE;
       } catch (e) {
         console.error('Falha ao carregar metadados:', e);
@@ -702,9 +735,45 @@ for item in dados['dados']:
       `;
     }
 
+    // ── Textos dinamicos (Home e Informacoes) ──
+    // Os valores no HTML sao apenas fallback; o meta.json gerado no build manda.
+    function preencherTextosDinamicos() {
+      const definir = (classe, valor) => {
+        document.querySelectorAll('.' + classe).forEach(el => { el.textContent = valor; });
+      };
+      const num = n => n.toLocaleString('pt-BR');
+
+      // Constantes da propria pagina, para a prosa nunca divergir do codigo
+      definir('est-lote', num(LOTE_ARQUIVOS));
+      definir('est-limite-arquivos', num(LIMITE_ARQUIVOS));
+      definir('est-pagina', num(TAMANHO_PAGINA));
+
+      const e = metaDados && metaDados.estatisticas;
+      if (!e) return;
+
+      const tamanho = bytes => bytes >= 1024 ** 3
+        ? (bytes / 1024 ** 3).toFixed(1).replace('.', ',') + ' GB'
+        : num(Math.round(bytes / 1024 ** 2)) + ' MB';
+
+      definir('est-csv-bruto', tamanho(e.bytesCsvBruto));
+      definir('est-comprimido', tamanho(e.bytesComprimido));
+      definir('est-reducao', e.reducaoPercentual + '%');
+      definir('est-tabelas', num(e.tabelas));
+      definir('est-ano-inicial', e.anoInicial);
+      definir('est-ano-final', e.anoFinal);
+      definir('est-registros', num(e.totalRegistros));
+      definir('est-arquivos', num(e.arquivosGerados));
+      definir('est-ncm-uf', num(e.registrosPorUf.ncm));
+      definir('est-nbs-uf', num(e.registrosPorUf.nbs));
+      definir('est-lc116-uf', num(e.registrosPorUf.lc116));
+      if (e.geradoEm) {
+        definir('est-gerado-em', new Date(e.geradoEm).toLocaleString('pt-BR'));
+      }
+    }
+
     // ── Fetch ──
-    async function buscarJsonGz(url) {
-      const r = await fetch(url);
+    async function buscarJsonGz(url, sinal) {
+      const r = await fetch(url, { signal: sinal });
       if (!r.ok) return null;
       const f = r.body.pipeThrough(new DecompressionStream('gzip'));
       return JSON.parse(await new Response(f).text());
@@ -721,54 +790,77 @@ for item in dados['dados']:
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
 
+      controleConsulta?.abort();
+      controleConsulta = new AbortController();
+      const sinal = controleConsulta.signal;
+
+      // O CSV consolidado e dividido por ano. Com filtro de ano so um arquivo e
+      // baixado; sem filtro, os anos sao percorridos do mais recente ao mais antigo.
+      const anosAlvo = ano ? [ano] : metaDados.anos.map(String);
+
+      document.getElementById('resultados').hidden = false;
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       document.getElementById('endpoint-display').style.display = 'flex';
-      document.getElementById('endpoint-path').textContent = `${API}/todos.csv.gz`;
+      document.getElementById('endpoint-path').textContent = anosAlvo.length === 1
+        ? `${API}/${csvDoAno(anosAlvo[0])}`
+        : `${API}/${csvDoAno('{ano}')} (${anosAlvo.length} anos)`;
       mostrarStatus('Baixando CSV consolidado…', true);
       mostrarTabelaVazia('Buscando dados…');
       todosResultados = [];
 
+      let linhas = 0;
+
       try {
-        const resp = await fetch(`${API}/todos.csv.gz`);
-        if (!resp.ok) throw new Error('Falha');
-        const total = parseInt(resp.headers.get('Content-Length') || '0');
-        const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream());
-        const leitor = fluxo.getReader();
-        let buf = '', skip = false, bytes = 0, linhas = 0;
+        for (let i = 0; i < anosAlvo.length; i++) {
+          if (sinal.aborted) return;
+          const anoAtual = anosAlvo[i];
 
-        while (true) {
-          const { done, value } = await leitor.read();
-          if (done) break;
-          buf += value; bytes += value.length;
-          let idx;
-          while ((idx = buf.indexOf('\n')) !== -1) {
-            const linha = buf.substring(0, idx); buf = buf.substring(idx + 1);
-            if (!skip) { skip = true; continue; }
-            if (!linha) continue;
-            const c = linha.split(';');
-            if (c.length < 13) continue;
-            if (ano && c[0] !== ano) continue;
-            if (versao && c[1] !== versao) continue;
-            if (tipo && c[2] !== tipo) continue;
-            if (uf && c[3] !== uf) continue;
-            if (codigo && !c[4].startsWith(codigo)) continue;
-            const desc = c[6].replace(/^"|"$/g, '').replace(/""/g, '"');
-            if (descricao && !desc.toLowerCase().includes(descricao)) continue;
-            const vi = c[11] || '', vf = c[12] || '';
-            todosResultados.push({
-              ano: c[0], tabela: c[1], tipo: c[2], uf: c[3],
-              r: { codigo: c[4], excecao: c[5].replace(/^"|"$/g,'').replace(/""/g,'"'), descricao: desc,
-                aliquotaNacionalFederal: parseFloat(c[7])||0, aliquotaImportadosFederal: parseFloat(c[8])||0,
-                aliquotaEstadual: parseFloat(c[9])||0, aliquotaMunicipal: parseFloat(c[10])||0,
-                vigenciaInicio: vi, vigenciaFim: vf }
-            });
-            linhas++;
+          const resp = await fetch(`${API}/${csvDoAno(anoAtual)}`, { signal: sinal });
+          if (!resp.ok) continue;   // ano sem shard publicado: segue para o proximo
+
+          const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream());
+          const leitor = fluxo.getReader();
+          let buf = '', skip = false;
+
+          while (true) {
+            if (sinal.aborted) { await leitor.cancel(); return; }
+            const { done, value } = await leitor.read();
+            if (done) break;
+            buf += value;
+            let idx;
+            while ((idx = buf.indexOf('\n')) !== -1) {
+              const linha = buf.substring(0, idx); buf = buf.substring(idx + 1);
+              if (!skip) { skip = true; continue; }
+              if (!linha) continue;
+              const c = linha.split(';');
+              if (c.length < 13) continue;
+              if (versao && c[1] !== versao) continue;
+              if (tipo && c[2] !== tipo) continue;
+              if (uf && c[3] !== uf) continue;
+              if (codigo && !c[4].startsWith(codigo)) continue;
+              const desc = c[6].replace(/^"|"$/g, '').replace(/""/g, '"');
+              if (descricao && !desc.toLowerCase().includes(descricao)) continue;
+              const vi = c[11] || '', vf = c[12] || '';
+              todosResultados.push({
+                ano: c[0], tabela: c[1], tipo: c[2], uf: c[3],
+                r: { codigo: c[4], excecao: c[5].replace(/^"|"$/g,'').replace(/""/g,'"'), descricao: desc,
+                  aliquotaNacionalFederal: parseFloat(c[7])||0, aliquotaImportadosFederal: parseFloat(c[8])||0,
+                  aliquotaEstadual: parseFloat(c[9])||0, aliquotaMunicipal: parseFloat(c[10])||0,
+                  vigenciaInicio: vi, vigenciaFim: vf }
+              });
+              linhas++;
+            }
+            mostrarStatus(`Processando ${anoAtual}… ${linhas.toLocaleString('pt-BR')} linhas`, true);
           }
-          if (total > 0) fill.style.width = Math.min(100, (bytes/total)*30) + '%';
-          mostrarStatus(`Processando… ${linhas.toLocaleString('pt-BR')} linhas`, true);
-        }
-      } catch (e) { mostrarStatus('Erro ao processar CSV', false); console.error(e); }
 
+          fill.style.width = ((i + 1) / anosAlvo.length) * 100 + '%';
+        }
+      } catch (e) {
+        if (sinal.aborted || e.name === 'AbortError') return;
+        mostrarStatus('Erro ao processar CSV', false); console.error(e);
+      }
+
+      if (sinal.aborted) return;
       paginaAtual = 1; colunaOrdenada = -1; renderizarResultados();
       barra.style.display = 'none'; btn.disabled = false;
       mostrarStatus(`${todosResultados.length.toLocaleString('pt-BR')} registros`, false);
@@ -786,11 +878,16 @@ for item in dados['dados']:
       const ufs = uf ? [uf] : metaDados.ufs;
       let total = 0;
       for (const a of anos) { const v = versao ? [versao] : (metaDados.versoes[a]||[]); total += v.length*tipos.length*ufs.length; }
-      if (!versao && total > 50) return consultarViaCsv();
+      if (!versao && total > LIMITE_ARQUIVOS) return consultarViaCsv();
 
       const btn = document.getElementById('btn-consultar');
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
+      controleConsulta?.abort();
+      controleConsulta = new AbortController();
+      const sinal = controleConsulta.signal;
+
+      document.getElementById('resultados').hidden = false;
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       mostrarStatus('Preparando consulta…', true);
       mostrarTabelaVazia('Buscando dados…');
@@ -807,23 +904,27 @@ for item in dados['dados']:
       } else { document.getElementById('endpoint-display').style.display = 'none'; }
 
       todosResultados = []; let concluidas = 0, erros = 0;
-      const LOTE = 8;
-      for (let i = 0; i < tarefas.length; i += LOTE) {
-        const lote = tarefas.slice(i, i + LOTE);
+      for (let i = 0; i < tarefas.length; i += LOTE_ARQUIVOS) {
+        if (sinal.aborted) return;
+        const lote = tarefas.slice(i, i + LOTE_ARQUIVOS);
         await Promise.all(lote.map(async ({ano:a,versao:v,tipo:t,uf:u}) => {
           try {
-            const d = await buscarJsonGz(`${API}/${a}/${v}/${t}/${u}.json.gz`);
+            const d = await buscarJsonGz(`${API}/${a}/${v}/${t}/${u}.json.gz`, sinal);
             if (!d||!d.dados) return;
             for (const r of d.dados) {
               if (codigo && !r.codigo.startsWith(codigo)) continue;
               if (descricao && !r.descricao.toLowerCase().includes(descricao)) continue;
               todosResultados.push({ano:a,tabela:v,tipo:t,uf:u,r});
             }
-          } catch { erros++; }
-          finally { concluidas++; fill.style.width=(concluidas/tarefas.length)*100+'%'; mostrarStatus(`Carregando… ${concluidas}/${tarefas.length}`, true); }
+          } catch (e) { if (!sinal.aborted && e.name !== 'AbortError') erros++; }
+          finally {
+            concluidas++;
+            if (!sinal.aborted) { fill.style.width=(concluidas/tarefas.length)*100+'%'; mostrarStatus(`Carregando… ${concluidas}/${tarefas.length}`, true); }
+          }
         }));
       }
 
+      if (sinal.aborted) return;
       paginaAtual = 1; colunaOrdenada = -1; renderizarResultados();
       barra.style.display = 'none'; btn.disabled = false;
       mostrarStatus(`${todosResultados.length.toLocaleString('pt-BR')} registros` + (erros > 0 ? ` (${erros} não encontrados)` : ''), false);
@@ -863,23 +964,53 @@ for item in dados['dados']:
       const campos = ['codigo','excecao','tipo','uf','tabela','descricao','aliquotaNacionalFederal','aliquotaImportadosFederal','aliquotaEstadual','aliquotaMunicipal','vigenciaInicio','vigenciaFim'];
       const val = (r,c) => { const f=campos[c]; return f==='tipo'?r.tipo:f==='uf'?r.uf:f==='tabela'?r.tabela:r.r[f]; };
       todosResultados.sort((a,b) => { let va=val(a,coluna),vb=val(b,coluna); if (typeof va==='number') return ordemCrescente?va-vb:vb-va; return ordemCrescente?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va)); });
-      paginaAtual = 1; renderizarResultados();
+      paginaAtual = 1;
+      atualizarAriaSort();
+      renderizarResultados();
+    }
+
+    /** Marca no cabecalho qual coluna ordena a tabela e em que sentido. */
+    function atualizarAriaSort() {
+      document.querySelectorAll('#tabela-resultados thead th').forEach((th, i) => {
+        if (i === colunaOrdenada) th.setAttribute('aria-sort', ordemCrescente ? 'ascending' : 'descending');
+        else th.setAttribute('aria-sort', 'none');
+      });
     }
 
     function limparFiltros() {
+      controleConsulta?.abort();
+      controleConsulta = null;
+      document.getElementById('btn-consultar').disabled = false;
       ['f-ano','f-uf','f-tipo','f-versao','f-codigo','f-descricao'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('endpoint-display').style.display = 'none';
+      document.getElementById('resultados').hidden = true;
       mostrarStatus('', false);
       mostrarTabelaVazia('Nenhum dado para exibir');
       document.getElementById('barra-progresso').style.display = 'none';
       atualizarVersoes(); todosResultados = [];
+      colunaOrdenada = -1; ordemCrescente = true; atualizarAriaSort();
+    }
+
+    // Escapa um campo CSV: aspas envolventes quando ha ; " ou quebra de linha,
+    // com as aspas internas dobradas. O prefixo ' neutraliza a formula que o
+    // Excel executaria num campo iniciado por = + - @.
+    function escaparCsv(valor) {
+      const texto = String(valor ?? '');
+      const seguro = /^[=+\-@\t\r]/.test(texto) ? `'${texto}` : texto;
+      return /[;"\n\r]/.test(seguro) ? `"${seguro.replace(/"/g, '""')}"` : seguro;
     }
 
     function exportarCsv() {
       if (!todosResultados.length) return;
       const h = 'Codigo;Excecao;Tipo;UF;Tabela;Descricao;AliquotaNacionalFederal;AliquotaImportadosFederal;AliquotaEstadual;AliquotaMunicipal;VigenciaInicio;VigenciaFim\n';
-      const l = todosResultados.map(r => `${r.r.codigo};${r.r.excecao};${r.tipo};${r.uf};${r.tabela};"${r.r.descricao}";${r.r.aliquotaNacionalFederal};${r.r.aliquotaImportadosFederal};${r.r.aliquotaEstadual};${r.r.aliquotaMunicipal};${r.r.vigenciaInicio||''};${r.r.vigenciaFim||''}`).join('\n');
-      const blob = new Blob([h+l], {type:'text/csv;charset=utf-8'});
+      const l = todosResultados.map(r => [
+        r.r.codigo, r.r.excecao, r.tipo, r.uf, r.tabela, r.r.descricao,
+        r.r.aliquotaNacionalFederal, r.r.aliquotaImportadosFederal,
+        r.r.aliquotaEstadual, r.r.aliquotaMunicipal,
+        r.r.vigenciaInicio || '', r.r.vigenciaFim || ''
+      ].map(escaparCsv).join(';')).join('\n');
+      // BOM para o Excel reconhecer UTF-8 e nao quebrar a acentuacao
+      const blob = new Blob(['\uFEFF' + h + l], {type:'text/csv;charset=utf-8'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = 'ibpt-consulta.csv'; a.click();
       URL.revokeObjectURL(url);
@@ -892,8 +1023,8 @@ for item in dados['dados']:
   {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": "IBPT API – Tabelas IBPTax",
-    "description": "API estática com 99 tabelas IBPTax (2015–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
+    "name": "Tabelas IBPT",
+    "description": "API estática com 100 tabelas IBPTax (2015–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
     "url": "https://ibpt.valraw.com.br/",
     "creator": {
       "@type": "Organization",
