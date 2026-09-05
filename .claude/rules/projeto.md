@@ -40,7 +40,13 @@ globs: "**/*"
 - 4 abas: Home, Pesquisa, Endpoints, Informações
 - 6 filtros: Ano, Versão, UF, Tipo, Código, Descrição
 - 12 colunas na tabela de resultados (inclui Início Vig. e Fim Vig.)
-- Tabela sempre visível com estados de vazio e carregamento
+- Numeros exibidos (tamanhos, % de compressao, total de tabelas/registros, media por UF) vem de `meta.json` -> `estatisticas`, gerado a cada build
+- Marcar o numero no HTML com `<span class="est-*">valor de fallback</span>` e preencher em `preencherTextosDinamicos()`
+- Constantes da pagina (`LOTE_ARQUIVOS`, `LIMITE_ARQUIVOS`, `TAMANHO_PAGINA`) tambem alimentam a prosa, para o texto nunca divergir do codigo
+- Consulta cancelavel via `AbortController` (`controleConsulta`): `limparFiltros()` aborta, e uma nova consulta aborta a anterior
+- Depois de `await`, sempre checar `sinal.aborted` antes de escrever na UI - senao a consulta cancelada sobrescreve a tela
+- Bloco de resultados (`#resultados`) oculto via atributo `hidden` até o usuário consultar
+- Estados de vazio e carregamento dentro da tabela
 - Spinner de carregamento ao lado do status de busca
 - Tooltips nos cabeçalhos da tabela de resultados
 - Consultas amplas (>50 arquivos) usam o CSV consolidado via streaming

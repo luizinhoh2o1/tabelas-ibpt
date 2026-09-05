@@ -100,7 +100,9 @@ npm run build        # Build: extrair ZIPs e gerar API estática
 - **6 filtros de pesquisa:** Ano, Versão, UF, Tipo, Código, Descrição
 - **Tooltips** nos cabeçalhos da tabela de resultados explicando cada coluna
 - **12 colunas na tabela:** Código, Ex, Tipo, UF, Tabela, Descrição, 4 alíquotas, Início Vig., Fim Vig.
-- **Tabela sempre visível** com estados de vazio ("Nenhum dado para exibir") e carregamento ("Buscando dados…")
+- **Consulta cancelavel** - `controleConsulta` (`AbortController`) e criado em `consultar()`/`consultarViaCsv()` e abortado por `limparFiltros()` ou por uma nova consulta; todo `fetch` da consulta recebe o `signal` (o `meta.json` da carga inicial fica de fora)
+- **Bloco de resultados oculto** (`#resultados` com `hidden`) até a primeira consulta; reaparece em `consultar()`/`consultarViaCsv()` e volta a ocultar em `limparFiltros()`
+- Estados de vazio ("Nenhum dado para exibir") e carregamento ("Buscando dados…") dentro da tabela
 - **Spinner de carregamento** ao lado do status de busca durante consultas
 - **Aviso de memória** na aba de pesquisa alertando que consultas sem filtro podem travar o navegador
 - **CSV consolidado** (`todos.csv.gz`) usado automaticamente quando consulta exigiria >50 arquivos individuais

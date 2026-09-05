@@ -647,8 +647,11 @@ for item in dados['dados']:
     let todosResultados = [];
     let paginaAtual = 1;
     const TAMANHO_PAGINA = 100;
+    const LOTE_ARQUIVOS = 8;      // requisicoes paralelas por lote
+    const LIMITE_ARQUIVOS = 50;   // acima disso, usa o CSV consolidado
     let colunaOrdenada = -1;
     let ordemCrescente = true;
+    let controleConsulta = null;
 
     function mostrarStatus(texto, carregando) {
       document.getElementById('texto-status').textContent = texto;
@@ -727,8 +730,8 @@ for item in dados['dados']:
     }
 
     // ── Fetch ──
-    async function buscarJsonGz(url) {
-      const r = await fetch(url);
+    async function buscarJsonGz(url, sinal) {
+      const r = await fetch(url, { signal: sinal });
       if (!r.ok) return null;
       const f = r.body.pipeThrough(new DecompressionStream('gzip'));
       return JSON.parse(await new Response(f).text());
@@ -745,6 +748,10 @@ for item in dados['dados']:
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
 
+      controleConsulta?.abort();
+      controleConsulta = new AbortController();
+      const sinal = controleConsulta.signal;
+
       document.getElementById('resultados').hidden = false;
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       document.getElementById('endpoint-display').style.display = 'flex';
@@ -754,7 +761,7 @@ for item in dados['dados']:
       todosResultados = [];
 
       try {
-        const resp = await fetch(`${API}/todos.csv.gz`);
+        const resp = await fetch(`${API}/todos.csv.gz`, { signal: sinal });
         if (!resp.ok) throw new Error('Falha');
         const total = parseInt(resp.headers.get('Content-Length') || '0');
         const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream());
@@ -762,6 +769,7 @@ for item in dados['dados']:
         let buf = '', skip = false, bytes = 0, linhas = 0;
 
         while (true) {
+          if (sinal.aborted) { await leitor.cancel(); return; }
           const { done, value } = await leitor.read();
           if (done) break;
           buf += value; bytes += value.length;
@@ -792,8 +800,12 @@ for item in dados['dados']:
           if (total > 0) fill.style.width = Math.min(100, (bytes/total)*30) + '%';
           mostrarStatus(`Processando… ${linhas.toLocaleString('pt-BR')} linhas`, true);
         }
-      } catch (e) { mostrarStatus('Erro ao processar CSV', false); console.error(e); }
+      } catch (e) {
+        if (sinal.aborted || e.name === 'AbortError') return;
+        mostrarStatus('Erro ao processar CSV', false); console.error(e);
+      }
 
+      if (sinal.aborted) return;
       paginaAtual = 1; colunaOrdenada = -1; renderizarResultados();
       barra.style.display = 'none'; btn.disabled = false;
       mostrarStatus(`${todosResultados.length.toLocaleString('pt-BR')} registros`, false);
@@ -811,11 +823,15 @@ for item in dados['dados']:
       const ufs = uf ? [uf] : metaDados.ufs;
       let total = 0;
       for (const a of anos) { const v = versao ? [versao] : (metaDados.versoes[a]||[]); total += v.length*tipos.length*ufs.length; }
-      if (!versao && total > 50) return consultarViaCsv();
+      if (!versao && total > LIMITE_ARQUIVOS) return consultarViaCsv();
 
       const btn = document.getElementById('btn-consultar');
       const barra = document.getElementById('barra-progresso');
       const fill = document.getElementById('progresso-fill');
+      controleConsulta?.abort();
+      controleConsulta = new AbortController();
+      const sinal = controleConsulta.signal;
+
       document.getElementById('resultados').hidden = false;
       btn.disabled = true; barra.style.display = 'block'; fill.style.width = '0%';
       mostrarStatus('Preparando consulta…', true);
@@ -833,23 +849,27 @@ for item in dados['dados']:
       } else { document.getElementById('endpoint-display').style.display = 'none'; }
 
       todosResultados = []; let concluidas = 0, erros = 0;
-      const LOTE = 8;
-      for (let i = 0; i < tarefas.length; i += LOTE) {
-        const lote = tarefas.slice(i, i + LOTE);
+      for (let i = 0; i < tarefas.length; i += LOTE_ARQUIVOS) {
+        if (sinal.aborted) return;
+        const lote = tarefas.slice(i, i + LOTE_ARQUIVOS);
         await Promise.all(lote.map(async ({ano:a,versao:v,tipo:t,uf:u}) => {
           try {
-            const d = await buscarJsonGz(`${API}/${a}/${v}/${t}/${u}.json.gz`);
+            const d = await buscarJsonGz(`${API}/${a}/${v}/${t}/${u}.json.gz`, sinal);
             if (!d||!d.dados) return;
             for (const r of d.dados) {
               if (codigo && !r.codigo.startsWith(codigo)) continue;
               if (descricao && !r.descricao.toLowerCase().includes(descricao)) continue;
               todosResultados.push({ano:a,tabela:v,tipo:t,uf:u,r});
             }
-          } catch { erros++; }
-          finally { concluidas++; fill.style.width=(concluidas/tarefas.length)*100+'%'; mostrarStatus(`Carregando… ${concluidas}/${tarefas.length}`, true); }
+          } catch (e) { if (!sinal.aborted && e.name !== 'AbortError') erros++; }
+          finally {
+            concluidas++;
+            if (!sinal.aborted) { fill.style.width=(concluidas/tarefas.length)*100+'%'; mostrarStatus(`Carregando… ${concluidas}/${tarefas.length}`, true); }
+          }
         }));
       }
 
+      if (sinal.aborted) return;
       paginaAtual = 1; colunaOrdenada = -1; renderizarResultados();
       barra.style.display = 'none'; btn.disabled = false;
       mostrarStatus(`${todosResultados.length.toLocaleString('pt-BR')} registros` + (erros > 0 ? ` (${erros} não encontrados)` : ''), false);
@@ -893,6 +913,9 @@ for item in dados['dados']:
     }
 
     function limparFiltros() {
+      controleConsulta?.abort();
+      controleConsulta = null;
+      document.getElementById('btn-consultar').disabled = false;
       ['f-ano','f-uf','f-tipo','f-versao','f-codigo','f-descricao'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('endpoint-display').style.display = 'none';
       document.getElementById('resultados').hidden = true;
