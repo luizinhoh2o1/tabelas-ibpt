@@ -52,7 +52,7 @@ paths: ["**/*"]
 ## Infraestrutura
 
 - Deploy por GitHub Actions (`upload-pages-artifact` com `path: docs`). Só o conteúdo de `docs/` vai para o site
-- O domínio customizado vem de **Settings > Pages**, não de um arquivo `CNAME`. Deploy por Actions ignora o `CNAME`; não recriar esse arquivo
+- **`docs/CNAME` é obrigatório** e contém `ibpt.valraw.com.br`. Com deploy por Actions, o Pages lê o `CNAME` de dentro do artefato publicado; sem ele o domínio customizado cai com "Site not found" e só o endereço `github.io` responde. O arquivo na raiz do repositório não serve para nada: precisa estar em `docs/`, que é a raiz do artefato
 - `docs/public/` é servido como `/public/`. Logo e favicons ficam ali e são referenciados por `/public/...`. Pasta `public/` na raiz do repositório não seria publicada
 - **`docs/api/` ocupa ~1,1 GB e o limite documentado do GitHub Pages é 1 GB.** Antes de acrescentar arquivo novo à saída, considerar o total
 - Os ZIPs em `repositorio-ibpt/` são rastreados neste repositório (não há `.gitmodules`). São binários já deflacionados: o git não faz delta e cada atualização grava um blob inteiro, então `.git` cresce ~5,7 MB por tabela
