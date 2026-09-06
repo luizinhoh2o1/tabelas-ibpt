@@ -39,6 +39,7 @@ paths: ["**/*"]
 - **Nunca montar `metaDados.versoes` a partir da lista de ZIPs.** Só entra a versão que gerou arquivo (`codigosGerados`); caso contrário o filtro da página oferece versão que responde 404
 - ZIP que não gera dados: o build imprime `ERRO:` com a lista e sai com `process.exitCode = 1`, para o CI não publicar site parcial
 - Testes em `src/*.test.ts` com `node:test` + `node:assert/strict`. Sem framework, sem dependência nova. O CI roda antes do build
+- `gerarPainel.test.ts` monta uma API falsa em `os.tmpdir()`, então não depende de `docs/api` estar construído
 - `analisarLinhaCsv` e `pegarCampo` são exportados só para teste; mexeu neles, rodar `npm test`
 
 ### Cache incremental
@@ -56,6 +57,31 @@ paths: ["**/*"]
 - `docs/public/` é servido como `/public/`. Logo e favicons ficam ali e são referenciados por `/public/...`. Pasta `public/` na raiz do repositório não seria publicada
 - **`docs/api/` ocupa ~1,1 GB e o limite documentado do GitHub Pages é 1 GB.** Antes de acrescentar arquivo novo à saída, considerar o total
 - Os ZIPs em `repositorio-ibpt/` são rastreados neste repositório (não há `.gitmodules`). São binários já deflacionados: o git não faz delta e cada atualização grava um blob inteiro, então `.git` cresce ~5,7 MB por tabela
+
+## Painel de carga tributária (`docs/painel.html`)
+
+Página separada, sem build step. Chega por dois caminhos: o link no header do `index.html` e o bloco `.promo-painel` na aba Home. Mede quanto do preço é tributo na cesta básica, no carro popular e na moto até 125cc.
+
+- **Nenhuma afirmação factual sem número medido por trás.** A auditoria de 06/09/2026 pegou uma atribuição causal falsa ("o salto do carro em 2016 foi o fim da redução de IPI", que acabou em 31/12/2014, um ano antes do salto) e uma generalização falsa ("trocar o estado muda quase só a parte verde", verdade na cesta e falsa na moto, onde o federal varia de 20,77 a 31,60 entre UFs)
+- **Frase que depende do dado tem que sair do dado.** "O federal é idêntico em todos os itens" é verdade desde 2020 e falsa de 2015 a 2019; hoje é montada em `montarItens()` a partir dos valores do ano
+- **Texto voltado ao público, não ao desenvolvedor.** Sem código de versão (`24.2.E`), sem nomenclatura interna, sem recomendação de implementação na página. Esse detalhe fica neste arquivo e no `CLAUDE.md`
+
+- **Todo o dado vem de `api/painel.json`**, gerado por `src/gerarPainel.ts` no fim do build. A página nunca lê os arquivos por versão, seriam ~2.700 requisições
+- `gerarPainel.ts` lê a saída já publicada em `docs/api`, então roda depois do build e não toca no processamento dos ZIPs
+- Regeneração é pulada quando nenhum ano foi refeito: senão o build incremental de 3s voltaria a levar 70s
+- **Média anual ponderada pelos dias de vigência.** Contar versões distorceria: as janelas vão de 29 a 183 dias, e alguns meses são cobertos por tabela do ano anterior
+- **Um item é o par NCM + exceção, nunca só o NCM.** O mesmo código traz a linha base e linhas `Ex 01` com alíquotas diferentes, descrevendo produtos diferentes. Ler só pelo código faz a última linha do arquivo vencer, que é a de exceção. Exemplos reais: `1905.90.90 Ex 01` é o pão comum e a linha base do `1905.10.00` é o knäckebrot; `1701.99.00 Ex 01` é sacarose pura e não açúcar de cana
+- **Período sem nenhuma revisão sadia fica fora da média**, não cai na defeituosa. Em 2021, AL e AP têm cinco versões seguidas com 100% das estaduais zeradas, e usá-las derrubava o estadual da cesta em 39%
+- **`cobertura` é por UF**, contando só dia com tabela utilizável naquela UF. É o que faz TO/2023 mostrar 95% em vez de 100%: a versão `23.1.D` é a única das 100 publicada sem Tocantins
+- **A vigência de uma versão é a janela dominante do arquivo, não a do primeiro registro.** `2024/24.2.F/ncm/PR` tem 11 linhas de uma revisão anterior no começo
+- `painel.fimCobertura` guarda o último dia coberto; a página usa para dizer quantos dos dias cobertos ainda são futuro. Sem isso, "cobre 273 de 365 dias" é lido como 273 dias já vividos
+- **Mesma data de vigência: vence a revisão mais alta.** Versão com mais de 80% das alíquotas estaduais zeradas na UF é descartada como publicação defeituosa (24.2.E, 25.1.A, 25.2.C, 26.1.E, 18.2.A)
+- **A série se parte em junho de 2021**, quando o IBPT deixou de publicar alíquota reduzida: 96,3% dos códigos mudaram de um mês para o outro, alta média de 9,14 pontos. Não é mudança de tributação. Os cards mostram os dois períodos separados e 2021 fica de fora dos dois lados
+- Par de cores das séries: federal `#2E3ED6`, estadual `#2E8B22`. Validado para daltonismo (ΔE 32,1 deutan, 10,4 tritan). Não trocar por olho
+- Barras na escala fixa de 0 a 60%, para o comprimento ser comparável entre categorias, anos e estados
+- Cards são montados uma vez e atualizados no lugar por `atualizarCards()`; refazer o HTML mataria a transição das barras na troca de UF
+- `.anim` só entra no `<body>` depois de dois `requestAnimationFrame`: a primeira pintura nasce pronta e só as mudanças posteriores animam
+- Cobertura do ano incompleto sai de `painel.diasCobertos`, nunca de conta feita sobre o percentual arredondado
 
 ## Interface web (`docs/index.html`)
 
