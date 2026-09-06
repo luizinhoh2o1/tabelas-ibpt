@@ -31,7 +31,7 @@ export const PAINEL = 'painel.json';
  * crocante escandinavo.
  */
 const CESTA: ItemCesta[] = [
-  { nome: 'Carne bovina (traseiro)', codigo: '02012020', excecao: '', ncm: '0201.20.20' },
+  { nome: 'Carne bovina', codigo: '02012020', excecao: '', ncm: '0201.20.20' },
   { nome: 'Leite UHT desnatado', codigo: '04011010', excecao: '', ncm: '0401.10.10' },
   { nome: 'Feijão', codigo: '07133399', excecao: '', ncm: '0713.33.99' },
   { nome: 'Arroz', codigo: '10063021', excecao: '', ncm: '1006.30.21' },

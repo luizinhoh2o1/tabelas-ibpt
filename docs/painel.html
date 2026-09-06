@@ -426,8 +426,9 @@
       <h2>Dentro da cesta básica</h2>
       <p class="prosa">
         Os 13 itens da ração essencial mínima do Decreto-Lei 399/1938, na composição da
-        região que inclui São Paulo, com a alíquota do último ano em
-        <strong id="uf-nome-1">São Paulo</strong>. <span id="nota-federal"></span>
+        região que inclui São Paulo. Abaixo, a média de <strong id="ano-cesta">2026</strong>
+        em <strong id="uf-nome-1">São Paulo</strong>, sobre <span id="vigencia-cesta"></span>.
+        <span id="nota-federal"></span>
       </p>
 
       <div class="itens" id="itens"></div>
@@ -763,6 +764,7 @@
       montarItens(uf);
       montarTabela(uf);
       document.getElementById('uf-nome-1').textContent = NOMES[uf];
+      document.getElementById('ano-cesta').textContent = ULTIMO_ANO;
     }
 
     /** Números da abertura e do rodapé, todos vindos do build. */
@@ -795,6 +797,9 @@
       const [dias, total] = D.diasCobertos[ULTIMO_ANO];
       const frase = `Em ${ULTIMO_ANO} as tabelas cobrem ${dias} de ${total} dias.`;
       document.getElementById('nota-cobertura').textContent = frase;
+      document.getElementById('vigencia-cesta').textContent = dias === total
+        ? `as tabelas vigentes no ano inteiro`
+        : `as tabelas vigentes em ${dias} dos ${total} dias do ano`;
       const futuros = diasAindaPorVir();
       document.getElementById('cobertura-detalhe').textContent = futuros > 0
         ? `O ano de ${ULTIMO_ANO} ainda não terminou: as tabelas cobrem ${dias} dos ${total} dias, `
