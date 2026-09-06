@@ -218,6 +218,29 @@
     .feature-card:hover h3::before { height: 26px; }
     .feature-card p { font-size: 13px; color: var(--texto-secundario); line-height: 1.5; }
 
+    /* ── Anuncio do painel ── */
+    .promo-painel {
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+      background: var(--fundo-cartao); border: 1px solid var(--borda-sutil);
+      border-radius: 20px; padding: 24px 28px; max-width: 900px; margin: 0 auto 32px;
+      box-shadow: var(--sombra-card);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .promo-painel:hover { transform: translateY(-3px); border-color: var(--borda-padrao); box-shadow: var(--sombra-card-hover); }
+    .promo-painel .texto { flex: 1 1 320px; min-width: 0; }
+    .promo-painel .rotulo {
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase; color: var(--acento-verde);
+      display: block; margin-bottom: 6px;
+    }
+    .promo-painel h3 {
+      font-size: 19px; font-weight: 600; color: var(--secundaria);
+      letter-spacing: -0.01em; margin-bottom: 8px;
+    }
+    .promo-painel p { font-size: 14px; color: var(--texto-secundario); line-height: 1.55; }
+    .promo-painel .btn { flex-shrink: 0; }
+    @media (max-width: 640px) { .promo-painel .btn { width: 100%; } }
+
     /* ── Search Box ── */
     .search-box {
       background: var(--fundo-cartao); border: 1px solid var(--borda-sutil);
@@ -396,7 +419,10 @@
       <h1>
         <img class="logo" src="/public/logo.webp" alt="Tabelas IBPT" width="2000" height="1000">
       </h1>
-      <a href="https://github.com/luizinhoh2o1/tabelas-ibpt" target="_blank" aria-label="Ver no GitHub" style="color:var(--texto-terciario);font-size:20px;transition:color 0.2s;"><i class="fab fa-github" aria-hidden="true"></i></a>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <a href="/painel.html" style="font-family:'Ubuntu Mono',monospace;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-terciario);"><i class="fas fa-chart-column" aria-hidden="true"></i> Painel</a>
+        <a href="https://github.com/luizinhoh2o1/tabelas-ibpt" target="_blank" aria-label="Ver no GitHub" style="color:var(--texto-terciario);font-size:20px;transition:color 0.2s;"><i class="fab fa-github" aria-hidden="true"></i></a>
+      </div>
     </div>
   </header>
 
@@ -430,6 +456,18 @@
       </div>
 
       <div id="stats" class="stats"></div>
+
+      <div class="promo-painel">
+        <div class="texto">
+          <span class="rotulo">Novo</span>
+          <h3>Quanto do preço é imposto</h3>
+          <p>O painel mostra a carga tributária da cesta básica, do carro popular e da moto,
+             ano a ano e por estado, calculada sobre todas as tabelas deste repositório.</p>
+        </div>
+        <a class="btn btn-primary" href="/painel.html">
+          <i class="fas fa-chart-column" aria-hidden="true"></i> Abrir o painel
+        </a>
+      </div>
 
       <div class="features">
         <div class="feature-card">
@@ -634,7 +672,7 @@ for item in dados['dados']:
       <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Licença: Apache 2.0
       <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
-      Build: <span class="est-gerado-em">—</span>
+      Build: <span class="est-gerado-em">-</span>
       <span style="color:var(--texto-terciario)" aria-hidden="true">|</span>
       Powered by <a href="https://valraw.com.br" target="_blank" style="font-weight:600"><span class="gradient-text">VALRAW</span></a>
     </div>
