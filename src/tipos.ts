@@ -123,8 +123,30 @@ export interface PainelAno {
   cobertura: number;
 }
 
+/** Numeros economicos de um ano, media dos meses disponiveis */
+export interface AnoEconomico {
+  /** Meses do ano que entraram na media */
+  meses: number;
+  /** Nivel de precos medio do ano por recorte do IPCA. So a razao entre dois anos tem significado */
+  indices: { geral: number; alimentacao: number; automovel: number; motocicleta: number };
+  /** Salario minimo medio do ano, em reais */
+  salarioBruto: number;
+  /** Salario minimo medio ja descontado o INSS do empregado */
+  salarioLiquido: number;
+  /** Percentual medio descontado a titulo de INSS */
+  inss: number;
+}
+
+/** Series economicas que a pagina cruza com as aliquotas */
+export interface Economia {
+  /** Horas de trabalho no mes pela CLT, usada para achar o valor da hora */
+  jornadaMensal: number;
+  anos: Record<string, AnoEconomico>;
+}
+
 /** Conteudo de docs/api/painel.json */
 export interface Painel {
+  /** As 27 UFs, precedidas de "BR", que e a media simples delas */
   ufs: string[];
   anos: number[];
   cesta: Array<Omit<ItemCesta, 'codigo' | 'excecao'>>;
@@ -132,6 +154,8 @@ export interface Painel {
   diasCobertos: Record<string, [number, number]>;
   /** Ultimo dia coberto por alguma tabela, aaaa-mm-dd. A pagina usa para saber quanto da cobertura ainda e futuro */
   fimCobertura: string;
+  /** IPCA, salario minimo e INSS por ano. Ausente quando dados/ nao esta completo */
+  economia?: Economia;
   /** UF -> ano -> medias */
   dados: Record<string, Record<string, PainelAno>>;
 }

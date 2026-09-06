@@ -1,0 +1,51 @@
+vigencia;faixa_ate;aliquota;progressiva;fonte
+2015-01;1399.12;8.00;nao;Portaria Interministerial MPS/MF 13/2015
+2015-01;2331.88;9.00;nao;Portaria Interministerial MPS/MF 13/2015
+2015-01;4663.75;11.00;nao;Portaria Interministerial MPS/MF 13/2015
+2016-01;1556.94;8.00;nao;Portaria Interministerial MTPS/MF 1/2016
+2016-01;2594.92;9.00;nao;Portaria Interministerial MTPS/MF 1/2016
+2016-01;5189.82;11.00;nao;Portaria Interministerial MTPS/MF 1/2016
+2017-01;1659.38;8.00;nao;Portaria Interministerial MF/MTPS 8/2017
+2017-01;2765.66;9.00;nao;Portaria Interministerial MF/MTPS 8/2017
+2017-01;5531.31;11.00;nao;Portaria Interministerial MF/MTPS 8/2017
+2018-01;1693.72;8.00;nao;Portaria MF 15/2018
+2018-01;2822.90;9.00;nao;Portaria MF 15/2018
+2018-01;5645.80;11.00;nao;Portaria MF 15/2018
+2019-01;1751.81;8.00;nao;Portaria ME 9/2019
+2019-01;2919.72;9.00;nao;Portaria ME 9/2019
+2019-01;5839.45;11.00;nao;Portaria ME 9/2019
+2020-01;1830.29;8.00;nao;Portaria SEPRT/ME 914/2020
+2020-01;3050.52;9.00;nao;Portaria SEPRT/ME 914/2020
+2020-01;6101.06;11.00;nao;Portaria SEPRT/ME 914/2020
+2020-03;1045.00;7.50;sim;EC 103/2019 e Portaria SEPRT/ME 3.659/2020
+2020-03;2089.60;9.00;sim;EC 103/2019 e Portaria SEPRT/ME 3.659/2020
+2020-03;3134.40;12.00;sim;EC 103/2019 e Portaria SEPRT/ME 3.659/2020
+2020-03;6101.06;14.00;sim;EC 103/2019 e Portaria SEPRT/ME 3.659/2020
+2021-01;1100.00;7.50;sim;Portaria SEPRT/ME 477/2021
+2021-01;2203.48;9.00;sim;Portaria SEPRT/ME 477/2021
+2021-01;3305.22;12.00;sim;Portaria SEPRT/ME 477/2021
+2021-01;6433.57;14.00;sim;Portaria SEPRT/ME 477/2021
+2022-01;1212.00;7.50;sim;Portaria Interministerial MTP/ME 12/2022
+2022-01;2427.35;9.00;sim;Portaria Interministerial MTP/ME 12/2022
+2022-01;3641.03;12.00;sim;Portaria Interministerial MTP/ME 12/2022
+2022-01;7087.22;14.00;sim;Portaria Interministerial MTP/ME 12/2022
+2023-01;1302.00;7.50;sim;Portaria Interministerial MPS/MF 26/2023
+2023-01;2571.29;9.00;sim;Portaria Interministerial MPS/MF 26/2023
+2023-01;3856.94;12.00;sim;Portaria Interministerial MPS/MF 26/2023
+2023-01;7507.49;14.00;sim;Portaria Interministerial MPS/MF 26/2023
+2023-05;1320.00;7.50;sim;Portaria Interministerial MPS/MF 2/2023
+2023-05;2571.29;9.00;sim;Portaria Interministerial MPS/MF 2/2023
+2023-05;3856.94;12.00;sim;Portaria Interministerial MPS/MF 2/2023
+2023-05;7507.49;14.00;sim;Portaria Interministerial MPS/MF 2/2023
+2024-01;1412.00;7.50;sim;Portaria Interministerial MPS/MF 2/2024
+2024-01;2666.68;9.00;sim;Portaria Interministerial MPS/MF 2/2024
+2024-01;4000.03;12.00;sim;Portaria Interministerial MPS/MF 2/2024
+2024-01;7786.02;14.00;sim;Portaria Interministerial MPS/MF 2/2024
+2025-01;1518.00;7.50;sim;Portaria Interministerial MPS/MF 6/2025
+2025-01;2793.88;9.00;sim;Portaria Interministerial MPS/MF 6/2025
+2025-01;4190.83;12.00;sim;Portaria Interministerial MPS/MF 6/2025
+2025-01;8157.41;14.00;sim;Portaria Interministerial MPS/MF 6/2025
+2026-01;1621.00;7.50;sim;Portaria Interministerial MPS/MF 1/2026
+2026-01;2983.60;9.00;sim;Portaria Interministerial MPS/MF 1/2026
+2026-01;4475.40;12.00;sim;Portaria Interministerial MPS/MF 1/2026
+2026-01;8710.90;14.00;sim;Portaria Interministerial MPS/MF 1/2026
