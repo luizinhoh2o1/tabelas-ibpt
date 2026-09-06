@@ -58,6 +58,20 @@ paths: ["**/*"]
 - **`docs/api/` ocupa ~1,1 GB e o limite documentado do GitHub Pages é 1 GB.** Antes de acrescentar arquivo novo à saída, considerar o total
 - Os ZIPs em `repositorio-ibpt/` são rastreados neste repositório (não há `.gitmodules`). São binários já deflacionados: o git não faz delta e cada atualização grava um blob inteiro, então `.git` cresce ~5,7 MB por tabela
 
+## Séries econômicas (`dados/`, `src/economia.ts`)
+
+Três CSVs versionados alimentam a seção em dinheiro do painel. Ficam no repositório de propósito: **o build nunca acessa a rede**, igual aos ZIPs do IBPT.
+
+- `dados/ipca.csv`, `dados/ipca-alimentacao.csv`, `dados/ipca-transportes.csv` e `dados/salario-minimo.csv` saem do SGS do Banco Central (séries 433, 1635, 1639 e 1619) por `npm run indices`, sob demanda. Formato `mes;valor`, competência `aaaa-mm`
+- **Cada categoria é corrigida pelo seu grupo do IPCA, nunca pelo índice cheio.** Comida e veículo não sofreram a mesma inflação: a mesma compra de R$ 100 de hoje custava R$ 50,91 em 2015 pelo índice de alimentação e R$ 58,08 pelo de transportes, 14% de diferença. O índice cheio fica só para o salário, que é o que mede o custo de vida de quem recebe
+- As séries 1635 e 1639 não vêm nomeadas pela API. Foram identificadas contra os acumulados oficiais de 2020 a 2022: alimentação 14,11 / 7,93 / 11,63 e transportes 1,03 / 21,04 / -1,30, este último com o pico dos combustíveis em 2021 e o corte de ICMS em 2022. Ao trocar de série, refazer essa conferência
+- `dados/inss.csv` é **o único dado escrito à mão do projeto**, porque não existe API para a tabela do INSS. Cada linha leva a portaria na última coluna. Formato `vigencia;faixa_ate;aliquota;progressiva;fonte`
+- **Até fevereiro de 2020 a alíquota do INSS incidia sobre o salário inteiro; da EC 103/2019 em diante é progressiva por faixa.** A coluna `progressiva` marca isso, e `descontoInss()` trata os dois regimes
+- **Invariante que protege a digitação:** desde 2020 o teto da primeira faixa do INSS é o próprio salário mínimo. `npm run indices` e `economia.test.ts` conferem mês a mês e falham se divergir. Foi assim que 2023 apareceu com duas vigências, janeiro em R$ 1.302 e maio em R$ 1.320
+- O nível de preços é encadeado a partir do IPCA mensal com base arbitrária: só a razão entre dois anos significa alguma coisa
+- A média é anual, para casar com a alíquota do IBPT, que também é média anual ponderada por dia. Mês sem IPCA publicado fica de fora dos dois lados
+- Sem os arquivos, `resumoAnual()` lança e o `gerarPainel` segue sem o bloco `economia`; a página esconde a seção inteira em vez de mostrar número pela metade
+
 ## Painel de carga tributária (`docs/painel.html`)
 
 Página separada, sem build step. Chega por dois caminhos: o link no header do `index.html` e o bloco `.promo-painel` na aba Home. Mede quanto do preço é tributo na cesta básica, no carro popular e na moto até 125cc.
@@ -77,6 +91,11 @@ Página separada, sem build step. Chega por dois caminhos: o link no header do `
 - `painel.fimCobertura` guarda o último dia coberto; a página usa para dizer quantos dos dias cobertos ainda são futuro. Sem isso, "cobre 273 de 365 dias" é lido como 273 dias já vividos
 - **Mesma data de vigência: vence a revisão mais alta.** Versão com mais de 80% das alíquotas estaduais zeradas na UF é descartada como publicação defeituosa (24.2.E, 25.1.A, 25.2.C, 26.1.E, 18.2.A)
 - **A série se parte em junho de 2021**, quando o IBPT deixou de publicar alíquota reduzida: 96,3% dos códigos mudaram de um mês para o outro, alta média de 9,14 pontos. Não é mudança de tributação. Os cards mostram os dois períodos separados e 2021 fica de fora dos dois lados
+- **A seção em dinheiro nunca cruza 2021 em reais.** Multiplicar preço por alíquota atravessando a quebra dá +78% que não é tributação. Os cartões são um por era; a única linha que percorre a série inteira é a de horas de trabalho da compra, que não depende de alíquota
+- **A régua é o salário líquido, não o bruto.** Sobre o mínimo o INSS tira 7,5% desde 2020 e 8% antes, o que muda as horas em 8%. IRRF é zero nessa faixa, FGTS não é desconto do trabalhador, e vale-transporte é opcional: os três ficam declarados na página
+- **O filtro de estado se resolve sozinho na primeira visita**, nesta ordem: `localStorage['painel-ibpt-uf']`, depois o IP (`ipwho.is`, campo `region_code`), depois a geolocalização aproximada do navegador (`api.bigdatacloud.net/data/reverse-geocode-client`, campo `principalSubdivisionCode`), e por fim SP. O valor encontrado é gravado e só muda quando o visitante troca o filtro na mão
+- **São as duas únicas chamadas a terceiros da página**, fora as fontes do Google, e as duas mandam dados do visitante para fora: o IP em uma, a coordenada na outra. Ambas têm prazo (4s e 5s) e falham em silêncio para SP. A geolocalização só é pedida quando o IP dá fora do Brasil, então o visitante brasileiro comum nunca vê o pedido de permissão
+- **A detecção roda depois da primeira pintura**, dentro do mesmo `requestAnimationFrame` que liga as animações: pedir permissão de localização não pode segurar a tela
 - Par de cores das séries: federal `#2E3ED6`, estadual `#2E8B22`. Validado para daltonismo (ΔE 32,1 deutan, 10,4 tritan). Não trocar por olho
 - Barras na escala fixa de 0 a 60%, para o comprimento ser comparável entre categorias, anos e estados
 - Cards são montados uma vez e atualizados no lugar por `atualizarCards()`; refazer o HTML mataria a transição das barras na troca de UF

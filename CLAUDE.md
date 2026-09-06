@@ -12,6 +12,8 @@ src/
   processadorCsv.ts → Parser de CSV via streaming (readline)
   geradorJson.ts    → Gerador de arquivos JSON.gz e CSV.gz consolidado
   gerarPainel.ts    → Lê a API gerada e monta docs/api/painel.json
+  economia.ts       → IPCA, salário mínimo e INSS lidos de dados/
+  gerarIndices.ts   → Baixa IPCA e salário mínimo do Banco Central (npm run indices)
   constantes.ts     → Constantes (UFs, tipos de tabela)
   tipos.ts          → Interfaces TypeScript (Registro, Versao, MetaDados, etc.)
 docs/
@@ -22,6 +24,12 @@ docs/
 .github/workflows/
   deploy.yml        → GitHub Actions: build + deploy no GitHub Pages
 repositorio-ibpt/   → ZIPs originais do IBPT (rastreados neste repo, nao e submodule)
+dados/
+  ipca.csv          → IPCA geral mensal (%), do Banco Central SGS 433
+  ipca-alimentacao.csv → IPCA do grupo Alimentacao e bebidas, SGS 1635
+  ipca-transportes.csv → IPCA do grupo Transportes, SGS 1639
+  salario-minimo.csv → Salário mínimo mensal (R$), do SGS 1619
+  inss.csv          → Faixas do INSS do empregado, digitadas das portarias
 ```
 
 ## Convenções
@@ -72,7 +80,8 @@ Cada registro contém 9 propriedades extraídas do CSV original do IBPT:
 ```bash
 npm install          # Instalar dependências
 npm run build        # Build: extrair ZIPs e gerar API estática
-npm test             # Testes do parser CSV e do gerador do painel (runner nativo do Node)
+npm test             # Testes do parser CSV, do gerador do painel e das series economicas
+npm run indices      # Atualiza dados/ipca.csv e dados/salario-minimo.csv no Banco Central
 ```
 
 ## Formato de Saída JSON
@@ -108,6 +117,8 @@ com filtro de UF.
 - **Na mesma vigencia vence a revisao mais alta**, e versao com mais de 80% das aliquotas estaduais zeradas na UF e descartada como publicacao defeituosa
 - **Periodo sem nenhuma revisao sadia sai da media**, e a UF aparece com `cobertura` abaixo de 100
 - **A serie e cortada em 2021**, quando o IBPT trocou o criterio de publicacao (96,3% dos codigos mudaram de um mes para o outro). Os cards mostram dois blocos separados e a tabela deixa 2021 vazio
+- **Secao "O mesmo em dinheiro"**: uma compra de R$ 100 corrigida para tras pelo grupo do IPCA da categoria (alimentacao para a cesta, transportes para carro e moto), o imposto do ano em reais e quantas horas de trabalho isso custa no salario minimo ja sem o INSS. Os cartoes por era nunca cruzam 2021; so a linha de horas da compra atravessa a serie, porque nao usa aliquota
+- **UF inicial descoberta sozinha**: `localStorage`, depois IP (`ipwho.is`), depois geolocalizacao aproximada (`api.bigdatacloud.net`), depois SP. Escolha manual sobrescreve e persiste
 - Barras empilhadas federal + estadual na escala fixa de 0 a 60%; par de cores `#2E3ED6`/`#2E8B22`, validado para daltonismo
 - Numeros da abertura e do rodape saem de `meta.json`, como no `index.html`
 
