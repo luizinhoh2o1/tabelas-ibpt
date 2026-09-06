@@ -170,6 +170,7 @@
       box-shadow: 0 0 0 3px var(--primaria-dim);
     }
     .chaves { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-left: auto; font-size: 13.5px; color: var(--texto-secundario); }
+    .nota-uf { font-size: 13px; color: var(--texto-terciario); margin: -8px 0 18px; }
     .chaves .item-ch { display: flex; align-items: center; gap: 7px; }
     .chaves .quad { width: 13px; height: 11px; border-radius: 3px; flex-shrink: 0; }
 
@@ -249,20 +250,113 @@
     .escala .marcas { display: flex; justify-content: space-between; }
     .nota-fig { font-size: 13px; color: var(--texto-terciario); margin: 0 0 30px; max-width: 74ch; }
 
+    /* ── Seção em dinheiro ── */
+    .abas-cat { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 16px; }
+    .aba-cat {
+      font-family: 'Ubuntu', sans-serif; font-size: 13.5px; padding: 7px 15px;
+      border-radius: 999px; border: 1px solid var(--borda-padrao);
+      background: var(--fundo-cartao); color: var(--texto-secundario); cursor: pointer;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+    .aba-cat:hover { border-color: var(--primaria); color: var(--primaria); }
+    .aba-cat[aria-selected="true"] {
+      background: var(--primaria); border-color: var(--primaria); color: #FFFFFF;
+    }
+    .aba-cat:focus-visible { outline: 2px solid var(--primaria); outline-offset: 2px; }
+    .aba-ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 13px; padding: 6px 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    /* 2021 mistura os dois criterios: a aba fica marcada, nao escondida */
+    .aba-ano.misto::after { content: '*'; color: var(--media); font-weight: 700; margin-left: 2px; }
+    .aviso-ano {
+      font-size: 12.5px; color: var(--media); background: var(--media-bg);
+      border: 1px solid rgba(198,140,0,0.25); border-radius: 10px;
+      padding: 9px 13px; margin: 0 0 14px;
+    }
+
+    .eras { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; margin: 0 0 14px; }
+    .era {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 16px 18px;
+    }
+    .era .rot {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario); margin: 0 0 2px;
+    }
+    .era .sub { font-size: 12.5px; color: var(--texto-secundario); margin: 0 0 12px; }
+    .era-linha, .era-cab { display: grid; grid-template-columns: 46px 1fr 1fr; gap: 10px; align-items: baseline; }
+    .era-cab {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+      padding-bottom: 7px; margin-bottom: 6px; border-bottom: 1px solid var(--borda-sutil);
+    }
+    .era-cab span, .era-linha span:not(.ano) { text-align: right; }
+    .era-cab span:first-child { text-align: left; }
+    .era-linha { padding: 5px 0; }
+    .era-linha .ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; color: var(--texto-terciario);
+      font-variant-numeric: tabular-nums;
+    }
+    .era-linha .valor, .era-linha .horas {
+      font-family: 'Ubuntu Mono', monospace; font-size: 17px; font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .era-var {
+      font-size: 12.5px; color: var(--texto-secundario);
+      margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--borda-sutil);
+    }
+
+    .rot-serie {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario); margin: 0 0 3px;
+    }
+    .sub-serie { font-size: 12.5px; color: var(--texto-secundario); margin: 0 0 12px; }
+    .horas-serie {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 18px 22px 16px; margin: 0 0 12px;
+    }
+    .linha-h, .cab-h { display: grid; grid-template-columns: 42px 78px 1fr 70px; gap: 10px; align-items: center; }
+    .linha-h { padding: 2.5px 0; }
+    .cab-h {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+      padding-bottom: 7px; margin-bottom: 4px; border-bottom: 1px solid var(--borda-sutil);
+    }
+    .cab-h span { text-align: right; }
+    .cab-h span:first-child { text-align: left; }
+    .linha-h .preco {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12px; text-align: right;
+      color: var(--texto-secundario); font-variant-numeric: tabular-nums;
+    }
+    .linha-h .ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; color: var(--texto-terciario);
+      font-variant-numeric: tabular-nums;
+    }
+    .linha-h .val {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; font-weight: 700;
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .trilho-h { height: 10px; border-radius: 5px; background: var(--trilho); overflow: hidden; }
+    .barra-h { height: 100%; background: var(--fed); }
+    .anim .barra-h { transition: width .5s cubic-bezier(.22,.61,.36,1); }
+
     /* ── Itens da cesta ── */
     .itens {
       background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
       border-radius: 16px; box-shadow: var(--sombra-card); padding: 20px 22px 18px; margin: 20px 0 10px;
     }
-    .item { display: grid; grid-template-columns: 128px 1fr 54px 54px 60px; align-items: center; gap: 10px; padding: 4px 0; }
+    .item { display: grid; grid-template-columns: 26px 122px 1fr 54px 54px 60px; align-items: center; gap: 10px; padding: 4px 0; }
+    .ico-item { display: flex; align-items: center; color: var(--texto-terciario); }
+    .ico-item svg { width: 22px; height: 22px; display: block; }
     .cab-item {
-      display: grid; grid-template-columns: 128px 1fr 54px 54px 60px; gap: 10px;
+      display: grid; grid-template-columns: 26px 122px 1fr 54px 54px 60px; gap: 10px;
       padding-bottom: 7px; margin-bottom: 2px; border-bottom: 1px solid var(--borda-sutil);
       font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
       text-transform: uppercase; color: var(--texto-terciario);
     }
     .cab-item span { text-align: right; }
-    .cab-item span:first-child, .cab-item span:nth-child(2) { text-align: left; }
+    .cab-item span:first-child, .cab-item span:nth-child(2), .cab-item span:nth-child(3) { text-align: left; }
     .item .rot { font-size: 14px; line-height: 1.25; }
     .item .rot span { display: block; font-family: 'Ubuntu Mono', monospace; font-size: 11px; color: var(--texto-terciario); }
     .item .tot {
@@ -410,6 +504,13 @@
       </div>
     </div>
 
+    <p class="nota-uf" id="nota-uf" hidden></p>
+    <p class="nota-uf" id="nota-brasil" hidden>
+      Média simples das 27 unidades da federação: cada estado pesa igual, então
+      isto não é a carga do brasileiro médio, que dependeria de quanta gente vive
+      e compra em cada um. Serve para ver o nível do país e comparar um estado com ele.
+    </p>
+
     <div class="estado" id="estado"><span class="girando" aria-hidden="true"></span>Carregando o painel</div>
 
     <div id="painel" hidden>
@@ -423,6 +524,17 @@
         <span id="nota-cobertura"></span>
       </p>
 
+      <h2 id="dinheiro">O mesmo em dinheiro</h2>
+      <p class="prosa" id="dinheiro-intro"></p>
+
+      <div class="abas-cat" id="abas-categoria" role="tablist" aria-label="Categoria"></div>
+
+      <div class="eras" id="eras"></div>
+
+      <div class="horas-serie" id="horas-serie"></div>
+
+      <p class="nota-fig" id="dinheiro-nota"></p>
+
       <h2>Dentro da cesta básica</h2>
       <p class="prosa">
         Os 13 itens da ração essencial mínima do Decreto-Lei 399/1938, na composição da
@@ -430,6 +542,9 @@
         em <strong id="uf-nome-1">São Paulo</strong>, sobre <span id="vigencia-cesta"></span>.
         <span id="nota-federal"></span>
       </p>
+
+      <div class="abas-cat" id="abas-ano" role="tablist" aria-label="Ano da cesta"></div>
+      <p class="aviso-ano" id="aviso-ano" hidden></p>
 
       <div class="itens" id="itens"></div>
 
@@ -541,7 +656,11 @@
     const QUEBRA = 2021;
     const VAZIO = '-';
 
+    /** Chave da média das 27 UFs, como vem do painel.json. */
+    const BRASIL = 'BR';
+
     const NOMES = {
+      BR: 'Brasil',
       AC: 'Acre', AL: 'Alagoas', AM: 'Amazonas', AP: 'Amapá', BA: 'Bahia',
       CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás',
       MA: 'Maranhão', MG: 'Minas Gerais', MS: 'Mato Grosso do Sul',
@@ -573,19 +692,89 @@
         </svg>`
     };
 
+    /**
+     * Um icone por item da cesta, no mesmo tracado dos icones das categorias:
+     * traco de 2.4 sobre grade de 64, sem preenchimento. A chave e o NCM que
+     * vem no painel.json, nao a posicao na lista.
+     */
+    const svg = corpo => `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor"
+        stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${corpo}</svg>`;
+
+    const ICONES_CESTA = {
+      // carne: peca com a gordura no meio
+      '0201.20.20': svg(`<path d="M17 25c8-9 24-11 30-3 6 8 3 22-7 26-11 4-24-2-26-10-1-5 0-9 3-13z"/>
+        <circle cx="30" cy="33" r="5"/>`),
+      // leite: caixinha de topo triangular
+      '0401.10.10': svg(`<path d="M22 27h20v27a2 2 0 0 1-2 2H24a2 2 0 0 1-2-2z"/>
+        <path d="M22 27l5-10h10l5 10"/><path d="M27 17l5 5 5-5"/>`),
+      // feijao: tres graos
+      '0713.33.99': svg(`<ellipse cx="24" cy="26" rx="9" ry="6" transform="rotate(-25 24 26)"/>
+        <ellipse cx="41" cy="32" rx="9" ry="6" transform="rotate(15 41 32)"/>
+        <ellipse cx="28" cy="43" rx="9" ry="6" transform="rotate(-8 28 43)"/>`),
+      // arroz: tigela com os graos acima
+      '1006.30.21': svg(`<path d="M12 35h40c0 11-9 18-20 18S12 46 12 35z"/>
+        <ellipse cx="23" cy="28" rx="4.6" ry="2.6" transform="rotate(-20 23 28)"/>
+        <ellipse cx="33" cy="24" rx="4.6" ry="2.6" transform="rotate(10 33 24)"/>
+        <ellipse cx="43" cy="29" rx="4.6" ry="2.6" transform="rotate(-14 43 29)"/>`),
+      // farinha de trigo: espiga
+      '1101.00.10': svg(`<path d="M32 56V22"/>
+        <path d="M32 24c0-5 3-9 7-11 1 6-2 10-7 11z"/><path d="M32 24c0-5-3-9-7-11-1 6 2 10 7 11z"/>
+        <path d="M32 35c0-5 3-9 7-11 1 6-2 10-7 11z"/><path d="M32 35c0-5-3-9-7-11-1 6 2 10 7 11z"/>
+        <path d="M32 46c0-5 3-9 7-11 1 6-2 10-7 11z"/><path d="M32 46c0-5-3-9-7-11-1 6 2 10 7 11z"/>`),
+      // batata: tuberculo com os olhos
+      '0701.90.00': svg(`<path d="M18 31c4-9 16-14 26-9 9 5 11 16 5 23-7 8-21 8-28 1-4-4-5-10-3-15z"/>
+        <path d="M27 30h.01M38 27h.01M33 39h.01M44 35h.01"/>`),
+      // tomate: fruto e as folhas do calice
+      '0702.00.00': svg(`<circle cx="32" cy="38" r="16"/><path d="M32 22v-5"/>
+        <path d="M32 22c-4-4-9-4-12-3 1 4 5 7 12 3z"/><path d="M32 22c4-4 9-4 12-3-1 4-5 7-12 3z"/>`),
+      // pao: filao com os cortes
+      '1905.90.90 Ex 01': svg(`<path d="M13 40c-2-6 2-13 9-16l19-8c7-3 14 0 16 6 2 6-2 13-9 16l-19 8c-7 3-14 0-16-6z"/>
+        <path d="M23 31l4 8M31 27l4 8M39 23l4 8"/>`),
+      // cafe: grao com o sulco
+      '0901.21.00': svg(`<ellipse cx="32" cy="32" rx="12" ry="17" transform="rotate(-35 32 32)"/>
+        <path d="M23 41c6-4 5-14 18-19"/>`),
+      // banana
+      '0803.90.00': svg(`<path d="M16 22c0 17 11 29 27 29 5 0 8-2 8-5 0-2-2-3-5-3-13 0-22-9-22-21 0-3-1-4-4-4s-4 2-4 4z"/>`),
+      // acucar: torrao em perspectiva, com os cristais soltos
+      '1701.99.00': svg(`<path d="M20 27l12-6 12 6v14l-12 6-12-6z"/><path d="M20 27l12 6 12-6M32 33v14"/>
+        <path d="M50 19h.01M14 45h.01M52 49h.01"/>`),
+      // oleo: garrafa com o rotulo
+      '1507.90.11': svg(`<path d="M27 13h10v7l4 6a8 8 0 0 1 2 5v18a4 4 0 0 1-4 4H25a4 4 0 0 1-4-4V31a8 8 0 0 1 2-5l4-6z"/>
+        <path d="M21 37h22"/>`),
+      // manteiga: tablete
+      '0405.10.00': svg(`<path d="M16 30l10-6h24l-10 6z"/><path d="M16 30h24v12H16z"/>
+        <path d="M40 42l10-6V24l-10 6"/>`)
+    };
+
+    /** Item sem icone proprio nao quebra a grade. */
+    const ICONE_GENERICO = svg(`<circle cx="32" cy="32" r="15"/>`);
+
+    // `ipca` diz por qual recorte do IPCA a categoria e corrigida. Comida e
+    // veiculo nao sofreram a mesma inflacao, e dentro de Transportes o carro e
+    // a moto tambem nao: por isso os dois usam subitem proprio, nao o grupo.
+    // O texto so nomeia o recorte; a conta esta em contaDoAno.
     const CATS = [
-      { k: 'cesta', icone: 'cesta', nome: 'Cesta básica',  sub: '13 itens · DL 399/1938' },
-      { k: 'carro', icone: 'carro', nome: 'Carro popular', sub: 'NCM 8703.21.00 · até 1.0' },
-      { k: 'moto',  icone: 'moto',  nome: 'Moto popular',  sub: 'NCM 8711.20.10 · 50 a 125cc' }
+      { k: 'cesta', icone: 'cesta', nome: 'Cesta básica',  sub: '13 itens · DL 399/1938',
+        ipca: 'alimentacao', ipcaNome: 'alimentação e bebidas' },
+      { k: 'carro', icone: 'carro', nome: 'Carro popular', sub: 'NCM 8703.21.00 · até 1.0',
+        ipca: 'automovel', ipcaNome: 'automóvel novo' },
+      { k: 'moto',  icone: 'moto',  nome: 'Moto popular',  sub: 'NCM 8711.20.10 · 50 a 125cc',
+        ipca: 'motocicleta', ipcaNome: 'motocicleta' }
     ];
 
     const CABECALHO_ITENS = `<div class="cab-item">
-        <span>Item</span><span></span><span>Federal</span><span>Estadual</span><span>Total</span>
+        <span></span><span>Item</span><span></span>
+        <span>Federal</span><span>Estadual</span><span>Total</span>
       </div>`;
 
     const CABECALHO = `<div class="cab-col">
         <span></span><span></span><span>Federal</span><span>Estadual</span><span>Total</span>
       </div>`;
+
+    /** UF usada quando nada mais identifica o visitante. */
+    const UF_PADRAO = 'SP';
+    /** Chave do navegador onde a escolha fica guardada. */
+    const CHAVE_UF = 'painel-ibpt-uf';
 
     let D = null;
     let ANOS_A = [];
@@ -677,8 +866,201 @@
       });
     }
 
+    // ── A conta em dinheiro ─────────────────────────────────────────────
+    // Uma compra que hoje custa R$ 100, corrigida pelo IPCA para trás. O
+    // imposto sai da alíquota do ano; as horas saem do salário mínimo já
+    // descontado o INSS. Sem as séries em dados/, a seção some inteira.
+
+    /** Compra de referência, em reais do último ano. */
+    const COMPRA = 100;
+    /** Teto da barra de horas. Fixo e com base em zero, para comparar anos. */
+    const ESCALA_HORAS = 20;
+
+    let catDinheiro = 'cesta';
+    /** Ano mostrado no bloco da cesta. Comeca no mais recente. */
+    let anoCesta = null;
+
+    const reais = v => 'R$ ' + v.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+    const horas = v => v.toFixed(2).replace('.', ',') + ' h';
+    /**
+     * A variação sai dos valores JÁ ARREDONDADOS, os mesmos que aparecem na
+     * tela. Calcular sobre os números cheios daria até 0,12 ponto de diferença
+     * e quem conferisse a conta com o que está escrito acharia que erramos.
+     */
+    const cent = v => Math.round(v * 100) / 100;
+    const modulo = (de, para) => Math.abs((cent(para) / cent(de) - 1) * 100).toFixed(1).replace('.', ',') + '%';
+    const subiu = (de, para) => cent(para) > cent(de);
+
+    /**
+     * A leitura muda conforme as duas medidas andarem juntas ou em sentidos
+     * opostos: "subiu em reais mas caiu em tempo" só vale quando é o caso.
+     */
+    function frasePeriodo(a, b) {
+      const dinheiro = `O imposto ${subiu(a.imposto, b.imposto) ? 'subiu' : 'caiu'} `
+        + `${modulo(a.imposto, b.imposto)} em dinheiro`;
+      const tempo = `${subiu(a.horasImposto, b.horasImposto) ? 'aumentou' : 'diminuiu'} `
+        + `${modulo(a.horasImposto, b.horasImposto)}`;
+      const mesmoRumo = subiu(a.imposto, b.imposto) === subiu(a.horasImposto, b.horasImposto);
+      return `${dinheiro}, e o tempo de trabalho para pagá-lo ${tempo}.`
+        .replace(', e o tempo', mesmoRumo ? ', e o tempo' : ', mas o tempo');
+    }
+
+    function temEconomia() {
+      return !!(D.economia && D.economia.anos[ULTIMO_ANO]);
+    }
+
+    /**
+     * Preço, imposto e horas de um ano. Devolve null quando falta a alíquota
+     * daquele ano ou a série econômica não cobre o ano.
+     */
+    function contaDoAno(uf, ano, chave) {
+      const eco = D.economia.anos[ano];
+      const base = D.economia.anos[ULTIMO_ANO];
+      const par = D.dados[uf][ano] && D.dados[uf][ano][chave];
+      if (!eco || !par) return null;
+
+      // O preço corrige pelo grupo do IPCA da categoria; o salário, adiante,
+      // pelo índice cheio, que é o que mede o custo de vida de quem recebe.
+      const grupo = CATS.find(c => c.k === chave).ipca;
+      const preco = COMPRA * (eco.indices[grupo] / base.indices[grupo]);
+      const imposto = preco * (par[0] + par[1]) / 100;
+      const valorHora = eco.salarioLiquido / D.economia.jornadaMensal;
+      return {
+        ano,
+        preco,
+        imposto,
+        horasImposto: imposto / valorHora,
+        horasCompra: preco / valorHora
+      };
+    }
+
+    function montarAbasDinheiro(uf) {
+      const caixa = document.getElementById('abas-categoria');
+      caixa.innerHTML = CATS.map(c => `
+        <button class="aba-cat" role="tab" data-cat="${c.k}"
+          aria-selected="${c.k === catDinheiro}">${c.nome}</button>`).join('');
+
+      caixa.querySelectorAll('.aba-cat').forEach(botao => {
+        botao.addEventListener('click', () => {
+          catDinheiro = botao.dataset.cat;
+          caixa.querySelectorAll('.aba-cat').forEach(b => {
+            b.setAttribute('aria-selected', String(b.dataset.cat === catDinheiro));
+          });
+          montarDinheiro(document.getElementById('uf').value);
+        });
+      });
+    }
+
+    /**
+     * Uma aba por ano publicado, para ver a cesta item a item em qualquer ano
+     * da serie e nao so no mais recente. O ano corrente vem selecionado.
+     */
+    function montarAbasAnos() {
+      const caixa = document.getElementById('abas-ano');
+      caixa.innerHTML = D.anos.map(ano => `
+        <button class="aba-cat aba-ano${ano === QUEBRA ? ' misto' : ''}" role="tab"
+          data-ano="${ano}" aria-selected="${String(ano) === anoCesta}">${ano}</button>`).join('');
+
+      caixa.querySelectorAll('.aba-ano').forEach(botao => {
+        botao.addEventListener('click', () => {
+          anoCesta = botao.dataset.ano;
+          caixa.querySelectorAll('.aba-ano').forEach(b => {
+            b.setAttribute('aria-selected', String(b.dataset.ano === anoCesta));
+          });
+          montarItens(document.getElementById('uf').value);
+        });
+      });
+    }
+
+    function cartaoEra(rotulo, contas) {
+      const primeiro = contas[0];
+      const ultimo = contas[contas.length - 1];
+      const linha = c => `<div class="era-linha">
+          <span class="ano">${c.ano}</span>
+          <span class="valor">${reais(c.imposto)}</span>
+          <span class="horas">${horas(c.horasImposto)}</span>
+        </div>`;
+
+      return `<div class="era">
+          <p class="rot">${rotulo} · ${primeiro.ano} a ${ultimo.ano}</p>
+          <p class="sub">Quanto da compra virou imposto, e quanto tempo de trabalho isso custou.</p>
+          <div class="era-cab"><span></span><span>Imposto</span><span>Horas</span></div>
+          ${linha(primeiro)}
+          ${contas.length > 1 ? linha(ultimo) : ''}
+          ${contas.length > 1 ? `<p class="era-var">${frasePeriodo(primeiro, ultimo)}</p>` : ''}
+        </div>`;
+    }
+
+    function montarDinheiro(uf) {
+      const secao = ['dinheiro', 'dinheiro-intro', 'eras', 'horas-serie', 'dinheiro-nota'];
+      if (!temEconomia()) {
+        secao.forEach(id => { document.getElementById(id).hidden = true; });
+        document.getElementById('abas-categoria').hidden = true;
+        return;
+      }
+
+      const antigas = ANOS_A.map(a => contaDoAno(uf, a, catDinheiro)).filter(Boolean);
+      const atuais = ANOS_D.map(a => contaDoAno(uf, a, catDinheiro)).filter(Boolean);
+      const todas = [...antigas, ...atuais];
+      if (todas.length === 0) return;
+
+      const base = D.economia.anos[ULTIMO_ANO];
+      const maisAntiga = todas[0];
+      const cat = CATS.find(c => c.k === catDinheiro);
+      const nome = cat.nome.toLowerCase();
+
+      document.getElementById('dinheiro-intro').innerHTML =
+        `O que hoje custa <strong>R$ ${COMPRA}</strong> em ${nome} custava `
+        + `<strong>${reais(maisAntiga.preco)}</strong> em ${maisAntiga.ano}. É a mesma compra, `
+        + `com o preço de cada época: a diferença é a inflação de <strong>${cat.ipcaNome}</strong>, `
+        + 'que é o recorte do IPCA correspondente a esta categoria. '
+        + 'Nos quadros abaixo, quanto desse valor é imposto em cada ano e quantas horas de '
+        + 'trabalho quem ganha um salário mínimo precisa para pagar só esse imposto.';
+
+      const caixaEras = document.getElementById('eras');
+      caixaEras.innerHTML =
+        (antigas.length ? cartaoEra('Critério antigo', antigas) : '')
+        + (atuais.length ? cartaoEra('Critério atual', atuais) : '');
+      reanimar(caixaEras);
+
+      // A linha de horas da compra atravessa a série inteira porque não usa
+      // alíquota: é a única comparação 2015 contra hoje que se sustenta.
+      document.getElementById('horas-serie').innerHTML =
+        `<p class="rot-serie">Horas de trabalho para pagar a compra inteira</p>
+         <p class="sub-serie">Sempre a mesma compra: os R$ ${COMPRA} de ${ULTIMO_ANO}, imposto já incluído,
+         com o preço de cada ano. Em ${ULTIMO_ANO} as três categorias empatam porque R$ ${COMPRA} é o ponto
+         de partida das três; o que as separa antes disso é a inflação de cada uma.</p>
+         <div class="cab-h"><span></span><span>Preço</span><span></span><span>Horas</span></div>`
+        + todas.map(c => `<div class="linha-h">
+            <span class="ano">${c.ano}</span>
+            <span class="preco">${reais(c.preco)}</span>
+            <div class="trilho-h" role="img"
+              aria-label="${c.ano}: ${reais(c.preco)}, ${horas(c.horasCompra)} de trabalho">
+              <div class="barra-h" style="width:${Math.min(100, c.horasCompra / ESCALA_HORAS * 100).toFixed(2)}%"></div>
+            </div>
+            <span class="val">${horas(c.horasCompra)}</span>
+          </div>`).join('');
+
+      const porMes = catDinheiro === 'cesta'
+        ? ` Fazendo essa compra uma vez por mês, são ${(todas[todas.length - 1].horasImposto * 12 / 8).toFixed(1).replace('.', ',')} `
+          + 'dias inteiros de trabalho por ano, de oito horas cada, só para pagar o imposto dela.'
+        : '';
+
+      document.getElementById('dinheiro-nota').innerHTML =
+        `As horas são contadas sobre o salário que a pessoa realmente recebe, não sobre o bruto. `
+        + `Em ${ULTIMO_ANO} o salário mínimo é de ${reais(base.salarioBruto)}, e sobram `
+        + `${reais(base.salarioLiquido)} depois do desconto do INSS, o que dá `
+        + `${reais(base.salarioLiquido / D.economia.jornadaMensal)} por hora em uma jornada de `
+        + `${D.economia.jornadaMensal} horas por mês. Quem ganha o mínimo não paga imposto de renda, e o `
+        + 'FGTS não é descontado do salário. O vale-transporte pode descontar até 6%, mas é opcional '
+        + `e não entrou na conta.${porMes}`;
+    }
+
     function montarItens(uf) {
-      const reg = D.dados[uf][ULTIMO_ANO];
+      const reg = D.dados[uf][anoCesta];
+      textoDaCesta(uf);
       const lista = D.cesta.map((it, i) => ({ ...it, par: reg.itens[i] })).filter(x => x.par);
 
       // Agrupa pelas faixas de estadual encontradas na UF, da maior para a menor
@@ -691,6 +1073,7 @@
                              : `Estadual de ${pct(f)}, reduzida`);
         return `<p class="grupo-rot">${rot}</p>` + doGrupo.map(x => `
           <div class="item">
+            <div class="ico-item">${ICONES_CESTA[x.ncm] || ICONE_GENERICO}</div>
             <div class="rot">${x.nome}<span>${x.ncm}</span></div>
             ${pilha(x.par, x.nome)}
             <span class="parte">${pct(x.par[0])}</span>
@@ -705,9 +1088,9 @@
       // Verdadeiro desde 2020, falso de 2015 a 2019: a frase tem que sair do dado
       const federais = [...new Set(lista.map(x => x.par[0]))];
       document.getElementById('nota-federal').textContent = federais.length === 1
-        ? `O federal é o mesmo nos ${lista.length} itens, ${pct(federais[0])}, então toda a `
-          + 'diferença entre um item e outro é ICMS.'
-        : `O federal varia entre os itens neste ano (${federais.length} valores diferentes), `
+        ? `Em ${anoCesta} o federal é o mesmo nos ${lista.length} itens, ${pct(federais[0])}, `
+          + 'então toda a diferença entre um item e outro é ICMS.'
+        : `Em ${anoCesta} o federal não é igual entre os itens (${federais.length} valores diferentes), `
           + 'então a diferença entre um item e outro não é só ICMS.';
 
       const totais = lista.map(x => x.par[0] + x.par[1]);
@@ -732,6 +1115,38 @@
       reanimar(document.getElementById('faixa'));
     }
 
+    /**
+     * Ano e período do bloco da cesta. Muda junto com a aba de ano e com a UF,
+     * porque a cobertura é por estado desde que passamos a descartar dia sem
+     * tabela confiável.
+     */
+    function textoDaCesta(uf) {
+      const [dias, total] = D.diasCobertos[anoCesta];
+      const cobertura = D.dados[uf][anoCesta].cobertura;
+
+      document.getElementById('ano-cesta').textContent = anoCesta;
+      document.getElementById('vigencia-cesta').textContent = dias === total
+        ? 'as tabelas vigentes no ano inteiro'
+        : `as tabelas vigentes em ${dias} dos ${total} dias do ano`;
+
+      const aviso = document.getElementById('aviso-ano');
+      const partes = [];
+      if (anoCesta === String(QUEBRA)) {
+        partes.push(`${QUEBRA} fica de fora das comparações do resto da página: `
+          + 'metade do ano saiu pelo critério antigo do IBPT e metade pelo novo, '
+          + 'então a média mistura os dois.');
+      }
+      // No ano corrente a cobertura parcial é o esperado e já está dita na
+      // frase acima. Em ano fechado ela significa tabela faltando ou defeituosa,
+      // e aí vale o alerta.
+      if (cobertura < 100 && anoCesta !== ULTIMO_ANO) {
+        partes.push(`${uf === BRASIL ? 'No Brasil' : `Em ${NOMES[uf]}`} este ano só tem `
+          + `${cobertura}% dos dias com tabela confiável; o resto ficou de fora da média.`);
+      }
+      aviso.textContent = partes.join(' ');
+      aviso.hidden = partes.length === 0;
+    }
+
     /** Reinicia o fade de um bloco recém-substituído. */
     function reanimar(el) {
       el.classList.remove('troca');
@@ -751,7 +1166,8 @@
         return `<tr><th scope="row">${c.nome}</th>${cels}</tr>`;
       }).join('');
       document.getElementById('cap-tabela').textContent =
-        `Alíquota total por ano em ${NOMES[uf]}, em % sobre o preço. ${QUEBRA} omitido por misturar os dois critérios.`;
+        `Alíquota total por ano ${uf === BRASIL ? 'no Brasil, média dos 27 estados' : `em ${NOMES[uf]}`}, `
+        + `em % sobre o preço. ${QUEBRA} omitido por misturar os dois critérios.`;
     }
 
     function render(uf) {
@@ -761,10 +1177,112 @@
       } else {
         atualizarCards(uf);
       }
+      montarDinheiro(uf);
       montarItens(uf);
       montarTabela(uf);
       document.getElementById('uf-nome-1').textContent = NOMES[uf];
-      document.getElementById('ano-cesta').textContent = ULTIMO_ANO;
+      document.getElementById('nota-brasil').hidden = uf !== BRASIL;
+    }
+
+    // ── Descoberta da UF ────────────────────────────────────────────────
+    // Ordem: o que o visitante já escolheu, depois o IP, depois a
+    // geolocalização aproximada, e por último SP. O valor encontrado fica
+    // guardado no navegador e só é substituído quando o visitante troca o
+    // filtro na mão.
+
+    function ufValida(uf) {
+      return typeof uf === 'string' && D.ufs.includes(uf);
+    }
+
+    /** localStorage falha em modo privado e com cookies bloqueados. */
+    function ufGuardada() {
+      try {
+        return localStorage.getItem(CHAVE_UF);
+      } catch {
+        return null;
+      }
+    }
+
+    function guardarUf(uf) {
+      try {
+        localStorage.setItem(CHAVE_UF, uf);
+      } catch {
+        // sem armazenamento: a escolha vale só nesta visita
+      }
+    }
+
+    /** fetch que desiste sozinho, para a página não ficar presa no serviço. */
+    async function buscarComPrazo(url, ms) {
+      const controle = new AbortController();
+      const relogio = setTimeout(() => controle.abort(), ms);
+      try {
+        const resposta = await fetch(url, { signal: controle.signal });
+        return resposta.ok ? await resposta.json() : null;
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(relogio);
+      }
+    }
+
+    /** UF pelo IP de quem acessa. Devolve null fora do Brasil ou se falhar. */
+    async function ufPorIp() {
+      const dados = await buscarComPrazo('https://ipwho.is/', 4000);
+      if (!dados || dados.success === false || dados.country_code !== 'BR') return null;
+      return ufValida(dados.region_code) ? dados.region_code : null;
+    }
+
+    /** Posição aproximada, sob permissão do visitante. */
+    function posicaoAproximada() {
+      return new Promise(resolve => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          p => resolve(p.coords),
+          () => resolve(null),
+          { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+        );
+      });
+    }
+
+    /** UF pela geolocalização do navegador. Pede permissão ao visitante. */
+    async function ufPorGeolocalizacao() {
+      const coords = await posicaoAproximada();
+      if (!coords) return null;
+
+      const dados = await buscarComPrazo(
+        'https://api.bigdatacloud.net/data/reverse-geocode-client'
+        + `?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=pt`,
+        5000
+      );
+      if (!dados || dados.countryCode !== 'BR') return null;
+
+      const uf = String(dados.principalSubdivisionCode || '').replace('BR-', '');
+      return ufValida(uf) ? uf : null;
+    }
+
+    /**
+     * Roda depois da primeira pintura, só quando o navegador ainda não tem UF
+     * guardada. A página já está legível em SP enquanto isso acontece.
+     */
+    async function detectarUf(sel) {
+      let uf = await ufPorIp();
+      let origem = uf ? 'do seu acesso' : '';
+
+      if (!uf) {
+        uf = await ufPorGeolocalizacao();
+        origem = uf ? 'da sua localização' : '';
+      }
+
+      guardarUf(uf || UF_PADRAO);
+      if (!uf || uf === sel.value) return;
+
+      sel.value = uf;
+      render(uf);
+
+      const nota = document.getElementById('nota-uf');
+      nota.textContent = `Estado escolhido a partir ${origem}: ${NOMES[uf]}.`
+        + ' Trocar no filtro fixa outro para as próximas visitas.';
+      nota.hidden = false;
     }
 
     /** Números da abertura e do rodapé, todos vindos do build. */
@@ -795,11 +1313,8 @@
     /** Cobertura do último ano, escrita nos dois pontos que a citam. */
     function preencherCobertura() {
       const [dias, total] = D.diasCobertos[ULTIMO_ANO];
-      const frase = `Em ${ULTIMO_ANO} as tabelas cobrem ${dias} de ${total} dias.`;
-      document.getElementById('nota-cobertura').textContent = frase;
-      document.getElementById('vigencia-cesta').textContent = dias === total
-        ? `as tabelas vigentes no ano inteiro`
-        : `as tabelas vigentes em ${dias} dos ${total} dias do ano`;
+      document.getElementById('nota-cobertura').textContent =
+        `Em ${ULTIMO_ANO} as tabelas cobrem ${dias} de ${total} dias.`;
       const futuros = diasAindaPorVir();
       document.getElementById('cobertura-detalhe').textContent = futuros > 0
         ? `O ano de ${ULTIMO_ANO} ainda não terminou: as tabelas cobrem ${dias} dos ${total} dias, `
@@ -835,12 +1350,26 @@
       ANOS_D = D.anos.filter(a => a > QUEBRA);
       TODOS_ANOS = [...D.anos];
       ULTIMO_ANO = String(D.anos[D.anos.length - 1]);
+      anoCesta = ULTIMO_ANO;
       preencherCobertura();
 
       const sel = document.getElementById('uf');
-      sel.innerHTML = D.ufs.map(u => `<option value="${u}">${NOMES[u]} (${u})</option>`).join('');
-      sel.value = D.ufs.includes('SP') ? 'SP' : D.ufs[0];
-      sel.addEventListener('change', () => render(sel.value));
+      sel.innerHTML = D.ufs.map(u => `<option value="${u}">`
+        + (u === BRASIL ? 'Brasil (média dos 27 estados)' : `${NOMES[u]} (${u})`)
+        + '</option>').join('');
+      if (temEconomia()) montarAbasDinheiro();
+      montarAbasAnos();
+
+      const guardada = ufGuardada();
+      sel.value = ufValida(guardada) ? guardada
+        : (D.ufs.includes(UF_PADRAO) ? UF_PADRAO : D.ufs[0]);
+
+      // Escolha manual manda: sobrescreve o que estiver guardado
+      sel.addEventListener('change', () => {
+        guardarUf(sel.value);
+        document.getElementById('nota-uf').hidden = true;
+        render(sel.value);
+      });
       render(sel.value);
 
       document.getElementById('estado').hidden = true;
@@ -850,6 +1379,10 @@
       // fica de fora de propósito, para a página nascer legível.
       requestAnimationFrame(() => requestAnimationFrame(() => {
         document.body.classList.add('anim');
+
+        // Só depois da página pronta: a detecção pode pedir permissão de
+        // localização e não pode segurar a primeira pintura.
+        if (!ufValida(guardada)) detectarUf(sel);
       }));
     }
 
