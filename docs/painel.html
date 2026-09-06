@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Carga Tributária</title>
+  <meta name="description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado, calculado sobre as tabelas IBPTax de 2015 a hoje.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ibpt.valraw.com.br/painel.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ibpt.valraw.com.br/painel.html">
+  <meta property="og:title" content="Painel de Carga Tributária">
+  <meta property="og:description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado.">
+  <meta property="og:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta property="og:image:width" content="2000">
+  <meta property="og:image:height" content="1000">
+  <meta property="og:image:alt" content="Logo Tabelas IBPT">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta name="twitter:title" content="Painel de Carga Tributária">
+  <meta name="twitter:description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado.">
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/public/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/public/favicon-64x64.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/public/favicon-128x128.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/public/favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="/public/favicon-256x256.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/public/favicon-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180x180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap"></noscript>
+  <style>
+    /* Tokens do Design System VALRAW UI, os mesmos do index.html.
+       As duas cores de série (federal e estadual) são o par validado para
+       daltonismo: ΔE 32,1 em deuteranopia, 10,4 em tritanopia. */
+    :root {
+      --fundo-principal: #FFFFFF;
+      --fundo-cartao: #FFFFFF;
+      --fundo-section: #F7F9FC;
+      --fundo-base: #F7F9FC;
+      --trilho: #E3E9F2;
+      --primaria: #000793;
+      --primaria-hover: #00055E;
+      --borda-sutil: #EDF2F7;
+      --borda-padrao: #E2E8F0;
+      --borda-forte: #CBD5E0;
+      --texto-principal: #1F2937;
+      --texto-secundario: #4A5568;
+      --texto-terciario: #718096;
+      --sombra-card: 0 4px 24px rgba(15,23,42,0.06);
+      --sombra-card-hover: 0 12px 36px rgba(15,23,42,0.12);
+      --sombra-sticky: 0 2px 12px rgba(15,23,42,0.04);
+      --fed: #2E3ED6;
+      --est: #2E8B22;
+      --grave: #B02A26;
+      --media: #C68C00;
+      --grave-bg: rgba(176,42,38,0.08);
+      --primaria-dim: rgba(0,7,147,0.06);
+      --primaria-border: rgba(0,7,147,0.22);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; height: 100%; }
+    body {
+      font-family: 'Ubuntu', system-ui, sans-serif;
+      background: var(--fundo-principal);
+      color: var(--texto-principal);
+      font-size: 16px; line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100%; display: flex; flex-direction: column;
+    }
+    ::selection { color: var(--texto-principal); background: rgba(5,199,0,0.22); }
+    a { color: var(--primaria); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--primaria-hover); }
+    main { flex: 1 0 auto; width: 100%; }
+
+    /* ── Header, igual ao do index ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--borda-sutil);
+      box-shadow: var(--sombra-sticky);
+    }
+    header .barra {
+      max-width: 1280px; margin: 0 auto; padding: 0 16px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    @media (min-width: 640px) { header .barra { padding: 0 24px; } }
+    header .logo { height: 38px; width: auto; display: block; }
+    .voltar {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .voltar:hover { color: var(--primaria); }
+
+    .pagina { max-width: 1080px; margin: 0 auto; padding: 92px 24px 72px; }
+    .prosa { max-width: 68ch; }
+
+    /* ── Abertura ── */
+    .abertura { margin-bottom: 30px; }
+    .etiqueta {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12px;
+      letter-spacing: .16em; text-transform: uppercase; color: var(--texto-terciario);
+      margin: 0 0 10px;
+    }
+    h1 {
+      font-size: clamp(30px, 4.4vw, 44px); line-height: 1.1; font-weight: 700;
+      letter-spacing: -.022em; margin: 0 0 14px; text-wrap: balance;
+    }
+    .resumo { font-size: 18px; color: var(--texto-secundario); margin: 0; max-width: 62ch; }
+    .assinatura {
+      display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; color: var(--texto-terciario);
+    }
+    /* Ficha da base, no pé do bloco de notas */
+    .assinatura.base-usada { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--borda-sutil); }
+    /* O header é fixo: âncora não pode parar embaixo dele */
+    [id] { scroll-margin-top: 76px; }
+
+    h2 {
+      font-size: 13px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+      color: var(--primaria); margin: 52px 0 6px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--borda-padrao);
+    }
+    h3 { font-size: 19px; font-weight: 500; letter-spacing: -.01em; margin: 30px 0 8px; }
+    p { margin: 0 0 15px; }
+    code {
+      font-family: 'Ubuntu Mono', monospace; font-size: .92em; background: var(--fundo-section);
+      border: 1px solid var(--borda-sutil); padding: 1px 5px; border-radius: 4px;
+    }
+    ul { margin: 0 0 15px; padding-left: 20px; }
+    li { margin-bottom: 6px; }
+
+    .veredito {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; padding: 20px 24px; margin: 30px 0 0;
+      box-shadow: var(--sombra-card);
+    }
+    .veredito p:last-child { margin-bottom: 0; }
+    .veredito .titulo { font-weight: 700; font-size: 15px; color: var(--grave); margin-bottom: 6px; }
+
+    /* ── Filtro ── */
+    .filtros {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 14px; padding: 13px 18px; margin: 22px 0 18px;
+      box-shadow: var(--sombra-card);
+    }
+    .filtros label {
+      font-family: 'Ubuntu Mono', monospace; font-size: 11.5px;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--texto-terciario);
+    }
+    /* appearance:none tira a moldura nativa, que aparecia por dentro da nossa.
+       O foco e um anel so: a borda muda de cor e ganha halo, sem outline. */
+    .filtros select {
+      appearance: none; -webkit-appearance: none;
+      font-family: 'Ubuntu', sans-serif; font-size: 15px; color: var(--texto-principal);
+      background: var(--fundo-section) no-repeat right 12px center / 11px 7px;
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' fill='none' stroke='%23718096' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      border: 1px solid var(--borda-forte); border-radius: 10px;
+      padding: 7px 34px 7px 12px; cursor: pointer; min-width: 230px;
+    }
+    .filtros select:focus-visible {
+      outline: none; border-color: var(--primaria);
+      box-shadow: 0 0 0 3px var(--primaria-dim);
+    }
+    .chaves { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-left: auto; font-size: 13.5px; color: var(--texto-secundario); }
+    .chaves .item-ch { display: flex; align-items: center; gap: 7px; }
+    .chaves .quad { width: 13px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+
+    /* ── Cards por categoria ── */
+    .cards { display: flex; flex-direction: column; gap: 16px; margin: 0 0 10px; }
+    .card {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card);
+      display: grid; grid-template-columns: 168px 1fr; overflow: hidden;
+    }
+    @media (max-width: 720px) { .card { grid-template-columns: 1fr; } }
+    .ilustra {
+      background: var(--fundo-section); border-right: 1px solid var(--borda-sutil);
+      padding: 22px 18px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; gap: 10px; color: var(--texto-terciario);
+    }
+    @media (max-width: 720px) {
+      .ilustra {
+        border-right: 0; border-bottom: 1px solid var(--borda-sutil);
+        flex-direction: row; justify-content: flex-start; text-align: left; padding: 16px 20px;
+      }
+    }
+    .ilustra svg { width: 74px; height: 74px; display: block; flex-shrink: 0; }
+    @media (max-width: 720px) { .ilustra svg { width: 50px; height: 50px; } }
+    .ilustra .nome { font-size: 15px; font-weight: 500; line-height: 1.3; color: var(--texto-principal); }
+    .ilustra .ncm {
+      font-family: 'Ubuntu Mono', monospace; font-size: 11.5px;
+      color: var(--texto-terciario); letter-spacing: .04em; margin-top: 2px;
+    }
+
+    .barras { padding: 16px 22px 18px; min-width: 0; }
+    .era-rot {
+      display: flex; align-items: center; gap: 10px; margin: 0 0 9px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; letter-spacing: .13em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .era-rot::after { content: ''; flex: 1; height: 1px; background: var(--borda-padrao); }
+    .era-rot.segunda { margin-top: 16px; }
+
+    .linha { display: grid; grid-template-columns: 42px 1fr 54px 54px 60px; align-items: center; gap: 10px; padding: 2.5px 0; }
+    .cab-col {
+      display: grid; grid-template-columns: 42px 1fr 54px 54px 60px; gap: 10px; margin-bottom: 3px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .cab-col span { text-align: right; }
+    .cab-col span:first-child, .cab-col span:nth-child(2) { text-align: left; }
+    .linha .ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px;
+      color: var(--texto-terciario); font-variant-numeric: tabular-nums;
+    }
+    .linha .parte, .item .parte {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12px; text-align: right;
+      color: var(--texto-secundario); font-variant-numeric: tabular-nums;
+    }
+    .pilha { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--trilho); }
+    .seg { height: 100%; }
+    .seg + .seg { margin-left: 2px; }
+    .linha .val {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; font-weight: 700;
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .linha.parcial .ano::after { content: '*'; color: var(--media); font-weight: 700; margin-left: 1px; }
+
+    .quebra {
+      display: flex; align-items: center; gap: 10px; margin: 15px 0 2px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--grave);
+    }
+    .quebra::before, .quebra::after { content: ''; flex: 1; height: 0; border-top: 2px dashed var(--grave); opacity: .45; }
+
+    .escala {
+      display: grid; grid-template-columns: 42px 1fr 168px; gap: 10px;
+      margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--borda-padrao);
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; color: var(--texto-terciario);
+    }
+    .escala .marcas { display: flex; justify-content: space-between; }
+    .nota-fig { font-size: 13px; color: var(--texto-terciario); margin: 0 0 30px; max-width: 74ch; }
+
+    /* ── Itens da cesta ── */
+    .itens {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 20px 22px 18px; margin: 20px 0 10px;
+    }
+    .item { display: grid; grid-template-columns: 128px 1fr 54px 54px 60px; align-items: center; gap: 10px; padding: 4px 0; }
+    .cab-item {
+      display: grid; grid-template-columns: 128px 1fr 54px 54px 60px; gap: 10px;
+      padding-bottom: 7px; margin-bottom: 2px; border-bottom: 1px solid var(--borda-sutil);
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .cab-item span { text-align: right; }
+    .cab-item span:first-child, .cab-item span:nth-child(2) { text-align: left; }
+    .item .rot { font-size: 14px; line-height: 1.25; }
+    .item .rot span { display: block; font-family: 'Ubuntu Mono', monospace; font-size: 11px; color: var(--texto-terciario); }
+    .item .tot {
+      font-family: 'Ubuntu Mono', monospace; font-size: 13px; font-weight: 700;
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .grupo-rot {
+      display: flex; align-items: center; gap: 10px; margin: 14px 0 7px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .grupo-rot:first-child { margin-top: 0; }
+    .grupo-rot::after { content: ''; flex: 1; height: 1px; background: var(--borda-padrao); }
+
+    .faixa {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px; margin: 18px 0 10px;
+    }
+    .faixa > div {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 16px 18px;
+    }
+    .faixa .rot {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 8px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .faixa .n {
+      font-family: 'Ubuntu Mono', monospace; font-size: 26px; font-weight: 700;
+      line-height: 1.15; font-variant-numeric: tabular-nums;
+    }
+    .faixa .r { font-size: 12.5px; color: var(--texto-secundario); margin-top: 3px; }
+    .faixa .chip {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10px; letter-spacing: .06em;
+      text-transform: uppercase; padding: 1px 8px; border-radius: 999px;
+      background: var(--primaria-dim); color: var(--primaria);
+      border: 1px solid var(--primaria-border);
+    }
+
+    /* ── Tabela ── */
+    .rolagem { overflow-x: auto; margin: 18px 0 8px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    caption { text-align: left; font-size: 13px; color: var(--texto-terciario); padding-bottom: 8px; }
+    th, td { padding: 7px 12px; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th {
+      font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--texto-terciario); border-bottom: 1.5px solid var(--borda-forte);
+    }
+    tbody td { border-bottom: 1px solid var(--borda-sutil); font-family: 'Ubuntu Mono', monospace; font-variant-numeric: tabular-nums; }
+    tbody th { border-bottom: 1px solid var(--borda-sutil); font-weight: 500; }
+    tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+    .vazio { color: var(--texto-terciario); }
+
+    /* ── Evidência da quebra ── */
+    .evidencia {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); gap: 1px;
+      background: var(--borda-padrao); border: 1px solid var(--borda-padrao);
+      border-radius: 14px; overflow: hidden; margin: 22px 0 10px;
+    }
+    .evidencia div { background: var(--fundo-cartao); padding: 16px 18px; }
+    .evidencia .n {
+      font-family: 'Ubuntu Mono', monospace; font-size: 27px; font-weight: 700;
+      color: var(--grave); line-height: 1.15; font-variant-numeric: tabular-nums;
+    }
+    .evidencia .r { font-size: 13px; color: var(--texto-secundario); margin-top: 3px; }
+
+
+
+    /* ── Estado de carga ── */
+    .estado {
+      display: flex; align-items: center; gap: 12px; justify-content: center;
+      background: var(--fundo-section); border: 1px solid var(--borda-sutil);
+      border-radius: 16px; padding: 40px 24px; margin: 22px 0;
+      color: var(--texto-secundario); font-size: 15px; text-align: center;
+    }
+    .estado.erro { background: var(--grave-bg); border-color: rgba(176,42,38,0.25); color: var(--grave); }
+    .girando {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid var(--borda-forte); border-top-color: var(--primaria);
+      animation: girar .8s linear infinite;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    footer {
+      background: var(--fundo-base); border-top: 1px solid var(--borda-sutil);
+      padding: 32px 0; text-align: center; font-size: 13px; color: var(--texto-terciario);
+      flex-shrink: 0;
+    }
+    footer a { color: var(--texto-secundario); }
+    footer a:hover { color: var(--primaria); }
+    footer .linha-rodape {
+      max-width: 1280px; margin: 0 auto; padding: 0 16px;
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #000793 0%, #05C700 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── Animação ──
+       A classe .anim só entra no <body> depois do primeiro quadro: a página
+       nasce no estado final e apenas as trocas posteriores são animadas. */
+    .anim .seg { transition: width .5s cubic-bezier(.22,.61,.36,1); }
+    .card, .itens, .faixa > div { transition: box-shadow .25s ease, transform .25s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--sombra-card-hover); }
+    @keyframes surge { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .surge { animation: surge .42s cubic-bezier(.22,.61,.36,1) both; }
+    @keyframes troca { from { opacity: .35; } to { opacity: 1; } }
+    .anim .troca { animation: troca .3s ease both; }
+    .filtros select { transition: border-color .2s ease, background .2s ease; }
+    .filtros select:hover { border-color: var(--primaria); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .card:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="barra">
+      <a href="/" aria-label="Tabelas IBPT, voltar para a consulta">
+        <img class="logo" src="/public/logo.webp" alt="Tabelas IBPT" width="2000" height="1000">
+      </a>
+      <a class="voltar" href="/">Consultar tabelas</a>
+    </div>
+  </header>
+
+  <main class="pagina">
+    <div class="abertura">
+      <p class="etiqueta">Tabelas IBPT · Painel</p>
+      <h1>Quanto do preço é imposto</h1>
+      <p class="resumo">
+        Cesta básica, carro popular e moto, ano a ano, no estado escolhido.
+      </p>
+    </div>
+
+    <div class="filtros">
+      <label for="uf">Estado</label>
+      <select id="uf" aria-label="Estado"><option>Carregando</option></select>
+      <div class="chaves">
+        <span class="item-ch"><span class="quad" style="background:var(--fed)"></span>Federal</span>
+        <span class="item-ch"><span class="quad" style="background:var(--est)"></span>Estadual e municipal</span>
+      </div>
+    </div>
+
+    <div class="estado" id="estado"><span class="girando" aria-hidden="true"></span>Carregando o painel</div>
+
+    <div id="painel" hidden>
+      <div class="cards" id="cards"></div>
+
+      <p class="nota-fig">
+        Escala fixa de 0 a 60%, igual em todos os cards. O degrau na linha tracejada é
+        troca de critério do IBPT, não aumento de imposto: <a href="#notas">o porquê está
+        no fim da página</a>. <strong>*</strong> marca ano que não tem tabela confiável em
+        todos os dias, e cuja média cobre só o período válido.
+        <span id="nota-cobertura"></span>
+      </p>
+
+      <h2>Dentro da cesta básica</h2>
+      <p class="prosa">
+        Os 13 itens da ração essencial mínima do Decreto-Lei 399/1938, na composição da
+        região que inclui São Paulo, com a alíquota do último ano em
+        <strong id="uf-nome-1">São Paulo</strong>. <span id="nota-federal"></span>
+      </p>
+
+      <div class="itens" id="itens"></div>
+
+      <p class="prosa">
+        A alíquota da cesta é média aritmética simples, com cada item pesando um treze
+        avos. Uma cesta real não funciona assim: a carne costuma responder por perto de
+        um terço do custo e a farinha por dois por cento.
+      </p>
+
+      <div class="faixa" id="faixa"></div>
+
+      <div class="rolagem">
+        <table>
+          <caption id="cap-tabela">Alíquota total por ano, em % sobre o preço.</caption>
+          <thead><tr id="cab-tabela"></tr></thead>
+          <tbody id="corpo-tabela"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 id="notas">Como ler estes números</h2>
+
+    <h3>O salto de 2021 não foi aumento de imposto</h3>
+    <div class="veredito">
+      <p class="titulo">Por que os anos aparecem em dois blocos</p>
+      <p>
+        De maio para junho de 2021, quase tudo aparece com imposto mais alto:
+        <strong>96 de cada 100 produtos mudaram de alíquota em um único mês</strong>,
+        com alta média de 9 pontos percentuais. Nenhuma lei muda o imposto de tudo
+        de uma vez assim.
+      </p>
+      <p>
+        O que mudou foi a forma de publicar. Até maio, o IBPT informava a alíquota
+        menor quando o produto tinha algum desconto de imposto. De junho em diante,
+        passou a informar sempre a alíquota cheia. O que se paga continuou parecido;
+        o número divulgado é que subiu.
+      </p>
+      <p>
+        Por isso os anos anteriores ficam em um bloco e os posteriores em outro, e
+        2021 não aparece: dentro dele convivem as duas formas de contar, então
+        comparar um ano de antes com um de depois compara critérios, não impostos.
+      </p>
+    </div>
+
+    <div class="evidencia">
+      <div><div class="n">96 em 100</div><div class="r">produtos mudaram de alíquota total de um mês para o outro</div></div>
+      <div><div class="n">95%</div><div class="r">deles mudaram para cima</div></div>
+      <div><div class="n">+9,14</div><div class="r">pontos percentuais de alta média</div></div>
+      <div><div class="n">1 mês</div><div class="r">foi todo o intervalo entre as duas tabelas</div></div>
+    </div>
+
+    <h3>Como a conta é feita</h3>
+    <div class="prosa">
+      <p>
+        Nos últimos anos o IBPT publica uma tabela nova a cada poucas semanas, e cada uma vale por um
+        tempo diferente: umas por um mês, outras por seis. Somar todas e dividir pelo
+        número de tabelas daria o mesmo peso para uma que valeu 29 dias e para outra
+        que valeu meio ano.
+      </p>
+      <p>
+        Então a conta é feita por dia. Para cada dia do ano vale a alíquota da tabela
+        que estava em vigor naquele dia, e o número do ano é a média de todos esses
+        dias. É a mesma lógica de calcular quanto se gastou por mês olhando o extrato
+        dia a dia, em vez de contar quantas contas chegaram.
+      </p>
+      <p>
+        A barra azul é o imposto federal, o que vai para a União. A verde é o
+        estadual, na prática o ICMS, que cada estado define por conta própria. Na cesta
+        básica o federal é o mesmo nos 27 estados, então trocar o estado muda só a parte
+        verde. No carro e na moto o IBPT publica federal diferente em alguns estados, e
+        aí as duas partes se mexem.
+      </p>
+    </div>
+
+    <h3>O que estes números não dizem</h3>
+    <ul class="prosa">
+      <li><span id="cobertura-detalhe">O ano mais recente ainda não terminou.</span> A média vale para o período já coberto, não para o ano fechado.</li>
+      <li>A cesta básica é a média simples dos 13 itens. Ela não leva em conta que uma família gasta mais com carne do que com farinha, então o peso no bolso depende do que vai no carrinho.</li>
+      <li>O salto do carro em 2016 é real, não falha de dados: das mais de dez mil linhas da tabela, só o automóvel dá esse pulo, e a moto no mesmo período não se mexe. O que o IBPT recalculou ali esta página não tem como dizer.</li>
+      <li>São valores aproximados. As alíquotas do IBPT são as estimativas médias previstas na Lei 12.741/2012, a que obriga a mostrar o imposto na nota fiscal. Servem para dar a ordem de grandeza, não para calcular o imposto de uma compra específica.</li>
+    </ul>
+
+    <div class="assinatura base-usada">
+      <span>Base: <span class="est-tabelas">100</span> versões, <span class="est-periodo">2015 a 2026</span></span>
+      <span><span class="est-registros">32.297.455</span> registros</span>
+      <span><span class="est-ufs">27</span> UFs</span>
+    </div>
+  </main>
+
+  <footer>
+    <div class="linha-rodape">
+      Dados: <a href="https://ibpt.com.br" target="_blank" rel="noopener">IBPT</a>
+      <span aria-hidden="true">|</span>
+      Licença: Apache 2.0
+      <span aria-hidden="true">|</span>
+      Build: <span class="est-gerado-em">-</span>
+      <span aria-hidden="true">|</span>
+      Powered by <a href="https://valraw.com.br" target="_blank" rel="noopener" style="font-weight:600"><span class="gradient-text">VALRAW</span></a>
+    </div>
+  </footer>
+
+  <script>
+    const BASE = location.pathname.replace(/\/painel\.html$/, '').replace(/\/$/, '');
+    const API = BASE + '/api';
+
+    /** Escala fixa das barras, em pontos percentuais. */
+    const ESCALA = 60;
+    /** Ano em que o IBPT trocou o critério de publicação. Sai dos dois recortes. */
+    const QUEBRA = 2021;
+    const VAZIO = '-';
+
+    const NOMES = {
+      AC: 'Acre', AL: 'Alagoas', AM: 'Amazonas', AP: 'Amapá', BA: 'Bahia',
+      CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás',
+      MA: 'Maranhão', MG: 'Minas Gerais', MS: 'Mato Grosso do Sul',
+      MT: 'Mato Grosso', PA: 'Pará', PB: 'Paraíba', PE: 'Pernambuco',
+      PI: 'Piauí', PR: 'Paraná', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte',
+      RO: 'Rondônia', RR: 'Roraima', RS: 'Rio Grande do Sul', SC: 'Santa Catarina',
+      SE: 'Sergipe', SP: 'São Paulo', TO: 'Tocantins'
+    };
+
+    const ICONES = {
+      cesta: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 25c0-7 4-12 9-12s9 5 9 12"/>
+          <path d="M12 26h40l-4 24a4 4 0 0 1-4 3.5H20A4 4 0 0 1 16 50z"/>
+          <path d="M25 34l1.5 12M39 34l-1.5 12M32 34v12"/>
+        </svg>`,
+      carro: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 41v-6.5a4 4 0 0 1 3-3.9l6-1.4 6.5-8.4A5 5 0 0 1 28.4 19h11.9a5 5 0 0 1 4 2l5.7 7.6 5 1.5a4 4 0 0 1 3 3.9V41"/>
+          <path d="M18 29h29"/><path d="M31 19v10"/>
+          <circle cx="20.5" cy="42" r="5.2"/><circle cx="45.5" cy="42" r="5.2"/>
+          <path d="M25.7 42h14.6M9 42h6.3M50.7 42H55"/>
+        </svg>`,
+      moto: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="14.5" cy="43" r="8.5"/><circle cx="49.5" cy="43" r="8.5"/>
+          <path d="M23 43h7l8.5-13H27"/><path d="M30 30l-6-8h-6"/>
+          <path d="M38.5 30l6.5 10.5"/><path d="M33 24h9l3.5 6"/><path d="M42 24h6"/>
+        </svg>`
+    };
+
+    const CATS = [
+      { k: 'cesta', icone: 'cesta', nome: 'Cesta básica',  sub: '13 itens · DL 399/1938' },
+      { k: 'carro', icone: 'carro', nome: 'Carro popular', sub: 'NCM 8703.21.00 · até 1.0' },
+      { k: 'moto',  icone: 'moto',  nome: 'Moto popular',  sub: 'NCM 8711.20.10 · 50 a 125cc' }
+    ];
+
+    const CABECALHO_ITENS = `<div class="cab-item">
+        <span>Item</span><span></span><span>Federal</span><span>Estadual</span><span>Total</span>
+      </div>`;
+
+    const CABECALHO = `<div class="cab-col">
+        <span></span><span></span><span>Federal</span><span>Estadual</span><span>Total</span>
+      </div>`;
+
+    let D = null;
+    let ANOS_A = [];
+    let ANOS_D = [];
+    let TODOS_ANOS = [];
+    let ULTIMO_ANO = null;
+    let montado = false;
+
+    const pct = v => v.toFixed(2).replace('.', ',') + '%';
+    const larg = v => (v / ESCALA * 100).toFixed(2);
+
+    function pilha(par, rotulo) {
+      const [f, e] = par;
+      return `<div class="pilha" role="img" aria-label="${rotulo}: ${pct(f)} federal e ${pct(e)} estadual">
+          <div class="seg" style="width:${larg(f)}%;background:var(--fed)"></div>
+          <div class="seg" style="width:${larg(e)}%;background:var(--est)"></div>
+        </div>`;
+    }
+
+    function linhasAno(uf, anos, chave) {
+      return anos.map(ano => {
+        const reg = D.dados[uf][ano];
+        const par = reg && reg[chave];
+        if (!par) return `<div class="linha" data-ano="${ano}"><span class="ano">${ano}</span>
+            <div class="pilha"></div><span class="parte">${VAZIO}</span>
+            <span class="parte">${VAZIO}</span><span class="val vazio">${VAZIO}</span></div>`;
+        const parcial = reg.cobertura < 100 ? ' parcial' : '';
+        return `<div class="linha${parcial}" data-ano="${ano}">
+            <span class="ano">${ano}</span>
+            ${pilha(par, ano)}
+            <span class="parte">${pct(par[0])}</span>
+            <span class="parte">${pct(par[1])}</span>
+            <span class="val">${pct(par[0] + par[1])}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function montarCards(uf) {
+      document.getElementById('cards').innerHTML = CATS.map((c, i) => `
+        <article class="card surge" data-cat="${c.k}" style="animation-delay:${i * 70}ms">
+          <div class="ilustra">
+            ${ICONES[c.icone]}
+            <div><div class="nome">${c.nome}</div><div class="ncm">${c.sub}</div></div>
+          </div>
+          <div class="barras">
+            <p class="era-rot">Critério antigo</p>
+            ${CABECALHO}
+            ${linhasAno(uf, ANOS_A, c.k)}
+            <p class="quebra">jun/${QUEBRA} · troca de critério</p>
+            <p class="era-rot segunda">Critério atual</p>
+            ${CABECALHO}
+            ${linhasAno(uf, ANOS_D, c.k)}
+            <div class="escala">
+              <span></span>
+              <span class="marcas"><span>0%</span><span>20%</span><span>40%</span><span>60%</span></span>
+              <span></span>
+            </div>
+          </div>
+        </article>`).join('');
+    }
+
+    /**
+     * Atualiza as larguras e os números sem refazer o DOM, para as barras
+     * transicionarem na troca de estado em vez de piscarem.
+     */
+    function atualizarCards(uf) {
+      document.querySelectorAll('.card').forEach(card => {
+        const chave = card.dataset.cat;
+        card.querySelectorAll('.linha').forEach(linha => {
+          const ano = linha.dataset.ano;
+          const reg = D.dados[uf][ano];
+          const par = reg && reg[chave];
+          const segs = linha.querySelectorAll('.seg');
+          const nums = linha.querySelectorAll('.parte, .val');
+          if (!par) {
+            segs.forEach(sg => { sg.style.width = '0%'; });
+            nums.forEach(n => { n.textContent = VAZIO; });
+            return;
+          }
+          segs[0].style.width = larg(par[0]) + '%';
+          segs[1].style.width = larg(par[1]) + '%';
+          nums[0].textContent = pct(par[0]);
+          nums[1].textContent = pct(par[1]);
+          nums[2].textContent = pct(par[0] + par[1]);
+          linha.classList.toggle('parcial', reg.cobertura < 100);
+          linha.querySelector('.pilha').setAttribute('aria-label',
+            `${ano}: ${pct(par[0])} federal e ${pct(par[1])} estadual`);
+        });
+      });
+    }
+
+    function montarItens(uf) {
+      const reg = D.dados[uf][ULTIMO_ANO];
+      const lista = D.cesta.map((it, i) => ({ ...it, par: reg.itens[i] })).filter(x => x.par);
+
+      // Agrupa pelas faixas de estadual encontradas na UF, da maior para a menor
+      const faixas = [...new Set(lista.map(x => x.par[1]))].sort((a, b) => b - a);
+      const html = faixas.map(f => {
+        const doGrupo = lista.filter(x => x.par[1] === f);
+        const rot = faixas.length === 1
+          ? `Estadual de ${pct(f)} em todos os itens`
+          : (f === faixas[0] ? `Estadual de ${pct(f)}, a maior da cesta`
+                             : `Estadual de ${pct(f)}, reduzida`);
+        return `<p class="grupo-rot">${rot}</p>` + doGrupo.map(x => `
+          <div class="item">
+            <div class="rot">${x.nome}<span>${x.ncm}</span></div>
+            ${pilha(x.par, x.nome)}
+            <span class="parte">${pct(x.par[0])}</span>
+            <span class="parte">${pct(x.par[1])}</span>
+            <div class="tot">${pct(x.par[0] + x.par[1])}</div>
+          </div>`).join('');
+      }).join('');
+      const caixaItens = document.getElementById('itens');
+      caixaItens.innerHTML = CABECALHO_ITENS + html;
+      reanimar(caixaItens);
+
+      // Verdadeiro desde 2020, falso de 2015 a 2019: a frase tem que sair do dado
+      const federais = [...new Set(lista.map(x => x.par[0]))];
+      document.getElementById('nota-federal').textContent = federais.length === 1
+        ? `O federal é o mesmo nos ${lista.length} itens, ${pct(federais[0])}, então toda a `
+          + 'diferença entre um item e outro é ICMS.'
+        : `O federal varia entre os itens neste ano (${federais.length} valores diferentes), `
+          + 'então a diferença entre um item e outro não é só ICMS.';
+
+      const totais = lista.map(x => x.par[0] + x.par[1]);
+      const menor = Math.min(...totais), maior = Math.max(...totais);
+      const media = totais.reduce((a, b) => a + b, 0) / totais.length;
+      document.getElementById('faixa').innerHTML = `
+        <div>
+          <p class="rot">Item menos tributado</p>
+          <div class="n">${pct(menor)}</div>
+          <div class="r">se a cesta fosse só ele</div>
+        </div>
+        <div>
+          <p class="rot">Média dos 13 itens <span class="chip">no card</span></p>
+          <div class="n">${pct(media)}</div>
+          <div class="r">é o valor mostrado acima</div>
+        </div>
+        <div>
+          <p class="rot">Item mais tributado</p>
+          <div class="n">${pct(maior)}</div>
+          <div class="r">se a cesta fosse só ele</div>
+        </div>`;
+      reanimar(document.getElementById('faixa'));
+    }
+
+    /** Reinicia o fade de um bloco recém-substituído. */
+    function reanimar(el) {
+      el.classList.remove('troca');
+      void el.offsetWidth;
+      el.classList.add('troca');
+    }
+
+    function montarTabela(uf) {
+      document.getElementById('cab-tabela').innerHTML =
+        '<th scope="col">Categoria</th>' + TODOS_ANOS.map(a => `<th scope="col">${a}</th>`).join('');
+      document.getElementById('corpo-tabela').innerHTML = CATS.map(c => {
+        const cels = TODOS_ANOS.map(a => {
+          if (a === QUEBRA) return `<td class="vazio">${VAZIO}</td>`;
+          const par = D.dados[uf][a] && D.dados[uf][a][c.k];
+          return par ? `<td>${pct(par[0] + par[1])}</td>` : `<td class="vazio">${VAZIO}</td>`;
+        }).join('');
+        return `<tr><th scope="row">${c.nome}</th>${cels}</tr>`;
+      }).join('');
+      document.getElementById('cap-tabela').textContent =
+        `Alíquota total por ano em ${NOMES[uf]}, em % sobre o preço. ${QUEBRA} omitido por misturar os dois critérios.`;
+    }
+
+    function render(uf) {
+      if (!montado) {
+        montarCards(uf);
+        montado = true;
+      } else {
+        atualizarCards(uf);
+      }
+      montarItens(uf);
+      montarTabela(uf);
+      document.getElementById('uf-nome-1').textContent = NOMES[uf];
+    }
+
+    /** Números da abertura e do rodapé, todos vindos do build. */
+    function preencherTextosDinamicos(meta) {
+      const est = meta.estatisticas;
+      const texto = (classe, valor) => {
+        document.querySelectorAll('.' + classe).forEach(el => { el.textContent = valor; });
+      };
+      texto('est-tabelas', est.tabelas);
+      texto('est-periodo', `${est.anoInicial} a ${est.anoFinal}`);
+      texto('est-registros', est.totalRegistros.toLocaleString('pt-BR'));
+      texto('est-ufs', meta.ufs.length);
+      texto('est-gerado-em', new Date(est.geradoEm).toLocaleDateString('pt-BR'));
+    }
+
+    /**
+     * Dias já cobertos por tabela que ainda não aconteceram. A última tabela
+     * costuma valer alguns dias à frente da data de hoje, e sem isso os dias
+     * cobertos são lidos como dias vividos.
+     */
+    function diasAindaPorVir() {
+      const fim = Date.parse(D.fimCobertura + 'T00:00:00Z');
+      const hoje = new Date();
+      const inicioDeHoje = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+      return Math.max(0, Math.round((fim - inicioDeHoje) / 86400000));
+    }
+
+    /** Cobertura do último ano, escrita nos dois pontos que a citam. */
+    function preencherCobertura() {
+      const [dias, total] = D.diasCobertos[ULTIMO_ANO];
+      const frase = `Em ${ULTIMO_ANO} as tabelas cobrem ${dias} de ${total} dias.`;
+      document.getElementById('nota-cobertura').textContent = frase;
+      const futuros = diasAindaPorVir();
+      document.getElementById('cobertura-detalhe').textContent = futuros > 0
+        ? `O ano de ${ULTIMO_ANO} ainda não terminou: as tabelas cobrem ${dias} dos ${total} dias, `
+          + `e ${futuros} desses dias ainda estão por vir.`
+        : `O ano de ${ULTIMO_ANO} ainda não terminou: as tabelas cobrem ${dias} dos ${total} dias.`;
+    }
+
+    function falhar(mensagem) {
+      const estado = document.getElementById('estado');
+      estado.className = 'estado erro';
+      estado.textContent = mensagem;
+    }
+
+    async function iniciar() {
+      let meta;
+      try {
+        const [painel, metaResposta] = await Promise.all([
+          fetch(`${API}/painel.json`),
+          fetch(`${API}/meta.json`)
+        ]);
+        if (!painel.ok) throw new Error(`painel.json respondeu ${painel.status}`);
+        if (!metaResposta.ok) throw new Error(`meta.json respondeu ${metaResposta.status}`);
+        D = await painel.json();
+        meta = await metaResposta.json();
+      } catch (erro) {
+        falhar(`Não foi possível carregar os dados do painel: ${erro.message}`);
+        return;
+      }
+
+      preencherTextosDinamicos(meta);
+
+      ANOS_A = D.anos.filter(a => a < QUEBRA);
+      ANOS_D = D.anos.filter(a => a > QUEBRA);
+      TODOS_ANOS = [...D.anos];
+      ULTIMO_ANO = String(D.anos[D.anos.length - 1]);
+      preencherCobertura();
+
+      const sel = document.getElementById('uf');
+      sel.innerHTML = D.ufs.map(u => `<option value="${u}">${NOMES[u]} (${u})</option>`).join('');
+      sel.value = D.ufs.includes('SP') ? 'SP' : D.ufs[0];
+      sel.addEventListener('change', () => render(sel.value));
+      render(sel.value);
+
+      document.getElementById('estado').hidden = true;
+      document.getElementById('painel').hidden = false;
+
+      // Daqui em diante as mudanças passam a ser animadas. A primeira pintura
+      // fica de fora de propósito, para a página nascer legível.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.body.classList.add('anim');
+      }));
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
