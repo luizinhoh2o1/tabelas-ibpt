@@ -15,6 +15,7 @@ import { readdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { join } from 'node:path';
 import { UFS } from './constantes.js';
+import { resumoAnual } from './economia.js';
 import type { ArquivoSaida, ItemCesta, Painel, PainelAno, ParAliquota, Registro } from './tipos.js';
 
 /** Nome do arquivo publicado na raiz da API. */
@@ -63,6 +64,12 @@ const CHAVES = new Set<string>([...CESTA, CARRO, MOTO].map(chaveItem));
  * tributacao, e defeito de publicacao.
  */
 const LIMITE_ZERADAS = 0.8;
+
+/**
+ * Chave da media nacional no filtro. Nao e uma UF do IBPT: e a media simples
+ * das 27, calculada aqui para a pagina nao ter que refazer a conta.
+ */
+export const MEDIA_NACIONAL = 'BR';
 
 /** UF usada so para descobrir a vigencia de cada versao. */
 const UF_REFERENCIA = 'SP';
@@ -203,6 +210,48 @@ function arredondar(valor: number): number {
   return Number(valor.toFixed(2));
 }
 
+/**
+ * Media simples das UFs, ano a ano.
+ *
+ * Cada estado pesa igual, entao isto nao e a carga do brasileiro medio, que
+ * dependeria de populacao e de consumo. E a media dos 27 numeros, e a pagina
+ * diz isso ao lado do filtro.
+ */
+function mediaDasUfs(
+  dados: Painel['dados'],
+  anos: number[],
+  totalItens: number
+): Record<string, PainelAno> {
+  const porAno: Record<string, PainelAno> = {};
+  const ufs = Object.keys(dados);
+
+  for (const ano of anos) {
+    const registros = ufs.map(uf => dados[uf][ano]).filter(Boolean);
+    if (registros.length === 0) continue;
+
+    const media = (pegar: (r: PainelAno) => ParAliquota | null): ParAliquota | null => {
+      const pares = registros.map(pegar).filter((p): p is ParAliquota => p !== null);
+      if (pares.length === 0) return null;
+      return [
+        arredondar(pares.reduce((s, p) => s + p[0], 0) / pares.length),
+        arredondar(pares.reduce((s, p) => s + p[1], 0) / pares.length)
+      ];
+    };
+
+    porAno[ano] = {
+      cesta: media(r => r.cesta),
+      carro: media(r => r.carro),
+      moto: media(r => r.moto),
+      itens: Array.from({ length: totalItens }, (_, i) => media(r => r.itens[i])),
+      cobertura: Math.round(
+        registros.reduce((soma, r) => soma + r.cobertura, 0) / registros.length
+      )
+    };
+  }
+
+  return porAno;
+}
+
 /** Monta o painel a partir dos arquivos ja publicados em docs/api. */
 export function gerarPainel(api: string): Painel {
   const vigencias = lerVigencias(api);
@@ -280,6 +329,8 @@ export function gerarPainel(api: string): Painel {
     dados[uf] = porAno;
   }
 
+  dados[MEDIA_NACIONAL] = mediaDasUfs(dados, anos, CESTA.length);
+
   const diasCobertos = Object.fromEntries(
     anos.map(ano => {
       const { cobertos, total } = calendario.get(ano)!;
@@ -291,12 +342,24 @@ export function gerarPainel(api: string): Painel {
     .toISOString()
     .slice(0, 10);
 
+  // As series de dados/ sao opcionais: sem elas a pagina simplesmente nao
+  // mostra a secao em reais, em vez de o build quebrar.
+  let economia;
+  try {
+    economia = resumoAnual();
+    console.log(`Painel: economia de ${Object.keys(economia.anos).length} ano(s)`);
+  } catch (erro) {
+    console.log(`  AVISO: sem series economicas (${(erro as Error).message})`);
+  }
+
   return {
-    ufs: [...UFS],
+    // A media entra primeiro na lista: e a opcao mais geral do filtro
+    ufs: [MEDIA_NACIONAL, ...UFS],
     anos,
     fimCobertura,
     cesta: CESTA.map(({ nome, ncm }) => ({ nome, ncm })),
     diasCobertos,
+    economia,
     dados
   };
 }

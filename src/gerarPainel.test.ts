@@ -127,6 +127,21 @@ test('cesta e a media dos itens presentes, federal e estadual separados', () => 
   });
 });
 
+test('a media nacional e a media simples das UFs com dado', () => {
+  comApi(api => {
+    const painel = gerarPainel(api);
+    // A fixture publica SP e RJ com o mesmo conteudo, entao a media dos dois
+    // repete o valor; as outras 25 UFs nao tem arquivo e ficam de fora
+    assert.equal(painel.ufs[0], 'BR', 'a media abre a lista do filtro');
+    assert.equal(painel.ufs.length, 28);
+    assert.deepEqual(painel.dados.BR['2020'].carro, painel.dados.SP['2020'].carro);
+    assert.deepEqual(painel.dados.BR['2020'].itens, painel.dados.SP['2020'].itens);
+    // A cobertura, ao contrario da aliquota, conta as 27: UF sem arquivo entra
+    // como 0%, porque "nao ha tabela utilizavel" e um fato, nao um dado faltando
+    assert.equal(painel.dados.BR['2020'].cobertura, Math.round((2 * 100) / 27));
+  });
+});
+
 test('UF sem arquivo publicado nao inventa numero', () => {
   comApi(api => {
     const ano = gerarPainel(api).dados.MG['2020'];
