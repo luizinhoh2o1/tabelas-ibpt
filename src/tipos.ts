@@ -98,3 +98,40 @@ export interface MetaDados {
   versoes: Record<string, string[]>;
   estatisticas: Estatisticas;
 }
+
+/** Par [federal, estadual] em pontos percentuais. */
+export type ParAliquota = [number, number];
+
+export interface ItemCesta {
+  nome: string;
+  /** NCM sem pontuacao, como vem no CSV do IBPT */
+  codigo: string;
+  /** Excecao tarifaria. Vazio e a linha base do NCM; o mesmo codigo pode ter linha Ex 01 com outra aliquota e outro produto */
+  excecao: string;
+  /** NCM formatado, para exibicao */
+  ncm: string;
+}
+
+/** Medias de um ano, ponderadas pelos dias de vigencia de cada tabela */
+export interface PainelAno {
+  cesta: ParAliquota | null;
+  carro: ParAliquota | null;
+  moto: ParAliquota | null;
+  /** Uma entrada por item da cesta, na ordem de Painel.cesta */
+  itens: Array<ParAliquota | null>;
+  /** Percentual dos dias do ano com tabela utilizavel nesta UF: exclui dia sem publicacao e dia coberto so por publicacao defeituosa */
+  cobertura: number;
+}
+
+/** Conteudo de docs/api/painel.json */
+export interface Painel {
+  ufs: string[];
+  anos: number[];
+  cesta: Array<Omit<ItemCesta, 'codigo' | 'excecao'>>;
+  /** Ano -> [dias com alguma tabela vigente, dias do ano] */
+  diasCobertos: Record<string, [number, number]>;
+  /** Ultimo dia coberto por alguma tabela, aaaa-mm-dd. A pagina usa para saber quanto da cobertura ainda e futuro */
+  fimCobertura: string;
+  /** UF -> ano -> medias */
+  dados: Record<string, Record<string, PainelAno>>;
+}

@@ -35,6 +35,7 @@ import {
   VERSAO_MANIFESTO,
   type FluxoCsvGz
 } from './geradorJson.js';
+import { gravarPainel, PAINEL } from './gerarPainel.js';
 import { UFS, ROTULO_TIPO, TIPOS } from './constantes.js';
 import type { Versao, TipoTabela, IndiceVersao, IndiceAno, MetaDados, Estatisticas, Manifesto, AnoNoManifesto } from './tipos.js';
 
@@ -480,6 +481,15 @@ async function construir(): Promise<void> {
 
   metaDados.anos.sort((a, b) => b - a);
   await gravarManifesto(DIRETORIO_API, manifesto);
+
+  // Painel da pagina docs/painel.html. Depende so dos arquivos ja publicados,
+  // entao quando nenhum ano foi refeito o do build anterior continua valendo.
+  if (anosReaproveitados < anos.length || !existsSync(join(DIRETORIO_API, PAINEL))) {
+    const bytesPainel = gravarPainel(DIRETORIO_API);
+    console.log(`Painel gerado: ${(bytesPainel / 1024).toFixed(0)} KB`);
+  } else {
+    console.log('Painel: inalterado, reaproveitando do build anterior');
+  }
 
   // Estatisticas finais. O meta.json e excluido da contagem e somado como +1,
   // para o numero nao depender de ele ter sobrado de um build anterior.
