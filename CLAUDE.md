@@ -14,11 +14,13 @@ src/
   gerarPainel.ts    → Lê a API gerada e monta docs/api/painel.json
   economia.ts       → IPCA, salário mínimo e INSS lidos de dados/
   gerarIndices.ts   → Baixa IPCA e salário mínimo do Banco Central (npm run indices)
+  gerarMalha.ts     → Baixa a malha das UFs do IBGE e gera docs/malha-uf.json (npm run malha)
   constantes.ts     → Constantes (UFs, tipos de tabela)
   tipos.ts          → Interfaces TypeScript (Registro, Versao, MetaDados, etc.)
 docs/
   index.html        → Página interativa de consulta (client-side)
   painel.html       → Painel de carga tributária por categoria, UF e ano
+  malha-uf.json     → Contorno das 27 UFs em SVG, usado pelo mapa do painel
   404.html          → Intercepta rotas para exibir JSON descomprimido no browser
   api/              → Arquivos gerados pelo build (gitignored)
 .github/workflows/
@@ -82,6 +84,8 @@ npm install          # Instalar dependências
 npm run build        # Build: extrair ZIPs e gerar API estática
 npm test             # Testes do parser CSV, do gerador do painel e das series economicas
 npm run indices      # Atualiza dados/ipca.csv e dados/salario-minimo.csv no Banco Central
+npm run malha        # Atualiza docs/malha-uf.json com a malha das UFs do IBGE
+npm run mapa         # Confere os rotulos do mapa: cruzamento, sobreposicao, tracado longo
 ```
 
 ## Formato de Saída JSON
@@ -118,6 +122,8 @@ com filtro de UF.
 - **Periodo sem nenhuma revisao sadia sai da media**, e a UF aparece com `cobertura` abaixo de 100
 - **A serie e cortada em 2021**, quando o IBPT trocou o criterio de publicacao (96,3% dos codigos mudaram de um mes para o outro). Os cards mostram dois blocos separados e a tabela deixa 2021 vazio
 - **Secao "O mesmo em dinheiro"**: uma compra de R$ 100 corrigida para tras pelo grupo do IPCA da categoria (alimentacao para a cesta, transportes para carro e moto), o imposto do ano em reais e quantas horas de trabalho isso custa no salario minimo ja sem o INSS. Os cartoes por era nunca cruzam 2021; so a linha de horas da compra atravessa a serie, porque nao usa aliquota
+- **Mapa de calor por estado**: as 27 UFs pintadas pela distancia ate a media nacional do ano, com uma aba por ano. E figura, nao controle: sem clique, sem hover, sem selecao. A cor e relativa de proposito, porque o nivel sobe em todos os estados junto e o que separa um do outro e o ICMS
+- **Rotulo do mapa fica todo fora do desenho**, ligado ao estado por um tracado. A posicao e procurada, nao digitada; `npm run mapa` confere se sobrou cruzamento ou sobreposicao
 - **UF inicial descoberta sozinha**: `localStorage`, depois IP (`ipwho.is`), depois geolocalizacao aproximada (`api.bigdatacloud.net`), depois SP. Escolha manual sobrescreve e persiste
 - Barras empilhadas federal + estadual na escala fixa de 0 a 60%; par de cores `#2E3ED6`/`#2E8B22`, validado para daltonismo
 - Numeros da abertura e do rodape saem de `meta.json`, como no `index.html`
