@@ -250,6 +250,37 @@
     .escala .marcas { display: flex; justify-content: space-between; }
     .nota-fig { font-size: 13px; color: var(--texto-terciario); margin: 0 0 30px; max-width: 74ch; }
 
+    /* ── Mapa de calor ── */
+    .mapa { margin: 0 0 6px; }
+    .mapa-svg { overflow-x: auto; }
+    .mapa-svg svg { width: 100%; min-width: 480px; height: auto; display: block; }
+    /* Divisa entre estados. O mapa e uma figura, nao um controle: sem hover,
+       sem foco, sem estado selecionado */
+    .mapa-svg .uf {
+      stroke: var(--fundo-cartao); stroke-width: 1.6; stroke-linejoin: round;
+    }
+    .mapa-svg .rot {
+      font-family: 'Ubuntu', sans-serif; fill: var(--texto-principal); pointer-events: none;
+    }
+    .mapa-svg .sigla { font-weight: 700; font-size: 24px; }
+    .mapa-svg .valor { font-size: 22px; font-variant-numeric: tabular-nums; }
+    /* O tracado e tinta escura com casulo branco fino: na cor da faixa ele
+       sumia dentro do estado da mesma cor, e com casulo largo virava um risco
+       branco que parecia divisa de estado. A cor da faixa fica no ponto que
+       marca o estado */
+    .mapa-svg .guia-base { fill: none; stroke: #FFFFFF; stroke-width: 4.4; }
+    .mapa-svg .guia { fill: none; stroke: var(--texto-principal); stroke-width: 1.8; }
+    .mapa-svg .ponto { stroke: #FFFFFF; stroke-width: 2; }
+
+    .escala-calor { max-width: 620px; margin: 10px 0 0; }
+    .escala-calor .faixas { display: flex; height: 12px; border-radius: 999px; overflow: hidden; }
+    .escala-calor .faixas span { flex: 1; }
+    .escala-calor .marcas {
+      display: flex; justify-content: space-between; gap: 12px; margin-top: 6px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; color: var(--texto-terciario);
+    }
+    .escala-calor .marcas b { color: var(--texto-secundario); font-weight: 700; }
+
     /* ── Seção em dinheiro ── */
     .abas-cat { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 16px; }
     .aba-cat {
@@ -524,6 +555,23 @@
         <span id="nota-cobertura"></span>
       </p>
 
+      <h2 id="mapa">O mapa do imposto</h2>
+      <p class="prosa" id="mapa-intro">
+        Onde a cesta básica é mais e menos tributada. A cor é a distância até a média do
+        país no ano escolhido, e não o valor absoluto: o nível sobe em todos os estados
+        ao mesmo tempo, então o que separa um do outro fica visível melhor assim.
+        O filtro de estado no topo muda os outros blocos da página, não este mapa.
+      </p>
+
+      <div class="abas-cat" id="abas-mapa" role="tablist" aria-label="Ano do mapa"></div>
+      <p class="aviso-ano" id="aviso-mapa" hidden></p>
+
+      <figure class="mapa" id="mapa-figura">
+        <div class="mapa-svg" id="mapa-svg"></div>
+        <div class="escala-calor" id="escala-calor"></div>
+        <figcaption class="nota-fig" id="mapa-nota"></figcaption>
+      </figure>
+
       <h2 id="dinheiro">O mesmo em dinheiro</h2>
       <p class="prosa" id="dinheiro-intro"></p>
 
@@ -777,6 +825,110 @@
     const CHAVE_UF = 'painel-ibpt-uf';
 
     let D = null;
+    /**
+     * Contorno das 27 UFs. Vem em arquivo proprio porque e geometria, nao
+     * dado do build: so muda se o IBGE republicar a malha.
+     */
+    let MALHA = null;
+    /** Posicao dos rotulos do mapa, calculada uma vez por carga da pagina. */
+    let LUGARES = null;
+    let anoMapa = null;
+
+    /**
+     * Faixas de cor do mapa, em pontos percentuais de distancia da media
+     * nacional daquele ano. Duas matizes com cinza no meio, como manda um
+     * mapa divergente: azul e imposto abaixo da media do pais, vermelho e
+     * acima. A escala e relativa de proposito, porque o nivel de todos os
+     * estados sobe junto e o que separa um do outro e o ICMS.
+     */
+    const CALOR = [
+      { ate: -4,       cor: '#1D4F91', tinta: '#FFFFFF' },
+      { ate: -2,       cor: '#3B79BC', tinta: '#FFFFFF' },
+      { ate: -0.7,     cor: '#A7C7E3', tinta: '#1F2937' },
+      { ate: 0.7,      cor: '#E8E6E1', tinta: '#1F2937' },
+      { ate: 2,        cor: '#EFB27C', tinta: '#1F2937' },
+      { ate: 4,        cor: '#D0643A', tinta: '#FFFFFF' },
+      { ate: Infinity, cor: '#9E2B1E', tinta: '#FFFFFF' }
+    ];
+
+    /** Cor de quem nao tem tabela utilizavel no ano. */
+    const SEM_DADO = { cor: '#EFF2F6', tinta: '#718096' };
+
+    /**
+     * Todo rotulo fica fora do desenho, encostado na costa do lado em que o
+     * estado esta. Dentro do mapa nao cabe: oito estados do Nordeste e o
+     * Distrito Federal sao menores que o proprio texto, e o que cabia
+     * acabava escrito por cima do vizinho.
+     *
+     * As medidas sao do viewBox da malha, onde o desenho ocupa de 0 a 1000.
+     */
+    /**
+     * Caixa do rotulo: sigla e aliquota sempre na mesma linha. E folgada de
+     * proposito, porque e um palpite sobre o tamanho do texto: se a fonte
+     * Ubuntu demorar a chegar, o navegador desenha com a fonte do sistema,
+     * que e mais larga, e o texto estoura uma caixa justa.
+     */
+    const FORMATOS = [{ largura: 150, altura: 38 }];
+    /** Ar entre um rotulo e o vizinho. */
+    const FOLGA_ROTULO = 8;
+
+    /**
+     * Direcao preferida do rotulo de alguns estados, em radianos, com zero
+     * apontando para leste. So entra estado em que a busca livre escolhe um
+     * lugar tecnicamente valido e visualmente ruim: o Distrito Federal cabe
+     * em varios lugares e a busca o mandava para baixo, entre Rio de Janeiro
+     * e Espirito Santo, longe do proprio estado.
+     */
+    const PREFERENCIA = { DF: 0 };
+    /** Quanto de abertura, para cada lado, ainda conta como a direcao pedida. */
+    const ABERTURA_PREFERIDA = Math.PI / 6;
+    /** Custo de ignorar a preferencia. Alto, mas nao proibitivo. */
+    const PESO_PREFERENCIA = 800;
+    /** Passo da caminhada que procura a saida do desenho. */
+    const PASSO_RAIO = 8;
+    /**
+     * O quanto um rotulo pode ser empurrado para fora depois de ja ter saido
+     * da silhueta. Alem disso ele fica longe demais do estado e o candidato
+     * nao vale a pena, entao a busca desiste e experimenta outro angulo: sem
+     * esse teto, cada angulo bloqueado custava uma caminhada ate a borda do
+     * mundo, e o mapa levava segundos para se montar.
+     */
+    const EMPURRAO_MAXIMO = 320;
+    /**
+     * Quantos angulos cada estado experimenta antes de escolher a saida. 48
+     * e multiplo de 8, entao as quatro direcoes retas e as quatro diagonais
+     * caem exatamente em cima de um candidato, e o tracado sai reto quando
+     * da para sair reto.
+     */
+    const DIRECOES = 48;
+    /**
+     * Deslocamentos laterais que cada angulo tambem experimenta, para o
+     * rotulo poder escorregar ao lado da reta de saida. Sem eles a busca so
+     * anda para frente e para tras, e nao consegue encaixar o rotulo do
+     * Acre acima do de Rondonia quando a vaga esta um pouco de lado.
+     */
+    const DESVIOS = [0, -40, 40, -80, 80];
+    /**
+     * Quanto um angulo torto custa, em unidades de comprimento. O tracado
+     * mais curto vence, mas nao a ponto de trocar uma linha reta por uma
+     * enviesada que economiza dez unidades.
+     */
+    const PESO_ANGULO = 70;
+    /**
+     * Quanto custa mandar o rotulo para o lado errado do mapa. Sergipe fica
+     * no litoral leste: o rotulo dele atravessar o pais inteiro para aparecer
+     * na esquerda e pior do que qualquer economia de distancia.
+     */
+    const PESO_LADO = 900;
+    /**
+     * Quanto custa inverter a ordem geografica de um vizinho: rotulo de
+     * Pernambuco embaixo do de Alagoas le errado, mesmo sem sobrepor nada.
+     */
+    const PESO_ORDEM = 200;
+    /** Ate onde um estado conta como vizinho, para efeito de ordem. */
+    const VIZINHANCA = 320;
+    /** Ar entre a borda do desenho e o comeco do texto. */
+    const RECUO_ROTULO = 12;
     let ANOS_A = [];
     let ANOS_D = [];
     let TODOS_ANOS = [];
@@ -934,6 +1086,593 @@
         horasImposto: imposto / valorHora,
         horasCompra: preco / valorHora
       };
+    }
+
+    /** Aliquota total da cesta em uma UF, ou null se o ano nao tem tabela. */
+    function totalCesta(uf, ano) {
+      const reg = D.dados[uf] && D.dados[uf][ano];
+      const par = reg && reg.cesta;
+      return par ? Number((par[0] + par[1]).toFixed(2)) : null;
+    }
+
+    function faixaDeCalor(desvio) {
+      return CALOR.find(f => desvio < f.ate);
+    }
+
+    /**
+     * Uma aba por ano, para ver o mapa em qualquer ponto da serie. O ano
+     * corrente vem selecionado.
+     */
+    function montarAbasMapa() {
+      const caixa = document.getElementById('abas-mapa');
+      caixa.innerHTML = D.anos.map(ano => `
+        <button class="aba-cat aba-ano${ano === QUEBRA ? ' misto' : ''}" role="tab"
+          data-ano="${ano}" aria-selected="${String(ano) === anoMapa}">${ano}</button>`).join('');
+
+      caixa.querySelectorAll('.aba-ano').forEach(botao => {
+        botao.addEventListener('click', () => {
+          anoMapa = botao.dataset.ano;
+          caixa.querySelectorAll('.aba-ano').forEach(b => {
+            b.setAttribute('aria-selected', String(b.dataset.ano === anoMapa));
+          });
+          montarMapa();
+        });
+      });
+    }
+
+    /** Tamanho do desenho, lido do viewBox da malha. */
+    function tamanhoDaMalha() {
+      const [, , largura, altura] = MALHA.viewBox.split(' ').map(Number);
+      return { largura, altura };
+    }
+
+    /**
+     * Diz se o ponto ja saiu do desenho. Usa o perfil da silhueta nos dois
+     * sentidos: oeste e leste dizem ate onde o mapa vai naquela latitude,
+     * norte e sul ate onde vai naquela longitude.
+     */
+    function foraDoDesenho(x, y) {
+      const perfil = MALHA.perfil;
+      const iy = Math.round(y / perfil.faixa);
+      const ix = Math.round(x / perfil.faixa);
+      if (iy < 0 || iy >= perfil.oeste.length || ix < 0 || ix >= perfil.norte.length) return true;
+      if (perfil.oeste[iy] === null || perfil.norte[ix] === null) return true;
+      return x < perfil.oeste[iy] || x > perfil.leste[iy]
+        || y < perfil.norte[ix] || y > perfil.sul[ix];
+    }
+
+    /** Caixa do rotulo pendurada no ponto de saida, do lado de fora. */
+    function caixaDoRotulo(x, y, ux, uy, formato) {
+      const { largura, altura } = formato;
+      const amarra = { x, y };
+      if (Math.abs(ux) > 0.35) {
+        const x1 = ux > 0 ? x + RECUO_ROTULO : x - RECUO_ROTULO - largura;
+        return {
+          x1, x2: x1 + largura, y1: y - altura / 2, y2: y + altura / 2,
+          amarra, ancora: ux > 0 ? 'start' : 'end'
+        };
+      }
+      const y1 = uy > 0 ? y + RECUO_ROTULO : y - RECUO_ROTULO - altura;
+      return {
+        x1: x - largura / 2, x2: x + largura / 2, y1, y2: y1 + altura,
+        amarra, ancora: 'middle'
+      };
+    }
+
+    /**
+     * O quanto o angulo foge das oito direcoes principais, de 0 (reto ou
+     * diagonal exata) a 1 (bem no meio de duas).
+     */
+    function desalinho(angulo) {
+      const passo = Math.PI / 4;
+      const resto = ((angulo % passo) + passo) % passo;
+      return Math.min(resto, passo - resto) / (passo / 2);
+    }
+
+    /**
+     * Diz se a caixa ainda pega no desenho. Nao basta o ponto de saida estar
+     * do lado de fora: o texto tem largura, e centrado na saida ele volta
+     * metade para cima do mapa.
+     */
+    function caixaSobreODesenho(caixa) {
+      // Varredura fina, nao so os cantos: a ponta sul do Rio Grande do Sul e
+      // estreita e passava entre um ponto de teste e o outro, deixando o
+      // rotulo de Santa Catarina escrito por cima dela
+      const passo = 12;
+      for (let x = caixa.x1; x <= caixa.x2 + passo; x += passo) {
+        for (let y = caixa.y1; y <= caixa.y2 + passo; y += passo) {
+          if (!foraDoDesenho(Math.min(x, caixa.x2), Math.min(y, caixa.y2))) return true;
+        }
+      }
+      return false;
+    }
+
+    /** Duas caixas encostadas, contando a folga que cada uma reserva. */
+    function encostam(a, b) {
+      return a.x1 - FOLGA_ROTULO < b.x2 && b.x1 - FOLGA_ROTULO < a.x2
+        && a.y1 - FOLGA_ROTULO < b.y2 && b.y1 - FOLGA_ROTULO < a.y2;
+    }
+
+    /** De que lado da reta ab cai o ponto c. */
+    function ladoDaReta(a, b, c) {
+      return Math.sign((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
+    }
+
+    /** Se os dois tracados se cruzam. Encostar pela ponta nao conta. */
+    function cruzam(a, b, c, d) {
+      const s1 = ladoDaReta(a, b, c);
+      const s2 = ladoDaReta(a, b, d);
+      const s3 = ladoDaReta(c, d, a);
+      const s4 = ladoDaReta(c, d, b);
+      return s1 !== s2 && s3 !== s4 && s1 !== 0 && s2 !== 0 && s3 !== 0 && s4 !== 0;
+    }
+
+    /** Se o tracado passa por cima de um rotulo ja colocado. */
+    function tracadoCortaCaixa(a, b, caixa) {
+      const cantos = [
+        { x: caixa.x1, y: caixa.y1 }, { x: caixa.x2, y: caixa.y1 },
+        { x: caixa.x2, y: caixa.y2 }, { x: caixa.x1, y: caixa.y2 }
+      ];
+      const dentro = p =>
+        p.x >= caixa.x1 && p.x <= caixa.x2 && p.y >= caixa.y1 && p.y <= caixa.y2;
+      if (dentro(a) || dentro(b)) return true;
+      for (let i = 0; i < 4; i++) {
+        if (cruzam(a, b, cantos[i], cantos[(i + 1) % 4])) return true;
+      }
+      return false;
+    }
+
+    /**
+     * Ate onde o tracado precisa andar naquele angulo para o rotulo caber
+     * inteiro fora do desenho, sem encostar em rotulo ja colocado. Devolve
+     * null quando nao ha saida por ali.
+     */
+    /**
+     * Ate onde e preciso andar naquele candidato so para sair da silhueta.
+     * Nao depende de quem ja esta posto, entao e calculado uma vez por
+     * estado e reaproveitado nas tres passadas: e a conta mais cara aqui, e
+     * refazer a cada passada custava cinco segundos de tela parada.
+     */
+    function raioDeSaida(estado, ux, uy, desvio, limite) {
+      const ladoX = -uy * desvio;
+      const ladoY = ux * desvio;
+      let raio = 0;
+      while (raio < limite
+        && !foraDoDesenho(estado.x + ux * raio + ladoX, estado.y + uy * raio + ladoY)) {
+        raio += PASSO_RAIO;
+      }
+      return raio;
+    }
+
+    function saidaNoAngulo(estado, ux, uy, postos, limite, formato, rigoroso, desvio, inicio) {
+      // Perpendicular a direcao de saida, por onde o rotulo escorrega
+      const ladoX = -uy * desvio;
+      const ladoY = ux * desvio;
+      const ponto = raio => ({ x: estado.x + ux * raio + ladoX, y: estado.y + uy * raio + ladoY });
+
+      let raio = inicio;
+      const teto = Math.min(limite, inicio + EMPURRAO_MAXIMO);
+      // O rotulo tambem nao pode cair em cima de tracado ja desenhado: sem
+      // esta linha, DF, ES e MG saem com o texto de um por cima da linha do
+      // outro, porque a checagem de tracado so olhava para tras
+      const atrapalha = caixa =>
+        caixaSobreODesenho(caixa)
+        || postos.some(posto => encostam(posto.caixa, caixa))
+        || postos.some(posto => tracadoCortaCaixa(posto.estado, posto.saida, caixa))
+        // No modo rigoroso o proprio tracado tambem nao pode raspar rotulo
+        // alheio. Como andar mais pela mesma reta nao resolve isso, o angulo
+        // acaba descartado, que e justamente o efeito desejado
+        || (rigoroso && postos.some(posto =>
+          tracadoCortaCaixa(estado, { x: caixa.amarra.x, y: caixa.amarra.y }, posto.caixa)));
+
+      let caixa = caixaDoRotulo(ponto(raio).x, ponto(raio).y, ux, uy, formato);
+      while (atrapalha(caixa) && raio < teto) {
+        raio += PASSO_RAIO;
+        caixa = caixaDoRotulo(ponto(raio).x, ponto(raio).y, ux, uy, formato);
+      }
+      if (raio >= teto) return null;
+      const saida = ponto(raio);
+      return { raio: Math.hypot(saida.x - estado.x, saida.y - estado.y), caixa, saida };
+    }
+
+    /**
+     * Com quantos dos outros este posto briga: tracado que cruza tracado,
+     * tracado que passa por cima de rotulo, nos dois sentidos, e rotulo
+     * encostado em rotulo.
+     */
+    function brigasDe(posto, outros) {
+      return outros.filter(outro =>
+        cruzam(posto.estado, posto.saida, outro.estado, outro.saida)
+        || tracadoCortaCaixa(posto.estado, posto.saida, outro.caixa)
+        || tracadoCortaCaixa(outro.estado, outro.saida, posto.caixa)
+        || encostam(posto.caixa, outro.caixa)).length;
+    }
+
+    /** Distancia do estado ate o meio do proprio rotulo. */
+    function esticamento(posto) {
+      return Math.hypot(
+        (posto.caixa.x1 + posto.caixa.x2) / 2 - posto.estado.x,
+        (posto.caixa.y1 + posto.caixa.y2) / 2 - posto.estado.y
+      );
+    }
+
+    /**
+     * Quantos vizinhos ficam fora de ordem com o rotulo neste lugar. Vizinho
+     * mais ao norte tem que ficar com o rotulo mais ao norte, e o mesmo vale
+     * para leste e oeste; senao o mapa le ao contrario do que mostra.
+     */
+    function desordem(estado, meio, postos) {
+      let fora = 0;
+      for (const posto of postos) {
+        const dx = estado.x - posto.estado.x;
+        const dy = estado.y - posto.estado.y;
+        if (Math.hypot(dx, dy) > VIZINHANCA) continue;
+        const outro = {
+          x: (posto.caixa.x1 + posto.caixa.x2) / 2,
+          y: (posto.caixa.y1 + posto.caixa.y2) / 2
+        };
+        if (Math.abs(dy) > 30 && dy * (meio.y - outro.y) < 0) fora++;
+        if (Math.abs(dx) > 30 && dx * (meio.x - outro.x) < 0) fora++;
+      }
+      return fora;
+    }
+
+    /**
+     * O melhor lugar para um rotulo, dado o que ja esta posto: o tracado mais
+     * curto e mais reto que sai do desenho sem cruzar tracado de outro
+     * estado, sem passar por cima de rotulo alheio e sem encostar em
+     * ninguem.
+     */
+    function melhorLugar(estado, postos, limite, centro) {
+      // Primeiro tenta sem raspar nada. Se o estado estiver mesmo sem saida,
+      // repete aceitando o menos ruim
+      return procurarLugar(estado, postos, limite, centro, true)
+        || procurarLugar(estado, postos, limite, centro, false)
+        // Ultimo recurso, para nenhum estado ficar sem rotulo: o candidato
+        // mais barato, encostado na silhueta, atropelando quem estiver la
+        || semSaida(estado);
+    }
+
+    /** 1 quando o angulo foge da direcao pedida para aquele estado, 0 quando obedece. */
+    function foraDaPreferencia(uf, angulo) {
+      const pedida = PREFERENCIA[uf];
+      if (pedida === undefined) return 0;
+      const diferenca = Math.abs(Math.atan2(
+        Math.sin(angulo - pedida), Math.cos(angulo - pedida)
+      ));
+      return diferenca > ABERTURA_PREFERIDA ? 1 : 0;
+    }
+
+    /** Rotulo colado na silhueta, sem olhar para os vizinhos. */
+    function semSaida(estado) {
+      const { ux, uy, formato, desvio, inicio } = estado.candidatos[0];
+      const x = estado.x + ux * inicio - uy * desvio;
+      const y = estado.y + uy * inicio + ux * desvio;
+      return {
+        raio: inicio,
+        caixa: caixaDoRotulo(x, y, ux, uy, formato),
+        saida: { x, y },
+        conflitos: Infinity,
+        custo: Infinity
+      };
+    }
+
+    /**
+     * Os candidatos de um estado: angulo, formato, desvio, raio de saida e o
+     * custo minimo que aquele candidato pode ter. O minimo e o custo com o
+     * rotulo colado na silhueta, sem nenhum vizinho no caminho; empurrar
+     * para fora so aumenta. Ordenados por esse minimo, a busca pode parar no
+     * primeiro que ja perde para o melhor achado.
+     */
+    function candidatosDoEstado(estado, limite, centro) {
+      const distancia = Math.hypot(estado.x - centro.x, estado.y - centro.y) || 1;
+      const foraX = (estado.x - centro.x) / distancia;
+      const foraY = (estado.y - centro.y) / distancia;
+      const pesoLado = PESO_LADO * Math.min(1, distancia / Math.hypot(centro.x, centro.y));
+
+      const lista = [];
+      for (const desvio of DESVIOS) {
+        for (const formato of FORMATOS) {
+          for (let i = 0; i < DIRECOES; i++) {
+            const angulo = (2 * Math.PI * i) / DIRECOES;
+            const ux = Math.cos(angulo);
+            const uy = Math.sin(angulo);
+            const inicio = raioDeSaida(estado, ux, uy, desvio, limite);
+            const caixa = caixaDoRotulo(
+              estado.x + ux * inicio - uy * desvio,
+              estado.y + uy * inicio + ux * desvio,
+              ux, uy, formato
+            );
+            const contramao = (1 - (ux * foraX + uy * foraY)) / 2;
+            const minimo = Math.hypot(
+              (caixa.x1 + caixa.x2) / 2 - estado.x,
+              (caixa.y1 + caixa.y2) / 2 - estado.y
+            ) + PESO_ANGULO * desalinho(angulo)
+              + pesoLado * contramao * contramao
+              + foraDaPreferencia(estado.uf, angulo) * PESO_PREFERENCIA;
+            lista.push({ angulo, ux, uy, formato, desvio, inicio, minimo, contramao, pesoLado });
+          }
+        }
+      }
+      return lista.sort((a, b) => a.minimo - b.minimo);
+    }
+
+    function procurarLugar(estado, postos, limite, centro, rigoroso) {
+      let melhor = null;
+      for (const candidato of estado.candidatos) {
+        const { angulo, ux, uy, formato, desvio, inicio, contramao, pesoLado } = candidato;
+        // Os candidatos vem em ordem de custo minimo: quando o minimo do
+        // proximo ja perde para o melhor achado, o resto tambem perde
+        if (melhor && melhor.conflitos === 0 && candidato.minimo >= melhor.custo) break;
+
+        const tentativa = saidaNoAngulo(
+          estado, ux, uy, postos, limite, formato, rigoroso, desvio, inicio
+        );
+        if (!tentativa) continue;
+
+        // Conta o estrago em vez de so descartar: se nenhum angulo estiver
+        // limpo, o menos ruim ainda e melhor que o mais curto
+        tentativa.conflitos = postos.filter(posto =>
+          cruzam(estado, tentativa.saida, posto.estado, posto.saida)
+          || tracadoCortaCaixa(estado, tentativa.saida, posto.caixa)).length;
+        // O que pesa e a distancia ate o texto, nao ate a saida: dois
+        // formatos com a mesma saida deixam o rotulo em lugares diferentes
+        const meio = {
+          x: (tentativa.caixa.x1 + tentativa.caixa.x2) / 2,
+          y: (tentativa.caixa.y1 + tentativa.caixa.y2) / 2
+        };
+        tentativa.custo = Math.hypot(meio.x - estado.x, meio.y - estado.y)
+          + PESO_ANGULO * desalinho(angulo)
+          + pesoLado * contramao * contramao
+          + foraDaPreferencia(estado.uf, angulo) * PESO_PREFERENCIA
+          + PESO_ORDEM * desordem(estado, meio, postos);
+
+        const ganha = !melhor
+          || tentativa.conflitos < melhor.conflitos
+          || (tentativa.conflitos === melhor.conflitos && tentativa.custo < melhor.custo);
+        if (ganha) melhor = tentativa;
+      }
+      return melhor;
+    }
+
+    /**
+     * Cada rotulo tenta de novo, agora com o mapa inteiro posto, e troca de
+     * lugar se achar coisa melhor. A primeira passada e gulosa: o ultimo a
+     * escolher encontra o mapa ocupado e vai parar longe do proprio estado.
+     */
+    function repescar(postos, limite, centro) {
+      for (let volta = 0; volta < 4; volta++) {
+        let mudou = false;
+        // Quem ficou com conflito tenta primeiro, depois quem ficou longe
+        const fila = [...postos].sort((a, b) =>
+          b.conflitos - a.conflitos || b.custo - a.custo);
+        for (const posto of fila) {
+          const outros = postos.filter(p => p !== posto);
+          const nova = melhorLugar(posto.estado, outros, limite, centro);
+          const melhorou = nova && (nova.conflitos < posto.conflitos
+            || (nova.conflitos === posto.conflitos && nova.custo < posto.custo - 2));
+          if (melhorou) {
+            Object.assign(posto, nova);
+            mudou = true;
+          }
+        }
+        if (!mudou) break;
+      }
+    }
+
+    /**
+     * Onde cada rotulo fica.
+     *
+     * Tres passadas. Na primeira cada estado escolhe seu lugar na ordem do
+     * aperto: quem tem mais vizinho perto decide antes, porque tem menos
+     * saida. Na segunda os que ficaram mais longe tentam de novo, agora com
+     * o mapa inteiro posto, e trocam de lugar se acharem coisa melhor.
+     *
+     * A repescagem existe porque a primeira passada e gulosa: o ultimo
+     * estado do Nordeste a escolher achava o mapa todo ocupado e ia parar a
+     * seiscentas unidades da propria costa.
+     *
+     * Testar cruzamento na hora de escolher e o que garante o mapa limpo.
+     * Regra geometrica fixa nao serve: regua lateral obriga tracado enorme
+     * no estado do miolo, e tracado radial a partir do centro joga o rotulo
+     * de MT e TO longe do estado.
+     */
+    function lugaresDosRotulos() {
+      const { largura, altura } = tamanhoDaMalha();
+      const centro = { x: largura / 2, y: altura / 2 };
+      const limite = Math.max(largura, altura);
+
+      const estados = D.ufs
+        .filter(uf => uf !== BRASIL && MALHA.ufs[uf])
+        .map(uf => ({ uf, x: MALHA.ufs[uf].cx, y: MALHA.ufs[uf].cy }));
+      for (const estado of estados) {
+        estado.candidatos = candidatosDoEstado(estado, limite, centro);
+      }
+      // Ordem de varredura, girando ao redor do mapa. Vizinho escolhe logo
+      // depois de vizinho, entao os rotulos saem na ordem geografica e os
+      // tracados ficam paralelos em vez de se trancarem. Medido contra as
+      // outras ordens: por aperto, do centro para fora e do centro por
+      // faixas, esta e a unica em que nenhum tracado passa de 300 unidades
+      const emVolta = e => Math.atan2(e.y - centro.y, e.x - centro.x);
+      estados.sort((a, b) => emVolta(a) - emVolta(b));
+
+      const postos = [];
+      for (const estado of estados) {
+        postos.push({ estado, ...melhorLugar(estado, postos, limite, centro) });
+      }
+
+      repescar(postos, limite, centro);
+
+      // Terceira passada: dois vizinhos trocam de rotulo. As vezes nao existe
+      // lugar melhor para nenhum dos dois separadamente, e o que esta errado
+      // e a ordem entre eles: Alagoas e Pernambuco saem da primeira passada
+      // com os lugares invertidos, e o tracado de um corta o rotulo do outro
+      for (let volta = 0; volta < 3; volta++) {
+        let mudou = false;
+        for (const a of postos) {
+          for (const b of postos) {
+            if (a === b) continue;
+            if (Math.hypot(a.estado.x - b.estado.x, a.estado.y - b.estado.y) > VIZINHANCA) continue;
+
+            const outros = postos.filter(p => p !== a && p !== b);
+            const trocados = [
+              { estado: a.estado, caixa: b.caixa, saida: b.saida },
+              { estado: b.estado, caixa: a.caixa, saida: a.saida }
+            ];
+            const meioDe = posto => ({
+              x: (posto.caixa.x1 + posto.caixa.x2) / 2,
+              y: (posto.caixa.y1 + posto.caixa.y2) / 2
+            });
+            const preco = dupla => 1000 * (brigasDe(dupla[0], [...outros, dupla[1]])
+              + brigasDe(dupla[1], [...outros, dupla[0]]))
+              + PESO_ORDEM * (desordem(dupla[0].estado, meioDe(dupla[0]), [...outros, dupla[1]])
+                + desordem(dupla[1].estado, meioDe(dupla[1]), [...outros, dupla[0]]))
+              + esticamento(dupla[0]) + esticamento(dupla[1]);
+
+            if (preco(trocados) < preco([a, b]) - 1) {
+              [a.caixa, b.caixa] = [b.caixa, a.caixa];
+              [a.saida, b.saida] = [b.saida, a.saida];
+              mudou = true;
+            }
+          }
+        }
+        if (!mudou) break;
+      }
+
+      // E de novo: a troca de vizinhos costuma abrir vaga melhor para quem
+      // tinha ficado longe
+      repescar(postos, limite, centro);
+
+      const lugares = {};
+      for (const posto of postos) {
+        lugares[posto.estado.uf] = { caixa: posto.caixa, saida: posto.saida };
+      }
+      return lugares;
+    }
+
+    /**
+     * Moldura do desenho: o mapa mais tudo o que os rotulos ocuparam. Sai
+     * calculada porque a posicao dos rotulos depende do formato da malha.
+     */
+    function moldura(lugares) {
+      const { largura, altura } = tamanhoDaMalha();
+      let x1 = 0;
+      let y1 = 0;
+      let x2 = largura;
+      let y2 = altura;
+      for (const { caixa } of Object.values(lugares)) {
+        x1 = Math.min(x1, caixa.x1);
+        x2 = Math.max(x2, caixa.x2);
+        y1 = Math.min(y1, caixa.y1);
+        y2 = Math.max(y2, caixa.y2);
+      }
+      const ar = 10;
+      return `${(x1 - ar).toFixed(1)} ${(y1 - ar).toFixed(1)} `
+        + `${(x2 - x1 + 2 * ar).toFixed(1)} ${(y2 - y1 + 2 * ar).toFixed(1)}`;
+    }
+
+    /**
+     * Tracado do estado ate o rotulo. Vai em duas passadas, uma branca larga
+     * por baixo e a colorida por cima: sozinha, a linha some quando cruza um
+     * estado da mesma cor.
+     */
+    function tracado(desenho, lugar, cor) {
+      const linha = `x1="${desenho.cx}" y1="${desenho.cy}"`
+        + ` x2="${lugar.saida.x.toFixed(1)}" y2="${lugar.saida.y.toFixed(1)}"`;
+      return `<line class="guia-base" ${linha}/>
+        <line class="guia" ${linha}/>
+        <circle class="ponto" cx="${desenho.cx}" cy="${desenho.cy}" r="6" fill="${cor}"/>`;
+    }
+
+    /**
+     * Rotulo de um estado, fora do mapa: sigla em cima, aliquota embaixo. Em
+     * duas linhas a regua fica estreita e sobra largura para o desenho.
+     */
+    function rotuloMapa(uf, texto, lugar) {
+      const { x1, x2, y1, ancora } = lugar.caixa;
+      const x = (ancora === 'start' ? x1 : ancora === 'end' ? x2 : (x1 + x2) / 2).toFixed(1);
+      return `<text class="rot" x="${x}" y="${(y1 + 22).toFixed(1)}" text-anchor="${ancora}">
+          <tspan class="sigla">${uf}</tspan>
+          <tspan class="valor" dx="9">${texto}</tspan>
+        </text>`;
+    }
+
+    /**
+     * Mapa de calor por estado. A cor sai da distancia ate a media nacional
+     * do ano escolhido, nao do valor absoluto.
+     */
+    function montarMapa() {
+      const secao = ['mapa', 'mapa-intro', 'mapa-figura'];
+      if (!MALHA) {
+        secao.forEach(id => { document.getElementById(id).hidden = true; });
+        document.getElementById('aviso-mapa').hidden = true;
+        return;
+      }
+
+      const media = totalCesta(BRASIL, anoMapa);
+      // O lugar dos rotulos depende so do desenho, nao do ano nem da UF: a
+      // busca roda uma vez e vale para todas as trocas de aba
+      LUGARES = LUGARES || lugaresDosRotulos();
+      const lugares = LUGARES;
+      const formas = [];
+      const guias = [];
+      const rotulos = [];
+
+      for (const uf of D.ufs) {
+        const desenho = MALHA.ufs[uf];
+        if (!desenho) continue;
+
+        const total = totalCesta(uf, anoMapa);
+        const faixa = total === null ? SEM_DADO : faixaDeCalor(total - media);
+        const desvio = total === null ? null : Number((total - media).toFixed(2));
+        const texto = total === null ? VAZIO : pct(total);
+
+        formas.push(`<path class="uf" d="${desenho.d}" fill="${faixa.cor}"/>`);
+
+        guias.push(tracado(desenho, lugares[uf], faixa.cor));
+        rotulos.push(rotuloMapa(uf, texto, lugares[uf]));
+      }
+
+      const caixa = document.getElementById('mapa-svg');
+      caixa.innerHTML = `
+        <svg viewBox="${moldura(lugares)}" role="img"
+          aria-label="Mapa do Brasil com a alíquota média da cesta básica em cada estado em ${anoMapa}">
+          ${formas.join('')}${guias.join('')}${rotulos.join('')}
+        </svg>`;
+
+      document.getElementById('escala-calor').innerHTML = `
+        <div class="faixas">${CALOR.map(f => `<span style="background:${f.cor}"></span>`).join('')}</div>
+        <div class="marcas">
+          <span>4 pp ou mais abaixo</span>
+          <b>média do Brasil: ${pct(media)}</b>
+          <span>4 pp ou mais acima</span>
+        </div>`;
+
+      textoDoMapa(media);
+    }
+
+    /** Frases do mapa, todas montadas a partir do ano em exibição. */
+    function textoDoMapa(media) {
+      const valores = D.ufs
+        .filter(uf => uf !== BRASIL)
+        .map(uf => ({ uf, total: totalCesta(uf, anoMapa) }))
+        .filter(v => v.total !== null)
+        .sort((a, b) => a.total - b.total);
+      const menor = valores[0];
+      const maior = valores[valores.length - 1];
+
+      document.getElementById('mapa-nota').textContent =
+        `Em ${anoMapa} a cesta básica vai de ${pct(menor.total)} em ${NOMES[menor.uf]} `
+        + `a ${pct(maior.total)} em ${NOMES[maior.uf]}: `
+        + `${pct(maior.total - menor.total).replace('%', ' pontos')} de diferença entre o `
+        + `estado mais barato e o mais caro, sobre uma média nacional de ${pct(media)}. `
+        + 'A parte federal é igual em todo o país; o que separa um estado do outro é o ICMS.';
+
+      const aviso = document.getElementById('aviso-mapa');
+      aviso.hidden = anoMapa !== String(QUEBRA);
+      aviso.textContent = `${QUEBRA} fica de fora das comparações do resto da página: `
+        + 'metade do ano saiu pelo critério antigo do IBPT e metade pelo novo, '
+        + 'então a média mistura os dois.';
     }
 
     function montarAbasDinheiro(uf) {
@@ -1177,6 +1916,7 @@
       } else {
         atualizarCards(uf);
       }
+      montarMapa();
       montarDinheiro(uf);
       montarItens(uf);
       montarTabela(uf);
@@ -1331,10 +2071,14 @@
     async function iniciar() {
       let meta;
       try {
-        const [painel, metaResposta] = await Promise.all([
+        const [painel, metaResposta, malha] = await Promise.all([
           fetch(`${API}/painel.json`),
-          fetch(`${API}/meta.json`)
+          fetch(`${API}/meta.json`),
+          // A malha e so o desenho: se faltar, a pagina perde o mapa e
+          // continua inteira, entao a falha nao derruba a carga
+          fetch(`${BASE}/malha-uf.json`).catch(() => null)
         ]);
+        if (malha && malha.ok) MALHA = await malha.json();
         if (!painel.ok) throw new Error(`painel.json respondeu ${painel.status}`);
         if (!metaResposta.ok) throw new Error(`meta.json respondeu ${metaResposta.status}`);
         D = await painel.json();
@@ -1351,6 +2095,7 @@
       TODOS_ANOS = [...D.anos];
       ULTIMO_ANO = String(D.anos[D.anos.length - 1]);
       anoCesta = ULTIMO_ANO;
+      anoMapa = ULTIMO_ANO;
       preencherCobertura();
 
       const sel = document.getElementById('uf');
@@ -1359,6 +2104,7 @@
         + '</option>').join('');
       if (temEconomia()) montarAbasDinheiro();
       montarAbasAnos();
+      if (MALHA) montarAbasMapa();
 
       const guardada = ufGuardada();
       sel.value = ufValida(guardada) ? guardada
