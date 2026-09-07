@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsx src/construir.ts",
     "test": "tsx --test src/*.test.ts",
-    "indices": "tsx src/gerarIndices.ts"
+    "indices": "tsx src/gerarIndices.ts",
+    "malha": "tsx src/gerarMalha.ts"
   },
   "engines": {
     "node": ">=22.0.0"
