@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Carga Tributária</title>
+  <meta name="description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado, calculado sobre as tabelas IBPTax de 2015 a hoje.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ibpt.valraw.com.br/painel.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ibpt.valraw.com.br/painel.html">
+  <meta property="og:title" content="Painel de Carga Tributária">
+  <meta property="og:description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado.">
+  <meta property="og:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta property="og:image:width" content="2000">
+  <meta property="og:image:height" content="1000">
+  <meta property="og:image:alt" content="Logo Tabelas IBPT">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://ibpt.valraw.com.br/public/logo.webp">
+  <meta name="twitter:title" content="Painel de Carga Tributária">
+  <meta name="twitter:description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado.">
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/public/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/public/favicon-64x64.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/public/favicon-128x128.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/public/favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="/public/favicon-256x256.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/public/favicon-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon-180x180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap"></noscript>
+  <style>
+    /* Tokens do Design System VALRAW UI, os mesmos do index.html.
+       As duas cores de série (federal e estadual) são o par validado para
+       daltonismo: ΔE 32,1 em deuteranopia, 10,4 em tritanopia. */
+    :root {
+      --fundo-principal: #FFFFFF;
+      --fundo-cartao: #FFFFFF;
+      --fundo-section: #F7F9FC;
+      --fundo-base: #F7F9FC;
+      --trilho: #E3E9F2;
+      --primaria: #000793;
+      --primaria-hover: #00055E;
+      --borda-sutil: #EDF2F7;
+      --borda-padrao: #E2E8F0;
+      --borda-forte: #CBD5E0;
+      --texto-principal: #1F2937;
+      --texto-secundario: #4A5568;
+      --texto-terciario: #718096;
+      --sombra-card: 0 4px 24px rgba(15,23,42,0.06);
+      --sombra-card-hover: 0 12px 36px rgba(15,23,42,0.12);
+      --sombra-sticky: 0 2px 12px rgba(15,23,42,0.04);
+      --fed: #2E3ED6;
+      --est: #2E8B22;
+      --grave: #B02A26;
+      --media: #C68C00;
+      --grave-bg: rgba(176,42,38,0.08);
+      --primaria-dim: rgba(0,7,147,0.06);
+      --primaria-border: rgba(0,7,147,0.22);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; height: 100%; }
+    body {
+      font-family: 'Ubuntu', system-ui, sans-serif;
+      background: var(--fundo-principal);
+      color: var(--texto-principal);
+      font-size: 16px; line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100%; display: flex; flex-direction: column;
+    }
+    ::selection { color: var(--texto-principal); background: rgba(5,199,0,0.22); }
+    a { color: var(--primaria); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--primaria-hover); }
+    main { flex: 1 0 auto; width: 100%; }
+
+    /* ── Header, igual ao do index ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--borda-sutil);
+      box-shadow: var(--sombra-sticky);
+    }
+    header .barra {
+      max-width: 1280px; margin: 0 auto; padding: 0 16px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    @media (min-width: 640px) { header .barra { padding: 0 24px; } }
+    header .logo { height: 38px; width: auto; display: block; }
+    .voltar {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .voltar:hover { color: var(--primaria); }
+
+    .pagina { max-width: 1080px; margin: 0 auto; padding: 92px 24px 72px; }
+    .prosa { max-width: 68ch; }
+
+    /* ── Abertura ── */
+    .abertura { margin-bottom: 30px; }
+    .etiqueta {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12px;
+      letter-spacing: .16em; text-transform: uppercase; color: var(--texto-terciario);
+      margin: 0 0 10px;
+    }
+    h1 {
+      font-size: clamp(30px, 4.4vw, 44px); line-height: 1.1; font-weight: 700;
+      letter-spacing: -.022em; margin: 0 0 14px; text-wrap: balance;
+    }
+    .resumo { font-size: 18px; color: var(--texto-secundario); margin: 0; max-width: 62ch; }
+    .assinatura {
+      display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; color: var(--texto-terciario);
+    }
+    /* Ficha da base, no pé do bloco de notas */
+    .assinatura.base-usada { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--borda-sutil); }
+    /* O header é fixo: âncora não pode parar embaixo dele */
+    [id] { scroll-margin-top: 76px; }
+
+    h2 {
+      font-size: 13px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+      color: var(--primaria); margin: 52px 0 6px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--borda-padrao);
+    }
+    h3 { font-size: 19px; font-weight: 500; letter-spacing: -.01em; margin: 30px 0 8px; }
+    p { margin: 0 0 15px; }
+    code {
+      font-family: 'Ubuntu Mono', monospace; font-size: .92em; background: var(--fundo-section);
+      border: 1px solid var(--borda-sutil); padding: 1px 5px; border-radius: 4px;
+    }
+    ul { margin: 0 0 15px; padding-left: 20px; }
+    li { margin-bottom: 6px; }
+
+    .veredito {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; padding: 20px 24px; margin: 30px 0 0;
+      box-shadow: var(--sombra-card);
+    }
+    .veredito p:last-child { margin-bottom: 0; }
+    .veredito .titulo { font-weight: 700; font-size: 15px; color: var(--grave); margin-bottom: 6px; }
+
+    /* ── Filtro ── */
+    .filtros {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 14px; padding: 13px 18px; margin: 22px 0 18px;
+      box-shadow: var(--sombra-card);
+    }
+    .filtros label {
+      font-family: 'Ubuntu Mono', monospace; font-size: 11.5px;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--texto-terciario);
+    }
+    /* appearance:none tira a moldura nativa, que aparecia por dentro da nossa.
+       O foco e um anel so: a borda muda de cor e ganha halo, sem outline. */
+    .filtros select {
+      appearance: none; -webkit-appearance: none;
+      font-family: 'Ubuntu', sans-serif; font-size: 15px; color: var(--texto-principal);
+      background: var(--fundo-section) no-repeat right 12px center / 11px 7px;
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' fill='none' stroke='%23718096' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      border: 1px solid var(--borda-forte); border-radius: 10px;
+      padding: 7px 34px 7px 12px; cursor: pointer; min-width: 230px;
+    }
+    .filtros select:focus-visible {
+      outline: none; border-color: var(--primaria);
+      box-shadow: 0 0 0 3px var(--primaria-dim);
+    }
+    .chaves { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-left: auto; font-size: 13.5px; color: var(--texto-secundario); }
+    .nota-uf { font-size: 13px; color: var(--texto-terciario); margin: -8px 0 18px; }
+    .chaves .item-ch { display: flex; align-items: center; gap: 7px; }
+    .chaves .quad { width: 13px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+
+    /* ── Cards por categoria ── */
+    .cards { display: flex; flex-direction: column; gap: 16px; margin: 0 0 10px; }
+    .card {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card);
+      display: grid; grid-template-columns: 168px 1fr; overflow: hidden;
+    }
+    @media (max-width: 720px) { .card { grid-template-columns: 1fr; } }
+    .ilustra {
+      background: var(--fundo-section); border-right: 1px solid var(--borda-sutil);
+      padding: 22px 18px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; gap: 10px; color: var(--texto-terciario);
+    }
+    @media (max-width: 720px) {
+      .ilustra {
+        border-right: 0; border-bottom: 1px solid var(--borda-sutil);
+        flex-direction: row; justify-content: flex-start; text-align: left; padding: 16px 20px;
+      }
+    }
+    .ilustra svg { width: 74px; height: 74px; display: block; flex-shrink: 0; }
+    @media (max-width: 720px) { .ilustra svg { width: 50px; height: 50px; } }
+    .ilustra .nome { font-size: 15px; font-weight: 500; line-height: 1.3; color: var(--texto-principal); }
+    .ilustra .ncm {
+      font-family: 'Ubuntu Mono', monospace; font-size: 11.5px;
+      color: var(--texto-terciario); letter-spacing: .04em; margin-top: 2px;
+    }
+
+    .barras { padding: 16px 22px 18px; min-width: 0; }
+    .era-rot {
+      display: flex; align-items: center; gap: 10px; margin: 0 0 9px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; letter-spacing: .13em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .era-rot::after { content: ''; flex: 1; height: 1px; background: var(--borda-padrao); }
+    .era-rot.segunda { margin-top: 16px; }
+
+    .linha { display: grid; grid-template-columns: 42px 1fr 54px 54px 60px; align-items: center; gap: 10px; padding: 2.5px 0; }
+    .cab-col {
+      display: grid; grid-template-columns: 42px 1fr 54px 54px 60px; gap: 10px; margin-bottom: 3px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .cab-col span { text-align: right; }
+    .cab-col span:first-child, .cab-col span:nth-child(2) { text-align: left; }
+    .linha .ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px;
+      color: var(--texto-terciario); font-variant-numeric: tabular-nums;
+    }
+    .linha .parte, .item .parte {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12px; text-align: right;
+      color: var(--texto-secundario); font-variant-numeric: tabular-nums;
+    }
+    .pilha { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--trilho); }
+    .seg { height: 100%; }
+    .seg + .seg { margin-left: 2px; }
+    .linha .val {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; font-weight: 700;
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .linha.parcial .ano::after { content: '*'; color: var(--media); font-weight: 700; margin-left: 1px; }
+
+    .quebra {
+      display: flex; align-items: center; gap: 10px; margin: 15px 0 2px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--grave);
+    }
+    .quebra::before, .quebra::after { content: ''; flex: 1; height: 0; border-top: 2px dashed var(--grave); opacity: .45; }
+
+    .escala {
+      display: grid; grid-template-columns: 42px 1fr 168px; gap: 10px;
+      margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--borda-padrao);
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; color: var(--texto-terciario);
+    }
+    .escala .marcas { display: flex; justify-content: space-between; }
+    .nota-fig { font-size: 13px; color: var(--texto-terciario); margin: 0 0 30px; max-width: 74ch; }
+
+    /* ── Mapa de calor ── */
+    .mapa { margin: 0 0 6px; }
+    .mapa-svg { overflow-x: auto; }
+    .mapa-svg svg { width: 100%; min-width: 480px; height: auto; display: block; }
+    /* Divisa entre estados. O mapa e uma figura, nao um controle: sem hover,
+       sem foco, sem estado selecionado */
+    .mapa-svg .uf {
+      stroke: var(--fundo-cartao); stroke-width: 1.6; stroke-linejoin: round;
+    }
+    .mapa-svg .rot {
+      font-family: 'Ubuntu', sans-serif; fill: var(--texto-principal); pointer-events: none;
+    }
+    .mapa-svg .sigla { font-weight: 700; font-size: 24px; }
+    .mapa-svg .valor { font-size: 22px; font-variant-numeric: tabular-nums; }
+    /* O tracado e tinta escura com casulo branco fino: na cor da faixa ele
+       sumia dentro do estado da mesma cor, e com casulo largo virava um risco
+       branco que parecia divisa de estado. A cor da faixa fica no ponto que
+       marca o estado */
+    .mapa-svg .guia-base { fill: none; stroke: #FFFFFF; stroke-width: 4.4; }
+    .mapa-svg .guia { fill: none; stroke: var(--texto-principal); stroke-width: 1.8; }
+    .mapa-svg .ponto { stroke: #FFFFFF; stroke-width: 2; }
+
+    .escala-calor { max-width: 620px; margin: 10px 0 0; }
+    .escala-calor .faixas { display: flex; height: 12px; border-radius: 999px; overflow: hidden; }
+    .escala-calor .faixas span { flex: 1; }
+    .escala-calor .marcas {
+      display: flex; justify-content: space-between; gap: 12px; margin-top: 6px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; color: var(--texto-terciario);
+    }
+    .escala-calor .marcas b { color: var(--texto-secundario); font-weight: 700; }
+
+    /* ── Seção em dinheiro ── */
+    .abas-cat { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 16px; }
+    .aba-cat {
+      font-family: 'Ubuntu', sans-serif; font-size: 13.5px; padding: 7px 15px;
+      border-radius: 999px; border: 1px solid var(--borda-padrao);
+      background: var(--fundo-cartao); color: var(--texto-secundario); cursor: pointer;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+    .aba-cat:hover { border-color: var(--primaria); color: var(--primaria); }
+    .aba-cat[aria-selected="true"] {
+      background: var(--primaria); border-color: var(--primaria); color: #FFFFFF;
+    }
+    .aba-cat:focus-visible { outline: 2px solid var(--primaria); outline-offset: 2px; }
+    .aba-ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 13px; padding: 6px 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    /* 2021 mistura os dois criterios: a aba fica marcada, nao escondida */
+    .aba-ano.misto::after { content: '*'; color: var(--media); font-weight: 700; margin-left: 2px; }
+    .aviso-ano {
+      font-size: 12.5px; color: var(--media); background: var(--media-bg);
+      border: 1px solid rgba(198,140,0,0.25); border-radius: 10px;
+      padding: 9px 13px; margin: 0 0 14px;
+    }
+
+    .eras { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; margin: 0 0 14px; }
+    .era {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 16px 18px;
+    }
+    .era .rot {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario); margin: 0 0 2px;
+    }
+    .era .sub { font-size: 12.5px; color: var(--texto-secundario); margin: 0 0 12px; }
+    .era-linha, .era-cab { display: grid; grid-template-columns: 46px 1fr 1fr; gap: 10px; align-items: baseline; }
+    .era-cab {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+      padding-bottom: 7px; margin-bottom: 6px; border-bottom: 1px solid var(--borda-sutil);
+    }
+    .era-cab span, .era-linha span:not(.ano) { text-align: right; }
+    .era-cab span:first-child { text-align: left; }
+    .era-linha { padding: 5px 0; }
+    .era-linha .ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; color: var(--texto-terciario);
+      font-variant-numeric: tabular-nums;
+    }
+    .era-linha .valor, .era-linha .horas {
+      font-family: 'Ubuntu Mono', monospace; font-size: 17px; font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .era-var {
+      font-size: 12.5px; color: var(--texto-secundario);
+      margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--borda-sutil);
+    }
+
+    .rot-serie {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario); margin: 0 0 3px;
+    }
+    .sub-serie { font-size: 12.5px; color: var(--texto-secundario); margin: 0 0 12px; }
+    .horas-serie {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 18px 22px 16px; margin: 0 0 12px;
+    }
+    .linha-h, .cab-h { display: grid; grid-template-columns: 42px 78px 1fr 70px; gap: 10px; align-items: center; }
+    .linha-h { padding: 2.5px 0; }
+    .cab-h {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+      padding-bottom: 7px; margin-bottom: 4px; border-bottom: 1px solid var(--borda-sutil);
+    }
+    .cab-h span { text-align: right; }
+    .cab-h span:first-child { text-align: left; }
+    .linha-h .preco {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12px; text-align: right;
+      color: var(--texto-secundario); font-variant-numeric: tabular-nums;
+    }
+    .linha-h .ano {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; color: var(--texto-terciario);
+      font-variant-numeric: tabular-nums;
+    }
+    .linha-h .val {
+      font-family: 'Ubuntu Mono', monospace; font-size: 12.5px; font-weight: 700;
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .trilho-h { height: 10px; border-radius: 5px; background: var(--trilho); overflow: hidden; }
+    .barra-h { height: 100%; background: var(--fed); }
+    .anim .barra-h { transition: width .5s cubic-bezier(.22,.61,.36,1); }
+
+    /* ── Itens da cesta ── */
+    .itens {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 20px 22px 18px; margin: 20px 0 10px;
+    }
+    .item { display: grid; grid-template-columns: 26px 122px 1fr 54px 54px 60px; align-items: center; gap: 10px; padding: 4px 0; }
+    .ico-item { display: flex; align-items: center; color: var(--texto-terciario); }
+    .ico-item svg { width: 22px; height: 22px; display: block; }
+    .cab-item {
+      display: grid; grid-template-columns: 26px 122px 1fr 54px 54px 60px; gap: 10px;
+      padding-bottom: 7px; margin-bottom: 2px; border-bottom: 1px solid var(--borda-sutil);
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .cab-item span { text-align: right; }
+    .cab-item span:first-child, .cab-item span:nth-child(2), .cab-item span:nth-child(3) { text-align: left; }
+    .item .rot { font-size: 14px; line-height: 1.25; }
+    .item .rot span { display: block; font-family: 'Ubuntu Mono', monospace; font-size: 11px; color: var(--texto-terciario); }
+    .item .tot {
+      font-family: 'Ubuntu Mono', monospace; font-size: 13px; font-weight: 700;
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .grupo-rot {
+      display: flex; align-items: center; gap: 10px; margin: 14px 0 7px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 11px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .grupo-rot:first-child { margin-top: 0; }
+    .grupo-rot::after { content: ''; flex: 1; height: 1px; background: var(--borda-padrao); }
+
+    .faixa {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px; margin: 18px 0 10px;
+    }
+    .faixa > div {
+      background: var(--fundo-cartao); border: 1px solid var(--borda-padrao);
+      border-radius: 16px; box-shadow: var(--sombra-card); padding: 16px 18px;
+    }
+    .faixa .rot {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 8px;
+      font-family: 'Ubuntu Mono', monospace; font-size: 10.5px; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--texto-terciario);
+    }
+    .faixa .n {
+      font-family: 'Ubuntu Mono', monospace; font-size: 26px; font-weight: 700;
+      line-height: 1.15; font-variant-numeric: tabular-nums;
+    }
+    .faixa .r { font-size: 12.5px; color: var(--texto-secundario); margin-top: 3px; }
+    .faixa .chip {
+      font-family: 'Ubuntu Mono', monospace; font-size: 10px; letter-spacing: .06em;
+      text-transform: uppercase; padding: 1px 8px; border-radius: 999px;
+      background: var(--primaria-dim); color: var(--primaria);
+      border: 1px solid var(--primaria-border);
+    }
+
+    /* ── Tabela ── */
+    .rolagem { overflow-x: auto; margin: 18px 0 8px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    caption { text-align: left; font-size: 13px; color: var(--texto-terciario); padding-bottom: 8px; }
+    th, td { padding: 7px 12px; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th {
+      font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--texto-terciario); border-bottom: 1.5px solid var(--borda-forte);
+    }
+    tbody td { border-bottom: 1px solid var(--borda-sutil); font-family: 'Ubuntu Mono', monospace; font-variant-numeric: tabular-nums; }
+    tbody th { border-bottom: 1px solid var(--borda-sutil); font-weight: 500; }
+    tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+    .vazio { color: var(--texto-terciario); }
+
+    /* ── Evidência da quebra ── */
+    .evidencia {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); gap: 1px;
+      background: var(--borda-padrao); border: 1px solid var(--borda-padrao);
+      border-radius: 14px; overflow: hidden; margin: 22px 0 10px;
+    }
+    .evidencia div { background: var(--fundo-cartao); padding: 16px 18px; }
+    .evidencia .n {
+      font-family: 'Ubuntu Mono', monospace; font-size: 27px; font-weight: 700;
+      color: var(--grave); line-height: 1.15; font-variant-numeric: tabular-nums;
+    }
+    .evidencia .r { font-size: 13px; color: var(--texto-secundario); margin-top: 3px; }
+
+
+
+    /* ── Estado de carga ── */
+    .estado {
+      display: flex; align-items: center; gap: 12px; justify-content: center;
+      background: var(--fundo-section); border: 1px solid var(--borda-sutil);
+      border-radius: 16px; padding: 40px 24px; margin: 22px 0;
+      color: var(--texto-secundario); font-size: 15px; text-align: center;
+    }
+    .estado.erro { background: var(--grave-bg); border-color: rgba(176,42,38,0.25); color: var(--grave); }
+    .girando {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid var(--borda-forte); border-top-color: var(--primaria);
+      animation: girar .8s linear infinite;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    footer {
+      background: var(--fundo-base); border-top: 1px solid var(--borda-sutil);
+      padding: 32px 0; text-align: center; font-size: 13px; color: var(--texto-terciario);
+      flex-shrink: 0;
+    }
+    footer a { color: var(--texto-secundario); }
+    footer a:hover { color: var(--primaria); }
+    footer .linha-rodape {
+      max-width: 1280px; margin: 0 auto; padding: 0 16px;
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #000793 0%, #05C700 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── Animação ──
+       A classe .anim só entra no <body> depois do primeiro quadro: a página
+       nasce no estado final e apenas as trocas posteriores são animadas. */
+    .anim .seg { transition: width .5s cubic-bezier(.22,.61,.36,1); }
+    .card, .itens, .faixa > div { transition: box-shadow .25s ease, transform .25s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--sombra-card-hover); }
+    @keyframes surge { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .surge { animation: surge .42s cubic-bezier(.22,.61,.36,1) both; }
+    @keyframes troca { from { opacity: .35; } to { opacity: 1; } }
+    .anim .troca { animation: troca .3s ease both; }
+    .filtros select { transition: border-color .2s ease, background .2s ease; }
+    .filtros select:hover { border-color: var(--primaria); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .card:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="barra">
+      <a href="/" aria-label="Tabelas IBPT, voltar para a consulta">
+        <img class="logo" src="/public/logo.webp" alt="Tabelas IBPT" width="2000" height="1000">
+      </a>
+      <a class="voltar" href="/">Consultar tabelas</a>
+    </div>
+  </header>
+
+  <main class="pagina">
+    <div class="abertura">
+      <p class="etiqueta">Tabelas IBPT · Painel</p>
+      <h1>Quanto do preço é imposto</h1>
+      <p class="resumo">
+        Cesta básica, carro popular e moto, ano a ano, no estado escolhido.
+      </p>
+    </div>
+
+    <div class="filtros">
+      <label for="uf">Estado</label>
+      <select id="uf" aria-label="Estado"><option>Carregando</option></select>
+      <div class="chaves">
+        <span class="item-ch"><span class="quad" style="background:var(--fed)"></span>Federal</span>
+        <span class="item-ch"><span class="quad" style="background:var(--est)"></span>Estadual e municipal</span>
+      </div>
+    </div>
+
+    <p class="nota-uf" id="nota-uf" hidden></p>
+    <p class="nota-uf" id="nota-brasil" hidden>
+      Média simples das 27 unidades da federação: cada estado pesa igual, então
+      isto não é a carga do brasileiro médio, que dependeria de quanta gente vive
+      e compra em cada um. Serve para ver o nível do país e comparar um estado com ele.
+    </p>
+
+    <div class="estado" id="estado"><span class="girando" aria-hidden="true"></span>Carregando o painel</div>
+
+    <div id="painel" hidden>
+      <div class="cards" id="cards"></div>
+
+      <p class="nota-fig">
+        Escala fixa de 0 a 60%, igual em todos os cards. O degrau na linha tracejada é
+        troca de critério do IBPT, não aumento de imposto: <a href="#notas">o porquê está
+        no fim da página</a>. <strong>*</strong> marca ano que não tem tabela confiável em
+        todos os dias, e cuja média cobre só o período válido.
+        <span id="nota-cobertura"></span>
+      </p>
+
+      <h2 id="mapa">O mapa do imposto</h2>
+      <p class="prosa" id="mapa-intro">
+        Onde a cesta básica é mais e menos tributada. A cor é a distância até a média do
+        país no ano escolhido, e não o valor absoluto: o nível sobe em todos os estados
+        ao mesmo tempo, então o que separa um do outro fica visível melhor assim.
+        O filtro de estado no topo muda os outros blocos da página, não este mapa.
+      </p>
+
+      <div class="abas-cat" id="abas-mapa" role="tablist" aria-label="Ano do mapa"></div>
+      <p class="aviso-ano" id="aviso-mapa" hidden></p>
+
+      <figure class="mapa" id="mapa-figura">
+        <div class="mapa-svg" id="mapa-svg"></div>
+        <div class="escala-calor" id="escala-calor"></div>
+        <figcaption class="nota-fig" id="mapa-nota"></figcaption>
+      </figure>
+
+      <h2 id="dinheiro">O mesmo em dinheiro</h2>
+      <p class="prosa" id="dinheiro-intro"></p>
+
+      <div class="abas-cat" id="abas-categoria" role="tablist" aria-label="Categoria"></div>
+
+      <div class="eras" id="eras"></div>
+
+      <div class="horas-serie" id="horas-serie"></div>
+
+      <p class="nota-fig" id="dinheiro-nota"></p>
+
+      <h2>Dentro da cesta básica</h2>
+      <p class="prosa">
+        Os 13 itens da ração essencial mínima do Decreto-Lei 399/1938, na composição da
+        região que inclui São Paulo. Abaixo, a média de <strong id="ano-cesta">2026</strong>
+        em <strong id="uf-nome-1">São Paulo</strong>, sobre <span id="vigencia-cesta"></span>.
+        <span id="nota-federal"></span>
+      </p>
+
+      <div class="abas-cat" id="abas-ano" role="tablist" aria-label="Ano da cesta"></div>
+      <p class="aviso-ano" id="aviso-ano" hidden></p>
+
+      <div class="itens" id="itens"></div>
+
+      <p class="prosa">
+        A alíquota da cesta é média aritmética simples, com cada item pesando um treze
+        avos. Uma cesta real não funciona assim: a carne costuma responder por perto de
+        um terço do custo e a farinha por dois por cento.
+      </p>
+
+      <div class="faixa" id="faixa"></div>
+
+      <div class="rolagem">
+        <table>
+          <caption id="cap-tabela">Alíquota total por ano, em % sobre o preço.</caption>
+          <thead><tr id="cab-tabela"></tr></thead>
+          <tbody id="corpo-tabela"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 id="notas">Como ler estes números</h2>
+
+    <h3>O salto de 2021 não foi aumento de imposto</h3>
+    <div class="veredito">
+      <p class="titulo">Por que os anos aparecem em dois blocos</p>
+      <p>
+        De maio para junho de 2021, quase tudo aparece com imposto mais alto:
+        <strong>96 de cada 100 produtos mudaram de alíquota em um único mês</strong>,
+        com alta média de 9 pontos percentuais. Nenhuma lei muda o imposto de tudo
+        de uma vez assim.
+      </p>
+      <p>
+        O que mudou foi a forma de publicar. Até maio, o IBPT informava a alíquota
+        menor quando o produto tinha algum desconto de imposto. De junho em diante,
+        passou a informar sempre a alíquota cheia. O que se paga continuou parecido;
+        o número divulgado é que subiu.
+      </p>
+      <p>
+        Por isso os anos anteriores ficam em um bloco e os posteriores em outro, e
+        2021 não aparece: dentro dele convivem as duas formas de contar, então
+        comparar um ano de antes com um de depois compara critérios, não impostos.
+      </p>
+    </div>
+
+    <div class="evidencia">
+      <div><div class="n">96 em 100</div><div class="r">produtos mudaram de alíquota total de um mês para o outro</div></div>
+      <div><div class="n">95%</div><div class="r">deles mudaram para cima</div></div>
+      <div><div class="n">+9,14</div><div class="r">pontos percentuais de alta média</div></div>
+      <div><div class="n">1 mês</div><div class="r">foi todo o intervalo entre as duas tabelas</div></div>
+    </div>
+
+    <h3>Como a conta é feita</h3>
+    <div class="prosa">
+      <p>
+        Nos últimos anos o IBPT publica uma tabela nova a cada poucas semanas, e cada uma vale por um
+        tempo diferente: umas por um mês, outras por seis. Somar todas e dividir pelo
+        número de tabelas daria o mesmo peso para uma que valeu 29 dias e para outra
+        que valeu meio ano.
+      </p>
+      <p>
+        Então a conta é feita por dia. Para cada dia do ano vale a alíquota da tabela
+        que estava em vigor naquele dia, e o número do ano é a média de todos esses
+        dias. É a mesma lógica de calcular quanto se gastou por mês olhando o extrato
+        dia a dia, em vez de contar quantas contas chegaram.
+      </p>
+      <p>
+        A barra azul é o imposto federal, o que vai para a União. A verde é o
+        estadual, na prática o ICMS, que cada estado define por conta própria. Na cesta
+        básica o federal é o mesmo nos 27 estados, então trocar o estado muda só a parte
+        verde. No carro e na moto o IBPT publica federal diferente em alguns estados, e
+        aí as duas partes se mexem.
+      </p>
+    </div>
+
+    <h3>O que estes números não dizem</h3>
+    <ul class="prosa">
+      <li><span id="cobertura-detalhe">O ano mais recente ainda não terminou.</span> A média vale para o período já coberto, não para o ano fechado.</li>
+      <li>A cesta básica é a média simples dos 13 itens. Ela não leva em conta que uma família gasta mais com carne do que com farinha, então o peso no bolso depende do que vai no carrinho.</li>
+      <li>O salto do carro em 2016 é real, não falha de dados: das mais de dez mil linhas da tabela, só o automóvel dá esse pulo, e a moto no mesmo período não se mexe. O que o IBPT recalculou ali esta página não tem como dizer.</li>
+      <li>São valores aproximados. As alíquotas do IBPT são as estimativas médias previstas na Lei 12.741/2012, a que obriga a mostrar o imposto na nota fiscal. Servem para dar a ordem de grandeza, não para calcular o imposto de uma compra específica.</li>
+    </ul>
+
+    <div class="assinatura base-usada">
+      <span>Base: <span class="est-tabelas">100</span> versões, <span class="est-periodo">2015 a 2026</span></span>
+      <span><span class="est-registros">32.297.455</span> registros</span>
+      <span><span class="est-ufs">27</span> UFs</span>
+    </div>
+  </main>
+
+  <footer>
+    <div class="linha-rodape">
+      Dados: <a href="https://ibpt.com.br" target="_blank" rel="noopener">IBPT</a>
+      <span aria-hidden="true">|</span>
+      Licença: Apache 2.0
+      <span aria-hidden="true">|</span>
+      Build: <span class="est-gerado-em">-</span>
+      <span aria-hidden="true">|</span>
+      Powered by <a href="https://valraw.com.br" target="_blank" rel="noopener" style="font-weight:600"><span class="gradient-text">VALRAW</span></a>
+    </div>
+  </footer>
+
+  <script>
+    const BASE = location.pathname.replace(/\/painel\.html$/, '').replace(/\/$/, '');
+    const API = BASE + '/api';
+
+    /** Escala fixa das barras, em pontos percentuais. */
+    const ESCALA = 60;
+    /** Ano em que o IBPT trocou o critério de publicação. Sai dos dois recortes. */
+    const QUEBRA = 2021;
+    const VAZIO = '-';
+
+    /** Chave da média das 27 UFs, como vem do painel.json. */
+    const BRASIL = 'BR';
+
+    const NOMES = {
+      BR: 'Brasil',
+      AC: 'Acre', AL: 'Alagoas', AM: 'Amazonas', AP: 'Amapá', BA: 'Bahia',
+      CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás',
+      MA: 'Maranhão', MG: 'Minas Gerais', MS: 'Mato Grosso do Sul',
+      MT: 'Mato Grosso', PA: 'Pará', PB: 'Paraíba', PE: 'Pernambuco',
+      PI: 'Piauí', PR: 'Paraná', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte',
+      RO: 'Rondônia', RR: 'Roraima', RS: 'Rio Grande do Sul', SC: 'Santa Catarina',
+      SE: 'Sergipe', SP: 'São Paulo', TO: 'Tocantins'
+    };
+
+    const ICONES = {
+      cesta: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 25c0-7 4-12 9-12s9 5 9 12"/>
+          <path d="M12 26h40l-4 24a4 4 0 0 1-4 3.5H20A4 4 0 0 1 16 50z"/>
+          <path d="M25 34l1.5 12M39 34l-1.5 12M32 34v12"/>
+        </svg>`,
+      carro: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 41v-6.5a4 4 0 0 1 3-3.9l6-1.4 6.5-8.4A5 5 0 0 1 28.4 19h11.9a5 5 0 0 1 4 2l5.7 7.6 5 1.5a4 4 0 0 1 3 3.9V41"/>
+          <path d="M18 29h29"/><path d="M31 19v10"/>
+          <circle cx="20.5" cy="42" r="5.2"/><circle cx="45.5" cy="42" r="5.2"/>
+          <path d="M25.7 42h14.6M9 42h6.3M50.7 42H55"/>
+        </svg>`,
+      moto: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="14.5" cy="43" r="8.5"/><circle cx="49.5" cy="43" r="8.5"/>
+          <path d="M23 43h7l8.5-13H27"/><path d="M30 30l-6-8h-6"/>
+          <path d="M38.5 30l6.5 10.5"/><path d="M33 24h9l3.5 6"/><path d="M42 24h6"/>
+        </svg>`
+    };
+
+    /**
+     * Um icone por item da cesta, no mesmo tracado dos icones das categorias:
+     * traco de 2.4 sobre grade de 64, sem preenchimento. A chave e o NCM que
+     * vem no painel.json, nao a posicao na lista.
+     */
+    const svg = corpo => `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor"
+        stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${corpo}</svg>`;
+
+    const ICONES_CESTA = {
+      // carne: peca com a gordura no meio
+      '0201.20.20': svg(`<path d="M17 25c8-9 24-11 30-3 6 8 3 22-7 26-11 4-24-2-26-10-1-5 0-9 3-13z"/>
+        <circle cx="30" cy="33" r="5"/>`),
+      // leite: caixinha de topo triangular
+      '0401.10.10': svg(`<path d="M22 27h20v27a2 2 0 0 1-2 2H24a2 2 0 0 1-2-2z"/>
+        <path d="M22 27l5-10h10l5 10"/><path d="M27 17l5 5 5-5"/>`),
+      // feijao: tres graos
+      '0713.33.99': svg(`<ellipse cx="24" cy="26" rx="9" ry="6" transform="rotate(-25 24 26)"/>
+        <ellipse cx="41" cy="32" rx="9" ry="6" transform="rotate(15 41 32)"/>
+        <ellipse cx="28" cy="43" rx="9" ry="6" transform="rotate(-8 28 43)"/>`),
+      // arroz: tigela com os graos acima
+      '1006.30.21': svg(`<path d="M12 35h40c0 11-9 18-20 18S12 46 12 35z"/>
+        <ellipse cx="23" cy="28" rx="4.6" ry="2.6" transform="rotate(-20 23 28)"/>
+        <ellipse cx="33" cy="24" rx="4.6" ry="2.6" transform="rotate(10 33 24)"/>
+        <ellipse cx="43" cy="29" rx="4.6" ry="2.6" transform="rotate(-14 43 29)"/>`),
+      // farinha de trigo: espiga
+      '1101.00.10': svg(`<path d="M32 56V22"/>
+        <path d="M32 24c0-5 3-9 7-11 1 6-2 10-7 11z"/><path d="M32 24c0-5-3-9-7-11-1 6 2 10 7 11z"/>
+        <path d="M32 35c0-5 3-9 7-11 1 6-2 10-7 11z"/><path d="M32 35c0-5-3-9-7-11-1 6 2 10 7 11z"/>
+        <path d="M32 46c0-5 3-9 7-11 1 6-2 10-7 11z"/><path d="M32 46c0-5-3-9-7-11-1 6 2 10 7 11z"/>`),
+      // batata: tuberculo com os olhos
+      '0701.90.00': svg(`<path d="M18 31c4-9 16-14 26-9 9 5 11 16 5 23-7 8-21 8-28 1-4-4-5-10-3-15z"/>
+        <path d="M27 30h.01M38 27h.01M33 39h.01M44 35h.01"/>`),
+      // tomate: fruto e as folhas do calice
+      '0702.00.00': svg(`<circle cx="32" cy="38" r="16"/><path d="M32 22v-5"/>
+        <path d="M32 22c-4-4-9-4-12-3 1 4 5 7 12 3z"/><path d="M32 22c4-4 9-4 12-3-1 4-5 7-12 3z"/>`),
+      // pao: filao com os cortes
+      '1905.90.90 Ex 01': svg(`<path d="M13 40c-2-6 2-13 9-16l19-8c7-3 14 0 16 6 2 6-2 13-9 16l-19 8c-7 3-14 0-16-6z"/>
+        <path d="M23 31l4 8M31 27l4 8M39 23l4 8"/>`),
+      // cafe: grao com o sulco
+      '0901.21.00': svg(`<ellipse cx="32" cy="32" rx="12" ry="17" transform="rotate(-35 32 32)"/>
+        <path d="M23 41c6-4 5-14 18-19"/>`),
+      // banana
+      '0803.90.00': svg(`<path d="M16 22c0 17 11 29 27 29 5 0 8-2 8-5 0-2-2-3-5-3-13 0-22-9-22-21 0-3-1-4-4-4s-4 2-4 4z"/>`),
+      // acucar: torrao em perspectiva, com os cristais soltos
+      '1701.99.00': svg(`<path d="M20 27l12-6 12 6v14l-12 6-12-6z"/><path d="M20 27l12 6 12-6M32 33v14"/>
+        <path d="M50 19h.01M14 45h.01M52 49h.01"/>`),
+      // oleo: garrafa com o rotulo
+      '1507.90.11': svg(`<path d="M27 13h10v7l4 6a8 8 0 0 1 2 5v18a4 4 0 0 1-4 4H25a4 4 0 0 1-4-4V31a8 8 0 0 1 2-5l4-6z"/>
+        <path d="M21 37h22"/>`),
+      // manteiga: tablete
+      '0405.10.00': svg(`<path d="M16 30l10-6h24l-10 6z"/><path d="M16 30h24v12H16z"/>
+        <path d="M40 42l10-6V24l-10 6"/>`)
+    };
+
+    /** Item sem icone proprio nao quebra a grade. */
+    const ICONE_GENERICO = svg(`<circle cx="32" cy="32" r="15"/>`);
+
+    // `ipca` diz por qual recorte do IPCA a categoria e corrigida. Comida e
+    // veiculo nao sofreram a mesma inflacao, e dentro de Transportes o carro e
+    // a moto tambem nao: por isso os dois usam subitem proprio, nao o grupo.
+    // O texto so nomeia o recorte; a conta esta em contaDoAno.
+    const CATS = [
+      { k: 'cesta', icone: 'cesta', nome: 'Cesta básica',  sub: '13 itens · DL 399/1938',
+        ipca: 'alimentacao', ipcaNome: 'alimentação e bebidas' },
+      { k: 'carro', icone: 'carro', nome: 'Carro popular', sub: 'NCM 8703.21.00 · até 1.0',
+        ipca: 'automovel', ipcaNome: 'automóvel novo' },
+      { k: 'moto',  icone: 'moto',  nome: 'Moto popular',  sub: 'NCM 8711.20.10 · 50 a 125cc',
+        ipca: 'motocicleta', ipcaNome: 'motocicleta' }
+    ];
+
+    const CABECALHO_ITENS = `<div class="cab-item">
+        <span></span><span>Item</span><span></span>
+        <span>Federal</span><span>Estadual</span><span>Total</span>
+      </div>`;
+
+    const CABECALHO = `<div class="cab-col">
+        <span></span><span></span><span>Federal</span><span>Estadual</span><span>Total</span>
+      </div>`;
+
+    /** UF usada quando nada mais identifica o visitante. */
+    const UF_PADRAO = 'SP';
+    /** Chave do navegador onde a escolha fica guardada. */
+    const CHAVE_UF = 'painel-ibpt-uf';
+
+    let D = null;
+    /**
+     * Contorno das 27 UFs. Vem em arquivo proprio porque e geometria, nao
+     * dado do build: so muda se o IBGE republicar a malha.
+     */
+    let MALHA = null;
+    /** Posicao dos rotulos do mapa, calculada uma vez por carga da pagina. */
+    let LUGARES = null;
+    let anoMapa = null;
+
+    /**
+     * Faixas de cor do mapa, em pontos percentuais de distancia da media
+     * nacional daquele ano. Duas matizes com cinza no meio, como manda um
+     * mapa divergente: azul e imposto abaixo da media do pais, vermelho e
+     * acima. A escala e relativa de proposito, porque o nivel de todos os
+     * estados sobe junto e o que separa um do outro e o ICMS.
+     */
+    const CALOR = [
+      { ate: -4,       cor: '#1D4F91', tinta: '#FFFFFF' },
+      { ate: -2,       cor: '#3B79BC', tinta: '#FFFFFF' },
+      { ate: -0.7,     cor: '#A7C7E3', tinta: '#1F2937' },
+      { ate: 0.7,      cor: '#E8E6E1', tinta: '#1F2937' },
+      { ate: 2,        cor: '#EFB27C', tinta: '#1F2937' },
+      { ate: 4,        cor: '#D0643A', tinta: '#FFFFFF' },
+      { ate: Infinity, cor: '#9E2B1E', tinta: '#FFFFFF' }
+    ];
+
+    /** Cor de quem nao tem tabela utilizavel no ano. */
+    const SEM_DADO = { cor: '#EFF2F6', tinta: '#718096' };
+
+    /**
+     * Todo rotulo fica fora do desenho, encostado na costa do lado em que o
+     * estado esta. Dentro do mapa nao cabe: oito estados do Nordeste e o
+     * Distrito Federal sao menores que o proprio texto, e o que cabia
+     * acabava escrito por cima do vizinho.
+     *
+     * As medidas sao do viewBox da malha, onde o desenho ocupa de 0 a 1000.
+     */
+    /**
+     * Caixa do rotulo: sigla e aliquota sempre na mesma linha. E folgada de
+     * proposito, porque e um palpite sobre o tamanho do texto: se a fonte
+     * Ubuntu demorar a chegar, o navegador desenha com a fonte do sistema,
+     * que e mais larga, e o texto estoura uma caixa justa.
+     */
+    const FORMATOS = [{ largura: 150, altura: 38 }];
+    /** Ar entre um rotulo e o vizinho. */
+    const FOLGA_ROTULO = 8;
+
+    /**
+     * Direcao preferida do rotulo de alguns estados, em radianos, com zero
+     * apontando para leste. So entra estado em que a busca livre escolhe um
+     * lugar tecnicamente valido e visualmente ruim: o Distrito Federal cabe
+     * em varios lugares e a busca o mandava para baixo, entre Rio de Janeiro
+     * e Espirito Santo, longe do proprio estado.
+     */
+    const PREFERENCIA = { DF: 0 };
+    /** Quanto de abertura, para cada lado, ainda conta como a direcao pedida. */
+    const ABERTURA_PREFERIDA = Math.PI / 6;
+    /** Custo de ignorar a preferencia. Alto, mas nao proibitivo. */
+    const PESO_PREFERENCIA = 800;
+    /** Passo da caminhada que procura a saida do desenho. */
+    const PASSO_RAIO = 8;
+    /**
+     * O quanto um rotulo pode ser empurrado para fora depois de ja ter saido
+     * da silhueta. Alem disso ele fica longe demais do estado e o candidato
+     * nao vale a pena, entao a busca desiste e experimenta outro angulo: sem
+     * esse teto, cada angulo bloqueado custava uma caminhada ate a borda do
+     * mundo, e o mapa levava segundos para se montar.
+     */
+    const EMPURRAO_MAXIMO = 320;
+    /**
+     * Quantos angulos cada estado experimenta antes de escolher a saida. 48
+     * e multiplo de 8, entao as quatro direcoes retas e as quatro diagonais
+     * caem exatamente em cima de um candidato, e o tracado sai reto quando
+     * da para sair reto.
+     */
+    const DIRECOES = 48;
+    /**
+     * Deslocamentos laterais que cada angulo tambem experimenta, para o
+     * rotulo poder escorregar ao lado da reta de saida. Sem eles a busca so
+     * anda para frente e para tras, e nao consegue encaixar o rotulo do
+     * Acre acima do de Rondonia quando a vaga esta um pouco de lado.
+     */
+    const DESVIOS = [0, -40, 40, -80, 80];
+    /**
+     * Quanto um angulo torto custa, em unidades de comprimento. O tracado
+     * mais curto vence, mas nao a ponto de trocar uma linha reta por uma
+     * enviesada que economiza dez unidades.
+     */
+    const PESO_ANGULO = 70;
+    /**
+     * Quanto custa mandar o rotulo para o lado errado do mapa. Sergipe fica
+     * no litoral leste: o rotulo dele atravessar o pais inteiro para aparecer
+     * na esquerda e pior do que qualquer economia de distancia.
+     */
+    const PESO_LADO = 900;
+    /**
+     * Quanto custa inverter a ordem geografica de um vizinho: rotulo de
+     * Pernambuco embaixo do de Alagoas le errado, mesmo sem sobrepor nada.
+     */
+    const PESO_ORDEM = 200;
+    /** Ate onde um estado conta como vizinho, para efeito de ordem. */
+    const VIZINHANCA = 320;
+    /** Ar entre a borda do desenho e o comeco do texto. */
+    const RECUO_ROTULO = 12;
+    let ANOS_A = [];
+    let ANOS_D = [];
+    let TODOS_ANOS = [];
+    let ULTIMO_ANO = null;
+    let montado = false;
+
+    const pct = v => v.toFixed(2).replace('.', ',') + '%';
+    const larg = v => (v / ESCALA * 100).toFixed(2);
+
+    function pilha(par, rotulo) {
+      const [f, e] = par;
+      return `<div class="pilha" role="img" aria-label="${rotulo}: ${pct(f)} federal e ${pct(e)} estadual">
+          <div class="seg" style="width:${larg(f)}%;background:var(--fed)"></div>
+          <div class="seg" style="width:${larg(e)}%;background:var(--est)"></div>
+        </div>`;
+    }
+
+    function linhasAno(uf, anos, chave) {
+      return anos.map(ano => {
+        const reg = D.dados[uf][ano];
+        const par = reg && reg[chave];
+        if (!par) return `<div class="linha" data-ano="${ano}"><span class="ano">${ano}</span>
+            <div class="pilha"></div><span class="parte">${VAZIO}</span>
+            <span class="parte">${VAZIO}</span><span class="val vazio">${VAZIO}</span></div>`;
+        const parcial = reg.cobertura < 100 ? ' parcial' : '';
+        return `<div class="linha${parcial}" data-ano="${ano}">
+            <span class="ano">${ano}</span>
+            ${pilha(par, ano)}
+            <span class="parte">${pct(par[0])}</span>
+            <span class="parte">${pct(par[1])}</span>
+            <span class="val">${pct(par[0] + par[1])}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function montarCards(uf) {
+      document.getElementById('cards').innerHTML = CATS.map((c, i) => `
+        <article class="card surge" data-cat="${c.k}" style="animation-delay:${i * 70}ms">
+          <div class="ilustra">
+            ${ICONES[c.icone]}
+            <div><div class="nome">${c.nome}</div><div class="ncm">${c.sub}</div></div>
+          </div>
+          <div class="barras">
+            <p class="era-rot">Critério antigo</p>
+            ${CABECALHO}
+            ${linhasAno(uf, ANOS_A, c.k)}
+            <p class="quebra">jun/${QUEBRA} · troca de critério</p>
+            <p class="era-rot segunda">Critério atual</p>
+            ${CABECALHO}
+            ${linhasAno(uf, ANOS_D, c.k)}
+            <div class="escala">
+              <span></span>
+              <span class="marcas"><span>0%</span><span>20%</span><span>40%</span><span>60%</span></span>
+              <span></span>
+            </div>
+          </div>
+        </article>`).join('');
+    }
+
+    /**
+     * Atualiza as larguras e os números sem refazer o DOM, para as barras
+     * transicionarem na troca de estado em vez de piscarem.
+     */
+    function atualizarCards(uf) {
+      document.querySelectorAll('.card').forEach(card => {
+        const chave = card.dataset.cat;
+        card.querySelectorAll('.linha').forEach(linha => {
+          const ano = linha.dataset.ano;
+          const reg = D.dados[uf][ano];
+          const par = reg && reg[chave];
+          const segs = linha.querySelectorAll('.seg');
+          const nums = linha.querySelectorAll('.parte, .val');
+          if (!par) {
+            segs.forEach(sg => { sg.style.width = '0%'; });
+            nums.forEach(n => { n.textContent = VAZIO; });
+            return;
+          }
+          segs[0].style.width = larg(par[0]) + '%';
+          segs[1].style.width = larg(par[1]) + '%';
+          nums[0].textContent = pct(par[0]);
+          nums[1].textContent = pct(par[1]);
+          nums[2].textContent = pct(par[0] + par[1]);
+          linha.classList.toggle('parcial', reg.cobertura < 100);
+          linha.querySelector('.pilha').setAttribute('aria-label',
+            `${ano}: ${pct(par[0])} federal e ${pct(par[1])} estadual`);
+        });
+      });
+    }
+
+    // ── A conta em dinheiro ─────────────────────────────────────────────
+    // Uma compra que hoje custa R$ 100, corrigida pelo IPCA para trás. O
+    // imposto sai da alíquota do ano; as horas saem do salário mínimo já
+    // descontado o INSS. Sem as séries em dados/, a seção some inteira.
+
+    /** Compra de referência, em reais do último ano. */
+    const COMPRA = 100;
+    /** Teto da barra de horas. Fixo e com base em zero, para comparar anos. */
+    const ESCALA_HORAS = 20;
+
+    let catDinheiro = 'cesta';
+    /** Ano mostrado no bloco da cesta. Comeca no mais recente. */
+    let anoCesta = null;
+
+    const reais = v => 'R$ ' + v.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+    const horas = v => v.toFixed(2).replace('.', ',') + ' h';
+    /**
+     * A variação sai dos valores JÁ ARREDONDADOS, os mesmos que aparecem na
+     * tela. Calcular sobre os números cheios daria até 0,12 ponto de diferença
+     * e quem conferisse a conta com o que está escrito acharia que erramos.
+     */
+    const cent = v => Math.round(v * 100) / 100;
+    const modulo = (de, para) => Math.abs((cent(para) / cent(de) - 1) * 100).toFixed(1).replace('.', ',') + '%';
+    const subiu = (de, para) => cent(para) > cent(de);
+
+    /**
+     * A leitura muda conforme as duas medidas andarem juntas ou em sentidos
+     * opostos: "subiu em reais mas caiu em tempo" só vale quando é o caso.
+     */
+    function frasePeriodo(a, b) {
+      const dinheiro = `O imposto ${subiu(a.imposto, b.imposto) ? 'subiu' : 'caiu'} `
+        + `${modulo(a.imposto, b.imposto)} em dinheiro`;
+      const tempo = `${subiu(a.horasImposto, b.horasImposto) ? 'aumentou' : 'diminuiu'} `
+        + `${modulo(a.horasImposto, b.horasImposto)}`;
+      const mesmoRumo = subiu(a.imposto, b.imposto) === subiu(a.horasImposto, b.horasImposto);
+      return `${dinheiro}, e o tempo de trabalho para pagá-lo ${tempo}.`
+        .replace(', e o tempo', mesmoRumo ? ', e o tempo' : ', mas o tempo');
+    }
+
+    function temEconomia() {
+      return !!(D.economia && D.economia.anos[ULTIMO_ANO]);
+    }
+
+    /**
+     * Preço, imposto e horas de um ano. Devolve null quando falta a alíquota
+     * daquele ano ou a série econômica não cobre o ano.
+     */
+    function contaDoAno(uf, ano, chave) {
+      const eco = D.economia.anos[ano];
+      const base = D.economia.anos[ULTIMO_ANO];
+      const par = D.dados[uf][ano] && D.dados[uf][ano][chave];
+      if (!eco || !par) return null;
+
+      // O preço corrige pelo grupo do IPCA da categoria; o salário, adiante,
+      // pelo índice cheio, que é o que mede o custo de vida de quem recebe.
+      const grupo = CATS.find(c => c.k === chave).ipca;
+      const preco = COMPRA * (eco.indices[grupo] / base.indices[grupo]);
+      const imposto = preco * (par[0] + par[1]) / 100;
+      const valorHora = eco.salarioLiquido / D.economia.jornadaMensal;
+      return {
+        ano,
+        preco,
+        imposto,
+        horasImposto: imposto / valorHora,
+        horasCompra: preco / valorHora
+      };
+    }
+
+    /** Aliquota total da cesta em uma UF, ou null se o ano nao tem tabela. */
+    function totalCesta(uf, ano) {
+      const reg = D.dados[uf] && D.dados[uf][ano];
+      const par = reg && reg.cesta;
+      return par ? Number((par[0] + par[1]).toFixed(2)) : null;
+    }
+
+    function faixaDeCalor(desvio) {
+      return CALOR.find(f => desvio < f.ate);
+    }
+
+    /**
+     * Uma aba por ano, para ver o mapa em qualquer ponto da serie. O ano
+     * corrente vem selecionado.
+     */
+    function montarAbasMapa() {
+      const caixa = document.getElementById('abas-mapa');
+      caixa.innerHTML = D.anos.map(ano => `
+        <button class="aba-cat aba-ano${ano === QUEBRA ? ' misto' : ''}" role="tab"
+          data-ano="${ano}" aria-selected="${String(ano) === anoMapa}">${ano}</button>`).join('');
+
+      caixa.querySelectorAll('.aba-ano').forEach(botao => {
+        botao.addEventListener('click', () => {
+          anoMapa = botao.dataset.ano;
+          caixa.querySelectorAll('.aba-ano').forEach(b => {
+            b.setAttribute('aria-selected', String(b.dataset.ano === anoMapa));
+          });
+          montarMapa();
+        });
+      });
+    }
+
+    /** Tamanho do desenho, lido do viewBox da malha. */
+    function tamanhoDaMalha() {
+      const [, , largura, altura] = MALHA.viewBox.split(' ').map(Number);
+      return { largura, altura };
+    }
+
+    /**
+     * Diz se o ponto ja saiu do desenho. Usa o perfil da silhueta nos dois
+     * sentidos: oeste e leste dizem ate onde o mapa vai naquela latitude,
+     * norte e sul ate onde vai naquela longitude.
+     */
+    function foraDoDesenho(x, y) {
+      const perfil = MALHA.perfil;
+      const iy = Math.round(y / perfil.faixa);
+      const ix = Math.round(x / perfil.faixa);
+      if (iy < 0 || iy >= perfil.oeste.length || ix < 0 || ix >= perfil.norte.length) return true;
+      if (perfil.oeste[iy] === null || perfil.norte[ix] === null) return true;
+      return x < perfil.oeste[iy] || x > perfil.leste[iy]
+        || y < perfil.norte[ix] || y > perfil.sul[ix];
+    }
+
+    /** Caixa do rotulo pendurada no ponto de saida, do lado de fora. */
+    function caixaDoRotulo(x, y, ux, uy, formato) {
+      const { largura, altura } = formato;
+      const amarra = { x, y };
+      if (Math.abs(ux) > 0.35) {
+        const x1 = ux > 0 ? x + RECUO_ROTULO : x - RECUO_ROTULO - largura;
+        return {
+          x1, x2: x1 + largura, y1: y - altura / 2, y2: y + altura / 2,
+          amarra, ancora: ux > 0 ? 'start' : 'end'
+        };
+      }
+      const y1 = uy > 0 ? y + RECUO_ROTULO : y - RECUO_ROTULO - altura;
+      return {
+        x1: x - largura / 2, x2: x + largura / 2, y1, y2: y1 + altura,
+        amarra, ancora: 'middle'
+      };
+    }
+
+    /**
+     * O quanto o angulo foge das oito direcoes principais, de 0 (reto ou
+     * diagonal exata) a 1 (bem no meio de duas).
+     */
+    function desalinho(angulo) {
+      const passo = Math.PI / 4;
+      const resto = ((angulo % passo) + passo) % passo;
+      return Math.min(resto, passo - resto) / (passo / 2);
+    }
+
+    /**
+     * Diz se a caixa ainda pega no desenho. Nao basta o ponto de saida estar
+     * do lado de fora: o texto tem largura, e centrado na saida ele volta
+     * metade para cima do mapa.
+     */
+    function caixaSobreODesenho(caixa) {
+      // Varredura fina, nao so os cantos: a ponta sul do Rio Grande do Sul e
+      // estreita e passava entre um ponto de teste e o outro, deixando o
+      // rotulo de Santa Catarina escrito por cima dela
+      const passo = 12;
+      for (let x = caixa.x1; x <= caixa.x2 + passo; x += passo) {
+        for (let y = caixa.y1; y <= caixa.y2 + passo; y += passo) {
+          if (!foraDoDesenho(Math.min(x, caixa.x2), Math.min(y, caixa.y2))) return true;
+        }
+      }
+      return false;
+    }
+
+    /** Duas caixas encostadas, contando a folga que cada uma reserva. */
+    function encostam(a, b) {
+      return a.x1 - FOLGA_ROTULO < b.x2 && b.x1 - FOLGA_ROTULO < a.x2
+        && a.y1 - FOLGA_ROTULO < b.y2 && b.y1 - FOLGA_ROTULO < a.y2;
+    }
+
+    /** De que lado da reta ab cai o ponto c. */
+    function ladoDaReta(a, b, c) {
+      return Math.sign((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
+    }
+
+    /** Se os dois tracados se cruzam. Encostar pela ponta nao conta. */
+    function cruzam(a, b, c, d) {
+      const s1 = ladoDaReta(a, b, c);
+      const s2 = ladoDaReta(a, b, d);
+      const s3 = ladoDaReta(c, d, a);
+      const s4 = ladoDaReta(c, d, b);
+      return s1 !== s2 && s3 !== s4 && s1 !== 0 && s2 !== 0 && s3 !== 0 && s4 !== 0;
+    }
+
+    /** Se o tracado passa por cima de um rotulo ja colocado. */
+    function tracadoCortaCaixa(a, b, caixa) {
+      const cantos = [
+        { x: caixa.x1, y: caixa.y1 }, { x: caixa.x2, y: caixa.y1 },
+        { x: caixa.x2, y: caixa.y2 }, { x: caixa.x1, y: caixa.y2 }
+      ];
+      const dentro = p =>
+        p.x >= caixa.x1 && p.x <= caixa.x2 && p.y >= caixa.y1 && p.y <= caixa.y2;
+      if (dentro(a) || dentro(b)) return true;
+      for (let i = 0; i < 4; i++) {
+        if (cruzam(a, b, cantos[i], cantos[(i + 1) % 4])) return true;
+      }
+      return false;
+    }
+
+    /**
+     * Ate onde o tracado precisa andar naquele angulo para o rotulo caber
+     * inteiro fora do desenho, sem encostar em rotulo ja colocado. Devolve
+     * null quando nao ha saida por ali.
+     */
+    /**
+     * Ate onde e preciso andar naquele candidato so para sair da silhueta.
+     * Nao depende de quem ja esta posto, entao e calculado uma vez por
+     * estado e reaproveitado nas tres passadas: e a conta mais cara aqui, e
+     * refazer a cada passada custava cinco segundos de tela parada.
+     */
+    function raioDeSaida(estado, ux, uy, desvio, limite) {
+      const ladoX = -uy * desvio;
+      const ladoY = ux * desvio;
+      let raio = 0;
+      while (raio < limite
+        && !foraDoDesenho(estado.x + ux * raio + ladoX, estado.y + uy * raio + ladoY)) {
+        raio += PASSO_RAIO;
+      }
+      return raio;
+    }
+
+    function saidaNoAngulo(estado, ux, uy, postos, limite, formato, rigoroso, desvio, inicio) {
+      // Perpendicular a direcao de saida, por onde o rotulo escorrega
+      const ladoX = -uy * desvio;
+      const ladoY = ux * desvio;
+      const ponto = raio => ({ x: estado.x + ux * raio + ladoX, y: estado.y + uy * raio + ladoY });
+
+      let raio = inicio;
+      const teto = Math.min(limite, inicio + EMPURRAO_MAXIMO);
+      // O rotulo tambem nao pode cair em cima de tracado ja desenhado: sem
+      // esta linha, DF, ES e MG saem com o texto de um por cima da linha do
+      // outro, porque a checagem de tracado so olhava para tras
+      const atrapalha = caixa =>
+        caixaSobreODesenho(caixa)
+        || postos.some(posto => encostam(posto.caixa, caixa))
+        || postos.some(posto => tracadoCortaCaixa(posto.estado, posto.saida, caixa))
+        // No modo rigoroso o proprio tracado tambem nao pode raspar rotulo
+        // alheio. Como andar mais pela mesma reta nao resolve isso, o angulo
+        // acaba descartado, que e justamente o efeito desejado
+        || (rigoroso && postos.some(posto =>
+          tracadoCortaCaixa(estado, { x: caixa.amarra.x, y: caixa.amarra.y }, posto.caixa)));
+
+      let caixa = caixaDoRotulo(ponto(raio).x, ponto(raio).y, ux, uy, formato);
+      while (atrapalha(caixa) && raio < teto) {
+        raio += PASSO_RAIO;
+        caixa = caixaDoRotulo(ponto(raio).x, ponto(raio).y, ux, uy, formato);
+      }
+      if (raio >= teto) return null;
+      const saida = ponto(raio);
+      return { raio: Math.hypot(saida.x - estado.x, saida.y - estado.y), caixa, saida };
+    }
+
+    /**
+     * Com quantos dos outros este posto briga: tracado que cruza tracado,
+     * tracado que passa por cima de rotulo, nos dois sentidos, e rotulo
+     * encostado em rotulo.
+     */
+    function brigasDe(posto, outros) {
+      return outros.filter(outro =>
+        cruzam(posto.estado, posto.saida, outro.estado, outro.saida)
+        || tracadoCortaCaixa(posto.estado, posto.saida, outro.caixa)
+        || tracadoCortaCaixa(outro.estado, outro.saida, posto.caixa)
+        || encostam(posto.caixa, outro.caixa)).length;
+    }
+
+    /** Distancia do estado ate o meio do proprio rotulo. */
+    function esticamento(posto) {
+      return Math.hypot(
+        (posto.caixa.x1 + posto.caixa.x2) / 2 - posto.estado.x,
+        (posto.caixa.y1 + posto.caixa.y2) / 2 - posto.estado.y
+      );
+    }
+
+    /**
+     * Quantos vizinhos ficam fora de ordem com o rotulo neste lugar. Vizinho
+     * mais ao norte tem que ficar com o rotulo mais ao norte, e o mesmo vale
+     * para leste e oeste; senao o mapa le ao contrario do que mostra.
+     */
+    function desordem(estado, meio, postos) {
+      let fora = 0;
+      for (const posto of postos) {
+        const dx = estado.x - posto.estado.x;
+        const dy = estado.y - posto.estado.y;
+        if (Math.hypot(dx, dy) > VIZINHANCA) continue;
+        const outro = {
+          x: (posto.caixa.x1 + posto.caixa.x2) / 2,
+          y: (posto.caixa.y1 + posto.caixa.y2) / 2
+        };
+        if (Math.abs(dy) > 30 && dy * (meio.y - outro.y) < 0) fora++;
+        if (Math.abs(dx) > 30 && dx * (meio.x - outro.x) < 0) fora++;
+      }
+      return fora;
+    }
+
+    /**
+     * O melhor lugar para um rotulo, dado o que ja esta posto: o tracado mais
+     * curto e mais reto que sai do desenho sem cruzar tracado de outro
+     * estado, sem passar por cima de rotulo alheio e sem encostar em
+     * ninguem.
+     */
+    function melhorLugar(estado, postos, limite, centro) {
+      // Primeiro tenta sem raspar nada. Se o estado estiver mesmo sem saida,
+      // repete aceitando o menos ruim
+      return procurarLugar(estado, postos, limite, centro, true)
+        || procurarLugar(estado, postos, limite, centro, false)
+        // Ultimo recurso, para nenhum estado ficar sem rotulo: o candidato
+        // mais barato, encostado na silhueta, atropelando quem estiver la
+        || semSaida(estado);
+    }
+
+    /** 1 quando o angulo foge da direcao pedida para aquele estado, 0 quando obedece. */
+    function foraDaPreferencia(uf, angulo) {
+      const pedida = PREFERENCIA[uf];
+      if (pedida === undefined) return 0;
+      const diferenca = Math.abs(Math.atan2(
+        Math.sin(angulo - pedida), Math.cos(angulo - pedida)
+      ));
+      return diferenca > ABERTURA_PREFERIDA ? 1 : 0;
+    }
+
+    /** Rotulo colado na silhueta, sem olhar para os vizinhos. */
+    function semSaida(estado) {
+      const { ux, uy, formato, desvio, inicio } = estado.candidatos[0];
+      const x = estado.x + ux * inicio - uy * desvio;
+      const y = estado.y + uy * inicio + ux * desvio;
+      return {
+        raio: inicio,
+        caixa: caixaDoRotulo(x, y, ux, uy, formato),
+        saida: { x, y },
+        conflitos: Infinity,
+        custo: Infinity
+      };
+    }
+
+    /**
+     * Os candidatos de um estado: angulo, formato, desvio, raio de saida e o
+     * custo minimo que aquele candidato pode ter. O minimo e o custo com o
+     * rotulo colado na silhueta, sem nenhum vizinho no caminho; empurrar
+     * para fora so aumenta. Ordenados por esse minimo, a busca pode parar no
+     * primeiro que ja perde para o melhor achado.
+     */
+    function candidatosDoEstado(estado, limite, centro) {
+      const distancia = Math.hypot(estado.x - centro.x, estado.y - centro.y) || 1;
+      const foraX = (estado.x - centro.x) / distancia;
+      const foraY = (estado.y - centro.y) / distancia;
+      const pesoLado = PESO_LADO * Math.min(1, distancia / Math.hypot(centro.x, centro.y));
+
+      const lista = [];
+      for (const desvio of DESVIOS) {
+        for (const formato of FORMATOS) {
+          for (let i = 0; i < DIRECOES; i++) {
+            const angulo = (2 * Math.PI * i) / DIRECOES;
+            const ux = Math.cos(angulo);
+            const uy = Math.sin(angulo);
+            const inicio = raioDeSaida(estado, ux, uy, desvio, limite);
+            const caixa = caixaDoRotulo(
+              estado.x + ux * inicio - uy * desvio,
+              estado.y + uy * inicio + ux * desvio,
+              ux, uy, formato
+            );
+            const contramao = (1 - (ux * foraX + uy * foraY)) / 2;
+            const minimo = Math.hypot(
+              (caixa.x1 + caixa.x2) / 2 - estado.x,
+              (caixa.y1 + caixa.y2) / 2 - estado.y
+            ) + PESO_ANGULO * desalinho(angulo)
+              + pesoLado * contramao * contramao
+              + foraDaPreferencia(estado.uf, angulo) * PESO_PREFERENCIA;
+            lista.push({ angulo, ux, uy, formato, desvio, inicio, minimo, contramao, pesoLado });
+          }
+        }
+      }
+      return lista.sort((a, b) => a.minimo - b.minimo);
+    }
+
+    function procurarLugar(estado, postos, limite, centro, rigoroso) {
+      let melhor = null;
+      for (const candidato of estado.candidatos) {
+        const { angulo, ux, uy, formato, desvio, inicio, contramao, pesoLado } = candidato;
+        // Os candidatos vem em ordem de custo minimo: quando o minimo do
+        // proximo ja perde para o melhor achado, o resto tambem perde
+        if (melhor && melhor.conflitos === 0 && candidato.minimo >= melhor.custo) break;
+
+        const tentativa = saidaNoAngulo(
+          estado, ux, uy, postos, limite, formato, rigoroso, desvio, inicio
+        );
+        if (!tentativa) continue;
+
+        // Conta o estrago em vez de so descartar: se nenhum angulo estiver
+        // limpo, o menos ruim ainda e melhor que o mais curto
+        tentativa.conflitos = postos.filter(posto =>
+          cruzam(estado, tentativa.saida, posto.estado, posto.saida)
+          || tracadoCortaCaixa(estado, tentativa.saida, posto.caixa)).length;
+        // O que pesa e a distancia ate o texto, nao ate a saida: dois
+        // formatos com a mesma saida deixam o rotulo em lugares diferentes
+        const meio = {
+          x: (tentativa.caixa.x1 + tentativa.caixa.x2) / 2,
+          y: (tentativa.caixa.y1 + tentativa.caixa.y2) / 2
+        };
+        tentativa.custo = Math.hypot(meio.x - estado.x, meio.y - estado.y)
+          + PESO_ANGULO * desalinho(angulo)
+          + pesoLado * contramao * contramao
+          + foraDaPreferencia(estado.uf, angulo) * PESO_PREFERENCIA
+          + PESO_ORDEM * desordem(estado, meio, postos);
+
+        const ganha = !melhor
+          || tentativa.conflitos < melhor.conflitos
+          || (tentativa.conflitos === melhor.conflitos && tentativa.custo < melhor.custo);
+        if (ganha) melhor = tentativa;
+      }
+      return melhor;
+    }
+
+    /**
+     * Cada rotulo tenta de novo, agora com o mapa inteiro posto, e troca de
+     * lugar se achar coisa melhor. A primeira passada e gulosa: o ultimo a
+     * escolher encontra o mapa ocupado e vai parar longe do proprio estado.
+     */
+    function repescar(postos, limite, centro) {
+      for (let volta = 0; volta < 4; volta++) {
+        let mudou = false;
+        // Quem ficou com conflito tenta primeiro, depois quem ficou longe
+        const fila = [...postos].sort((a, b) =>
+          b.conflitos - a.conflitos || b.custo - a.custo);
+        for (const posto of fila) {
+          const outros = postos.filter(p => p !== posto);
+          const nova = melhorLugar(posto.estado, outros, limite, centro);
+          const melhorou = nova && (nova.conflitos < posto.conflitos
+            || (nova.conflitos === posto.conflitos && nova.custo < posto.custo - 2));
+          if (melhorou) {
+            Object.assign(posto, nova);
+            mudou = true;
+          }
+        }
+        if (!mudou) break;
+      }
+    }
+
+    /**
+     * Onde cada rotulo fica.
+     *
+     * Tres passadas. Na primeira cada estado escolhe seu lugar na ordem do
+     * aperto: quem tem mais vizinho perto decide antes, porque tem menos
+     * saida. Na segunda os que ficaram mais longe tentam de novo, agora com
+     * o mapa inteiro posto, e trocam de lugar se acharem coisa melhor.
+     *
+     * A repescagem existe porque a primeira passada e gulosa: o ultimo
+     * estado do Nordeste a escolher achava o mapa todo ocupado e ia parar a
+     * seiscentas unidades da propria costa.
+     *
+     * Testar cruzamento na hora de escolher e o que garante o mapa limpo.
+     * Regra geometrica fixa nao serve: regua lateral obriga tracado enorme
+     * no estado do miolo, e tracado radial a partir do centro joga o rotulo
+     * de MT e TO longe do estado.
+     */
+    function lugaresDosRotulos() {
+      const { largura, altura } = tamanhoDaMalha();
+      const centro = { x: largura / 2, y: altura / 2 };
+      const limite = Math.max(largura, altura);
+
+      const estados = D.ufs
+        .filter(uf => uf !== BRASIL && MALHA.ufs[uf])
+        .map(uf => ({ uf, x: MALHA.ufs[uf].cx, y: MALHA.ufs[uf].cy }));
+      for (const estado of estados) {
+        estado.candidatos = candidatosDoEstado(estado, limite, centro);
+      }
+      // Ordem de varredura, girando ao redor do mapa. Vizinho escolhe logo
+      // depois de vizinho, entao os rotulos saem na ordem geografica e os
+      // tracados ficam paralelos em vez de se trancarem. Medido contra as
+      // outras ordens: por aperto, do centro para fora e do centro por
+      // faixas, esta e a unica em que nenhum tracado passa de 300 unidades
+      const emVolta = e => Math.atan2(e.y - centro.y, e.x - centro.x);
+      estados.sort((a, b) => emVolta(a) - emVolta(b));
+
+      const postos = [];
+      for (const estado of estados) {
+        postos.push({ estado, ...melhorLugar(estado, postos, limite, centro) });
+      }
+
+      repescar(postos, limite, centro);
+
+      // Terceira passada: dois vizinhos trocam de rotulo. As vezes nao existe
+      // lugar melhor para nenhum dos dois separadamente, e o que esta errado
+      // e a ordem entre eles: Alagoas e Pernambuco saem da primeira passada
+      // com os lugares invertidos, e o tracado de um corta o rotulo do outro
+      for (let volta = 0; volta < 3; volta++) {
+        let mudou = false;
+        for (const a of postos) {
+          for (const b of postos) {
+            if (a === b) continue;
+            if (Math.hypot(a.estado.x - b.estado.x, a.estado.y - b.estado.y) > VIZINHANCA) continue;
+
+            const outros = postos.filter(p => p !== a && p !== b);
+            const trocados = [
+              { estado: a.estado, caixa: b.caixa, saida: b.saida },
+              { estado: b.estado, caixa: a.caixa, saida: a.saida }
+            ];
+            const meioDe = posto => ({
+              x: (posto.caixa.x1 + posto.caixa.x2) / 2,
+              y: (posto.caixa.y1 + posto.caixa.y2) / 2
+            });
+            const preco = dupla => 1000 * (brigasDe(dupla[0], [...outros, dupla[1]])
+              + brigasDe(dupla[1], [...outros, dupla[0]]))
+              + PESO_ORDEM * (desordem(dupla[0].estado, meioDe(dupla[0]), [...outros, dupla[1]])
+                + desordem(dupla[1].estado, meioDe(dupla[1]), [...outros, dupla[0]]))
+              + esticamento(dupla[0]) + esticamento(dupla[1]);
+
+            if (preco(trocados) < preco([a, b]) - 1) {
+              [a.caixa, b.caixa] = [b.caixa, a.caixa];
+              [a.saida, b.saida] = [b.saida, a.saida];
+              mudou = true;
+            }
+          }
+        }
+        if (!mudou) break;
+      }
+
+      // E de novo: a troca de vizinhos costuma abrir vaga melhor para quem
+      // tinha ficado longe
+      repescar(postos, limite, centro);
+
+      const lugares = {};
+      for (const posto of postos) {
+        lugares[posto.estado.uf] = { caixa: posto.caixa, saida: posto.saida };
+      }
+      return lugares;
+    }
+
+    /**
+     * Moldura do desenho: o mapa mais tudo o que os rotulos ocuparam. Sai
+     * calculada porque a posicao dos rotulos depende do formato da malha.
+     */
+    function moldura(lugares) {
+      const { largura, altura } = tamanhoDaMalha();
+      let x1 = 0;
+      let y1 = 0;
+      let x2 = largura;
+      let y2 = altura;
+      for (const { caixa } of Object.values(lugares)) {
+        x1 = Math.min(x1, caixa.x1);
+        x2 = Math.max(x2, caixa.x2);
+        y1 = Math.min(y1, caixa.y1);
+        y2 = Math.max(y2, caixa.y2);
+      }
+      const ar = 10;
+      return `${(x1 - ar).toFixed(1)} ${(y1 - ar).toFixed(1)} `
+        + `${(x2 - x1 + 2 * ar).toFixed(1)} ${(y2 - y1 + 2 * ar).toFixed(1)}`;
+    }
+
+    /**
+     * Tracado do estado ate o rotulo. Vai em duas passadas, uma branca larga
+     * por baixo e a colorida por cima: sozinha, a linha some quando cruza um
+     * estado da mesma cor.
+     */
+    function tracado(desenho, lugar, cor) {
+      const linha = `x1="${desenho.cx}" y1="${desenho.cy}"`
+        + ` x2="${lugar.saida.x.toFixed(1)}" y2="${lugar.saida.y.toFixed(1)}"`;
+      return `<line class="guia-base" ${linha}/>
+        <line class="guia" ${linha}/>
+        <circle class="ponto" cx="${desenho.cx}" cy="${desenho.cy}" r="6" fill="${cor}"/>`;
+    }
+
+    /**
+     * Rotulo de um estado, fora do mapa: sigla em cima, aliquota embaixo. Em
+     * duas linhas a regua fica estreita e sobra largura para o desenho.
+     */
+    function rotuloMapa(uf, texto, lugar) {
+      const { x1, x2, y1, ancora } = lugar.caixa;
+      const x = (ancora === 'start' ? x1 : ancora === 'end' ? x2 : (x1 + x2) / 2).toFixed(1);
+      return `<text class="rot" x="${x}" y="${(y1 + 22).toFixed(1)}" text-anchor="${ancora}">
+          <tspan class="sigla">${uf}</tspan>
+          <tspan class="valor" dx="9">${texto}</tspan>
+        </text>`;
+    }
+
+    /**
+     * Mapa de calor por estado. A cor sai da distancia ate a media nacional
+     * do ano escolhido, nao do valor absoluto.
+     */
+    function montarMapa() {
+      const secao = ['mapa', 'mapa-intro', 'mapa-figura'];
+      if (!MALHA) {
+        secao.forEach(id => { document.getElementById(id).hidden = true; });
+        document.getElementById('aviso-mapa').hidden = true;
+        return;
+      }
+
+      const media = totalCesta(BRASIL, anoMapa);
+      // O lugar dos rotulos depende so do desenho, nao do ano nem da UF: a
+      // busca roda uma vez e vale para todas as trocas de aba
+      LUGARES = LUGARES || lugaresDosRotulos();
+      const lugares = LUGARES;
+      const formas = [];
+      const guias = [];
+      const rotulos = [];
+
+      for (const uf of D.ufs) {
+        const desenho = MALHA.ufs[uf];
+        if (!desenho) continue;
+
+        const total = totalCesta(uf, anoMapa);
+        const faixa = total === null ? SEM_DADO : faixaDeCalor(total - media);
+        const desvio = total === null ? null : Number((total - media).toFixed(2));
+        const texto = total === null ? VAZIO : pct(total);
+
+        formas.push(`<path class="uf" d="${desenho.d}" fill="${faixa.cor}"/>`);
+
+        guias.push(tracado(desenho, lugares[uf], faixa.cor));
+        rotulos.push(rotuloMapa(uf, texto, lugares[uf]));
+      }
+
+      const caixa = document.getElementById('mapa-svg');
+      caixa.innerHTML = `
+        <svg viewBox="${moldura(lugares)}" role="img"
+          aria-label="Mapa do Brasil com a alíquota média da cesta básica em cada estado em ${anoMapa}">
+          ${formas.join('')}${guias.join('')}${rotulos.join('')}
+        </svg>`;
+
+      document.getElementById('escala-calor').innerHTML = `
+        <div class="faixas">${CALOR.map(f => `<span style="background:${f.cor}"></span>`).join('')}</div>
+        <div class="marcas">
+          <span>4 pp ou mais abaixo</span>
+          <b>média do Brasil: ${pct(media)}</b>
+          <span>4 pp ou mais acima</span>
+        </div>`;
+
+      textoDoMapa(media);
+    }
+
+    /** Frases do mapa, todas montadas a partir do ano em exibição. */
+    function textoDoMapa(media) {
+      const valores = D.ufs
+        .filter(uf => uf !== BRASIL)
+        .map(uf => ({ uf, total: totalCesta(uf, anoMapa) }))
+        .filter(v => v.total !== null)
+        .sort((a, b) => a.total - b.total);
+      const menor = valores[0];
+      const maior = valores[valores.length - 1];
+
+      document.getElementById('mapa-nota').textContent =
+        `Em ${anoMapa} a cesta básica vai de ${pct(menor.total)} em ${NOMES[menor.uf]} `
+        + `a ${pct(maior.total)} em ${NOMES[maior.uf]}: `
+        + `${pct(maior.total - menor.total).replace('%', ' pontos')} de diferença entre o `
+        + `estado mais barato e o mais caro, sobre uma média nacional de ${pct(media)}. `
+        + 'A parte federal é igual em todo o país; o que separa um estado do outro é o ICMS.';
+
+      const aviso = document.getElementById('aviso-mapa');
+      aviso.hidden = anoMapa !== String(QUEBRA);
+      aviso.textContent = `${QUEBRA} fica de fora das comparações do resto da página: `
+        + 'metade do ano saiu pelo critério antigo do IBPT e metade pelo novo, '
+        + 'então a média mistura os dois.';
+    }
+
+    function montarAbasDinheiro(uf) {
+      const caixa = document.getElementById('abas-categoria');
+      caixa.innerHTML = CATS.map(c => `
+        <button class="aba-cat" role="tab" data-cat="${c.k}"
+          aria-selected="${c.k === catDinheiro}">${c.nome}</button>`).join('');
+
+      caixa.querySelectorAll('.aba-cat').forEach(botao => {
+        botao.addEventListener('click', () => {
+          catDinheiro = botao.dataset.cat;
+          caixa.querySelectorAll('.aba-cat').forEach(b => {
+            b.setAttribute('aria-selected', String(b.dataset.cat === catDinheiro));
+          });
+          montarDinheiro(document.getElementById('uf').value);
+        });
+      });
+    }
+
+    /**
+     * Uma aba por ano publicado, para ver a cesta item a item em qualquer ano
+     * da serie e nao so no mais recente. O ano corrente vem selecionado.
+     */
+    function montarAbasAnos() {
+      const caixa = document.getElementById('abas-ano');
+      caixa.innerHTML = D.anos.map(ano => `
+        <button class="aba-cat aba-ano${ano === QUEBRA ? ' misto' : ''}" role="tab"
+          data-ano="${ano}" aria-selected="${String(ano) === anoCesta}">${ano}</button>`).join('');
+
+      caixa.querySelectorAll('.aba-ano').forEach(botao => {
+        botao.addEventListener('click', () => {
+          anoCesta = botao.dataset.ano;
+          caixa.querySelectorAll('.aba-ano').forEach(b => {
+            b.setAttribute('aria-selected', String(b.dataset.ano === anoCesta));
+          });
+          montarItens(document.getElementById('uf').value);
+        });
+      });
+    }
+
+    function cartaoEra(rotulo, contas) {
+      const primeiro = contas[0];
+      const ultimo = contas[contas.length - 1];
+      const linha = c => `<div class="era-linha">
+          <span class="ano">${c.ano}</span>
+          <span class="valor">${reais(c.imposto)}</span>
+          <span class="horas">${horas(c.horasImposto)}</span>
+        </div>`;
+
+      return `<div class="era">
+          <p class="rot">${rotulo} · ${primeiro.ano} a ${ultimo.ano}</p>
+          <p class="sub">Quanto da compra virou imposto, e quanto tempo de trabalho isso custou.</p>
+          <div class="era-cab"><span></span><span>Imposto</span><span>Horas</span></div>
+          ${linha(primeiro)}
+          ${contas.length > 1 ? linha(ultimo) : ''}
+          ${contas.length > 1 ? `<p class="era-var">${frasePeriodo(primeiro, ultimo)}</p>` : ''}
+        </div>`;
+    }
+
+    function montarDinheiro(uf) {
+      const secao = ['dinheiro', 'dinheiro-intro', 'eras', 'horas-serie', 'dinheiro-nota'];
+      if (!temEconomia()) {
+        secao.forEach(id => { document.getElementById(id).hidden = true; });
+        document.getElementById('abas-categoria').hidden = true;
+        return;
+      }
+
+      const antigas = ANOS_A.map(a => contaDoAno(uf, a, catDinheiro)).filter(Boolean);
+      const atuais = ANOS_D.map(a => contaDoAno(uf, a, catDinheiro)).filter(Boolean);
+      const todas = [...antigas, ...atuais];
+      if (todas.length === 0) return;
+
+      const base = D.economia.anos[ULTIMO_ANO];
+      const maisAntiga = todas[0];
+      const cat = CATS.find(c => c.k === catDinheiro);
+      const nome = cat.nome.toLowerCase();
+
+      document.getElementById('dinheiro-intro').innerHTML =
+        `O que hoje custa <strong>R$ ${COMPRA}</strong> em ${nome} custava `
+        + `<strong>${reais(maisAntiga.preco)}</strong> em ${maisAntiga.ano}. É a mesma compra, `
+        + `com o preço de cada época: a diferença é a inflação de <strong>${cat.ipcaNome}</strong>, `
+        + 'que é o recorte do IPCA correspondente a esta categoria. '
+        + 'Nos quadros abaixo, quanto desse valor é imposto em cada ano e quantas horas de '
+        + 'trabalho quem ganha um salário mínimo precisa para pagar só esse imposto.';
+
+      const caixaEras = document.getElementById('eras');
+      caixaEras.innerHTML =
+        (antigas.length ? cartaoEra('Critério antigo', antigas) : '')
+        + (atuais.length ? cartaoEra('Critério atual', atuais) : '');
+      reanimar(caixaEras);
+
+      // A linha de horas da compra atravessa a série inteira porque não usa
+      // alíquota: é a única comparação 2015 contra hoje que se sustenta.
+      document.getElementById('horas-serie').innerHTML =
+        `<p class="rot-serie">Horas de trabalho para pagar a compra inteira</p>
+         <p class="sub-serie">Sempre a mesma compra: os R$ ${COMPRA} de ${ULTIMO_ANO}, imposto já incluído,
+         com o preço de cada ano. Em ${ULTIMO_ANO} as três categorias empatam porque R$ ${COMPRA} é o ponto
+         de partida das três; o que as separa antes disso é a inflação de cada uma.</p>
+         <div class="cab-h"><span></span><span>Preço</span><span></span><span>Horas</span></div>`
+        + todas.map(c => `<div class="linha-h">
+            <span class="ano">${c.ano}</span>
+            <span class="preco">${reais(c.preco)}</span>
+            <div class="trilho-h" role="img"
+              aria-label="${c.ano}: ${reais(c.preco)}, ${horas(c.horasCompra)} de trabalho">
+              <div class="barra-h" style="width:${Math.min(100, c.horasCompra / ESCALA_HORAS * 100).toFixed(2)}%"></div>
+            </div>
+            <span class="val">${horas(c.horasCompra)}</span>
+          </div>`).join('');
+
+      const porMes = catDinheiro === 'cesta'
+        ? ` Fazendo essa compra uma vez por mês, são ${(todas[todas.length - 1].horasImposto * 12 / 8).toFixed(1).replace('.', ',')} `
+          + 'dias inteiros de trabalho por ano, de oito horas cada, só para pagar o imposto dela.'
+        : '';
+
+      document.getElementById('dinheiro-nota').innerHTML =
+        `As horas são contadas sobre o salário que a pessoa realmente recebe, não sobre o bruto. `
+        + `Em ${ULTIMO_ANO} o salário mínimo é de ${reais(base.salarioBruto)}, e sobram `
+        + `${reais(base.salarioLiquido)} depois do desconto do INSS, o que dá `
+        + `${reais(base.salarioLiquido / D.economia.jornadaMensal)} por hora em uma jornada de `
+        + `${D.economia.jornadaMensal} horas por mês. Quem ganha o mínimo não paga imposto de renda, e o `
+        + 'FGTS não é descontado do salário. O vale-transporte pode descontar até 6%, mas é opcional '
+        + `e não entrou na conta.${porMes}`;
+    }
+
+    function montarItens(uf) {
+      const reg = D.dados[uf][anoCesta];
+      textoDaCesta(uf);
+      const lista = D.cesta.map((it, i) => ({ ...it, par: reg.itens[i] })).filter(x => x.par);
+
+      // Agrupa pelas faixas de estadual encontradas na UF, da maior para a menor
+      const faixas = [...new Set(lista.map(x => x.par[1]))].sort((a, b) => b - a);
+      const html = faixas.map(f => {
+        const doGrupo = lista.filter(x => x.par[1] === f);
+        const rot = faixas.length === 1
+          ? `Estadual de ${pct(f)} em todos os itens`
+          : (f === faixas[0] ? `Estadual de ${pct(f)}, a maior da cesta`
+                             : `Estadual de ${pct(f)}, reduzida`);
+        return `<p class="grupo-rot">${rot}</p>` + doGrupo.map(x => `
+          <div class="item">
+            <div class="ico-item">${ICONES_CESTA[x.ncm] || ICONE_GENERICO}</div>
+            <div class="rot">${x.nome}<span>${x.ncm}</span></div>
+            ${pilha(x.par, x.nome)}
+            <span class="parte">${pct(x.par[0])}</span>
+            <span class="parte">${pct(x.par[1])}</span>
+            <div class="tot">${pct(x.par[0] + x.par[1])}</div>
+          </div>`).join('');
+      }).join('');
+      const caixaItens = document.getElementById('itens');
+      caixaItens.innerHTML = CABECALHO_ITENS + html;
+      reanimar(caixaItens);
+
+      // Verdadeiro desde 2020, falso de 2015 a 2019: a frase tem que sair do dado
+      const federais = [...new Set(lista.map(x => x.par[0]))];
+      document.getElementById('nota-federal').textContent = federais.length === 1
+        ? `Em ${anoCesta} o federal é o mesmo nos ${lista.length} itens, ${pct(federais[0])}, `
+          + 'então toda a diferença entre um item e outro é ICMS.'
+        : `Em ${anoCesta} o federal não é igual entre os itens (${federais.length} valores diferentes), `
+          + 'então a diferença entre um item e outro não é só ICMS.';
+
+      const totais = lista.map(x => x.par[0] + x.par[1]);
+      const menor = Math.min(...totais), maior = Math.max(...totais);
+      const media = totais.reduce((a, b) => a + b, 0) / totais.length;
+      document.getElementById('faixa').innerHTML = `
+        <div>
+          <p class="rot">Item menos tributado</p>
+          <div class="n">${pct(menor)}</div>
+          <div class="r">se a cesta fosse só ele</div>
+        </div>
+        <div>
+          <p class="rot">Média dos 13 itens <span class="chip">no card</span></p>
+          <div class="n">${pct(media)}</div>
+          <div class="r">é o valor mostrado acima</div>
+        </div>
+        <div>
+          <p class="rot">Item mais tributado</p>
+          <div class="n">${pct(maior)}</div>
+          <div class="r">se a cesta fosse só ele</div>
+        </div>`;
+      reanimar(document.getElementById('faixa'));
+    }
+
+    /**
+     * Ano e período do bloco da cesta. Muda junto com a aba de ano e com a UF,
+     * porque a cobertura é por estado desde que passamos a descartar dia sem
+     * tabela confiável.
+     */
+    function textoDaCesta(uf) {
+      const [dias, total] = D.diasCobertos[anoCesta];
+      const cobertura = D.dados[uf][anoCesta].cobertura;
+
+      document.getElementById('ano-cesta').textContent = anoCesta;
+      document.getElementById('vigencia-cesta').textContent = dias === total
+        ? 'as tabelas vigentes no ano inteiro'
+        : `as tabelas vigentes em ${dias} dos ${total} dias do ano`;
+
+      const aviso = document.getElementById('aviso-ano');
+      const partes = [];
+      if (anoCesta === String(QUEBRA)) {
+        partes.push(`${QUEBRA} fica de fora das comparações do resto da página: `
+          + 'metade do ano saiu pelo critério antigo do IBPT e metade pelo novo, '
+          + 'então a média mistura os dois.');
+      }
+      // No ano corrente a cobertura parcial é o esperado e já está dita na
+      // frase acima. Em ano fechado ela significa tabela faltando ou defeituosa,
+      // e aí vale o alerta.
+      if (cobertura < 100 && anoCesta !== ULTIMO_ANO) {
+        partes.push(`${uf === BRASIL ? 'No Brasil' : `Em ${NOMES[uf]}`} este ano só tem `
+          + `${cobertura}% dos dias com tabela confiável; o resto ficou de fora da média.`);
+      }
+      aviso.textContent = partes.join(' ');
+      aviso.hidden = partes.length === 0;
+    }
+
+    /** Reinicia o fade de um bloco recém-substituído. */
+    function reanimar(el) {
+      el.classList.remove('troca');
+      void el.offsetWidth;
+      el.classList.add('troca');
+    }
+
+    function montarTabela(uf) {
+      document.getElementById('cab-tabela').innerHTML =
+        '<th scope="col">Categoria</th>' + TODOS_ANOS.map(a => `<th scope="col">${a}</th>`).join('');
+      document.getElementById('corpo-tabela').innerHTML = CATS.map(c => {
+        const cels = TODOS_ANOS.map(a => {
+          if (a === QUEBRA) return `<td class="vazio">${VAZIO}</td>`;
+          const par = D.dados[uf][a] && D.dados[uf][a][c.k];
+          return par ? `<td>${pct(par[0] + par[1])}</td>` : `<td class="vazio">${VAZIO}</td>`;
+        }).join('');
+        return `<tr><th scope="row">${c.nome}</th>${cels}</tr>`;
+      }).join('');
+      document.getElementById('cap-tabela').textContent =
+        `Alíquota total por ano ${uf === BRASIL ? 'no Brasil, média dos 27 estados' : `em ${NOMES[uf]}`}, `
+        + `em % sobre o preço. ${QUEBRA} omitido por misturar os dois critérios.`;
+    }
+
+    function render(uf) {
+      if (!montado) {
+        montarCards(uf);
+        montado = true;
+      } else {
+        atualizarCards(uf);
+      }
+      montarMapa();
+      montarDinheiro(uf);
+      montarItens(uf);
+      montarTabela(uf);
+      document.getElementById('uf-nome-1').textContent = NOMES[uf];
+      document.getElementById('nota-brasil').hidden = uf !== BRASIL;
+    }
+
+    // ── Descoberta da UF ────────────────────────────────────────────────
+    // Ordem: o que o visitante já escolheu, depois o IP, depois a
+    // geolocalização aproximada, e por último SP. O valor encontrado fica
+    // guardado no navegador e só é substituído quando o visitante troca o
+    // filtro na mão.
+
+    function ufValida(uf) {
+      return typeof uf === 'string' && D.ufs.includes(uf);
+    }
+
+    /** localStorage falha em modo privado e com cookies bloqueados. */
+    function ufGuardada() {
+      try {
+        return localStorage.getItem(CHAVE_UF);
+      } catch {
+        return null;
+      }
+    }
+
+    function guardarUf(uf) {
+      try {
+        localStorage.setItem(CHAVE_UF, uf);
+      } catch {
+        // sem armazenamento: a escolha vale só nesta visita
+      }
+    }
+
+    /** fetch que desiste sozinho, para a página não ficar presa no serviço. */
+    async function buscarComPrazo(url, ms) {
+      const controle = new AbortController();
+      const relogio = setTimeout(() => controle.abort(), ms);
+      try {
+        const resposta = await fetch(url, { signal: controle.signal });
+        return resposta.ok ? await resposta.json() : null;
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(relogio);
+      }
+    }
+
+    /** UF pelo IP de quem acessa. Devolve null fora do Brasil ou se falhar. */
+    async function ufPorIp() {
+      const dados = await buscarComPrazo('https://ipwho.is/', 4000);
+      if (!dados || dados.success === false || dados.country_code !== 'BR') return null;
+      return ufValida(dados.region_code) ? dados.region_code : null;
+    }
+
+    /** Posição aproximada, sob permissão do visitante. */
+    function posicaoAproximada() {
+      return new Promise(resolve => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          p => resolve(p.coords),
+          () => resolve(null),
+          { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+        );
+      });
+    }
+
+    /** UF pela geolocalização do navegador. Pede permissão ao visitante. */
+    async function ufPorGeolocalizacao() {
+      const coords = await posicaoAproximada();
+      if (!coords) return null;
+
+      const dados = await buscarComPrazo(
+        'https://api.bigdatacloud.net/data/reverse-geocode-client'
+        + `?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=pt`,
+        5000
+      );
+      if (!dados || dados.countryCode !== 'BR') return null;
+
+      const uf = String(dados.principalSubdivisionCode || '').replace('BR-', '');
+      return ufValida(uf) ? uf : null;
+    }
+
+    /**
+     * Roda depois da primeira pintura, só quando o navegador ainda não tem UF
+     * guardada. A página já está legível em SP enquanto isso acontece.
+     */
+    async function detectarUf(sel) {
+      let uf = await ufPorIp();
+      let origem = uf ? 'do seu acesso' : '';
+
+      if (!uf) {
+        uf = await ufPorGeolocalizacao();
+        origem = uf ? 'da sua localização' : '';
+      }
+
+      guardarUf(uf || UF_PADRAO);
+      if (!uf || uf === sel.value) return;
+
+      sel.value = uf;
+      render(uf);
+
+      const nota = document.getElementById('nota-uf');
+      nota.textContent = `Estado escolhido a partir ${origem}: ${NOMES[uf]}.`
+        + ' Trocar no filtro fixa outro para as próximas visitas.';
+      nota.hidden = false;
+    }
+
+    /** Números da abertura e do rodapé, todos vindos do build. */
+    function preencherTextosDinamicos(meta) {
+      const est = meta.estatisticas;
+      const texto = (classe, valor) => {
+        document.querySelectorAll('.' + classe).forEach(el => { el.textContent = valor; });
+      };
+      texto('est-tabelas', est.tabelas);
+      texto('est-periodo', `${est.anoInicial} a ${est.anoFinal}`);
+      texto('est-registros', est.totalRegistros.toLocaleString('pt-BR'));
+      texto('est-ufs', meta.ufs.length);
+      texto('est-gerado-em', new Date(est.geradoEm).toLocaleDateString('pt-BR'));
+    }
+
+    /**
+     * Dias já cobertos por tabela que ainda não aconteceram. A última tabela
+     * costuma valer alguns dias à frente da data de hoje, e sem isso os dias
+     * cobertos são lidos como dias vividos.
+     */
+    function diasAindaPorVir() {
+      const fim = Date.parse(D.fimCobertura + 'T00:00:00Z');
+      const hoje = new Date();
+      const inicioDeHoje = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+      return Math.max(0, Math.round((fim - inicioDeHoje) / 86400000));
+    }
+
+    /** Cobertura do último ano, escrita nos dois pontos que a citam. */
+    function preencherCobertura() {
+      const [dias, total] = D.diasCobertos[ULTIMO_ANO];
+      document.getElementById('nota-cobertura').textContent =
+        `Em ${ULTIMO_ANO} as tabelas cobrem ${dias} de ${total} dias.`;
+      const futuros = diasAindaPorVir();
+      document.getElementById('cobertura-detalhe').textContent = futuros > 0
+        ? `O ano de ${ULTIMO_ANO} ainda não terminou: as tabelas cobrem ${dias} dos ${total} dias, `
+          + `e ${futuros} desses dias ainda estão por vir.`
+        : `O ano de ${ULTIMO_ANO} ainda não terminou: as tabelas cobrem ${dias} dos ${total} dias.`;
+    }
+
+    function falhar(mensagem) {
+      const estado = document.getElementById('estado');
+      estado.className = 'estado erro';
+      estado.textContent = mensagem;
+    }
+
+    async function iniciar() {
+      let meta;
+      try {
+        const [painel, metaResposta, malha] = await Promise.all([
+          fetch(`${API}/painel.json`),
+          fetch(`${API}/meta.json`),
+          // A malha e so o desenho: se faltar, a pagina perde o mapa e
+          // continua inteira, entao a falha nao derruba a carga
+          fetch(`${BASE}/malha-uf.json`).catch(() => null)
+        ]);
+        if (malha && malha.ok) MALHA = await malha.json();
+        if (!painel.ok) throw new Error(`painel.json respondeu ${painel.status}`);
+        if (!metaResposta.ok) throw new Error(`meta.json respondeu ${metaResposta.status}`);
+        D = await painel.json();
+        meta = await metaResposta.json();
+      } catch (erro) {
+        falhar(`Não foi possível carregar os dados do painel: ${erro.message}`);
+        return;
+      }
+
+      preencherTextosDinamicos(meta);
+
+      ANOS_A = D.anos.filter(a => a < QUEBRA);
+      ANOS_D = D.anos.filter(a => a > QUEBRA);
+      TODOS_ANOS = [...D.anos];
+      ULTIMO_ANO = String(D.anos[D.anos.length - 1]);
+      anoCesta = ULTIMO_ANO;
+      anoMapa = ULTIMO_ANO;
+      preencherCobertura();
+
+      const sel = document.getElementById('uf');
+      sel.innerHTML = D.ufs.map(u => `<option value="${u}">`
+        + (u === BRASIL ? 'Brasil (média dos 27 estados)' : `${NOMES[u]} (${u})`)
+        + '</option>').join('');
+      if (temEconomia()) montarAbasDinheiro();
+      montarAbasAnos();
+      if (MALHA) montarAbasMapa();
+
+      const guardada = ufGuardada();
+      sel.value = ufValida(guardada) ? guardada
+        : (D.ufs.includes(UF_PADRAO) ? UF_PADRAO : D.ufs[0]);
+
+      // Escolha manual manda: sobrescreve o que estiver guardado
+      sel.addEventListener('change', () => {
+        guardarUf(sel.value);
+        document.getElementById('nota-uf').hidden = true;
+        render(sel.value);
+      });
+      render(sel.value);
+
+      document.getElementById('estado').hidden = true;
+      document.getElementById('painel').hidden = false;
+
+      // Daqui em diante as mudanças passam a ser animadas. A primeira pintura
+      // fica de fora de propósito, para a página nascer legível.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.body.classList.add('anim');
+
+        // Só depois da página pronta: a detecção pode pedir permissão de
+        // localização e não pode segurar a primeira pintura.
+        if (!ufValida(guardada)) detectarUf(sel);
+      }));
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>

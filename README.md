@@ -97,6 +97,7 @@ Base: `https://ibpt.valraw.com.br/api`
 | `/{ano}/{tabela}/{tipo}/index.json` | Contagem por UF de um tipo |
 | `/{ano}/{tabela}/{tipo}/{uf}.json.gz` | Os registros (gzip) |
 | `/todos-{ano}.csv.gz` | Todos os registros de um ano em CSV (gzip) |
+| `/painel.json` | Série de alíquotas por categoria, UF e ano, usada pelo painel |
 
 Os índices são JSON puro; os dados vêm comprimidos. Um arquivo típico de NCM tem 211 KB comprimidos.
 

@@ -11,15 +11,27 @@ src/
   construir.ts      → Script principal de build (extrai ZIPs, gera JSON/CSV)
   processadorCsv.ts → Parser de CSV via streaming (readline)
   geradorJson.ts    → Gerador de arquivos JSON.gz e CSV.gz consolidado
+  gerarPainel.ts    → Lê a API gerada e monta docs/api/painel.json
+  economia.ts       → IPCA, salário mínimo e INSS lidos de dados/
+  gerarIndices.ts   → Baixa IPCA e salário mínimo do Banco Central (npm run indices)
+  gerarMalha.ts     → Baixa a malha das UFs do IBGE e gera docs/malha-uf.json (npm run malha)
   constantes.ts     → Constantes (UFs, tipos de tabela)
   tipos.ts          → Interfaces TypeScript (Registro, Versao, MetaDados, etc.)
 docs/
   index.html        → Página interativa de consulta (client-side)
+  painel.html       → Painel de carga tributária por categoria, UF e ano
+  malha-uf.json     → Contorno das 27 UFs em SVG, usado pelo mapa do painel
   404.html          → Intercepta rotas para exibir JSON descomprimido no browser
   api/              → Arquivos gerados pelo build (gitignored)
 .github/workflows/
   deploy.yml        → GitHub Actions: build + deploy no GitHub Pages
 repositorio-ibpt/   → ZIPs originais do IBPT (rastreados neste repo, nao e submodule)
+dados/
+  ipca.csv          → IPCA geral mensal (%), do Banco Central SGS 433
+  ipca-alimentacao.csv → IPCA do grupo Alimentacao e bebidas, SGS 1635
+  ipca-transportes.csv → IPCA do grupo Transportes, SGS 1639
+  salario-minimo.csv → Salário mínimo mensal (R$), do SGS 1619
+  inss.csv          → Faixas do INSS do empregado, digitadas das portarias
 ```
 
 ## Convenções
@@ -39,6 +51,7 @@ repositorio-ibpt/   → ZIPs originais do IBPT (rastreados neste repo, nao e sub
 /api/{ano}/{tabela}/{tipo}/index.json  → Índice por tipo
 /api/{ano}/{tabela}/{tipo}/{uf}.json.gz → Dados comprimidos
 /api/todos-{ano}.csv.gz                → CSV consolidado de um ano (todas as versões/tipos/UFs)
+/api/painel.json                       → Série por categoria/UF/ano consumida por painel.html
 /api/{ano}/{tabela}/{tipo}/{uf}        → Rota sem extensão (404.html descomprime e exibe)
 ```
 
@@ -69,7 +82,10 @@ Cada registro contém 9 propriedades extraídas do CSV original do IBPT:
 ```bash
 npm install          # Instalar dependências
 npm run build        # Build: extrair ZIPs e gerar API estática
-npm test             # Testes do parser CSV (runner nativo do Node)
+npm test             # Testes do parser CSV, do gerador do painel e das series economicas
+npm run indices      # Atualiza dados/ipca.csv e dados/salario-minimo.csv no Banco Central
+npm run malha        # Atualiza docs/malha-uf.json com a malha das UFs do IBGE
+npm run mapa         # Confere os rotulos do mapa: cruzamento, sobreposicao, tracado longo
 ```
 
 ## Formato de Saída JSON
@@ -93,7 +109,26 @@ npm test             # Testes do parser CSV (runner nativo do Node)
 }
 ```
 
-## Interface Web
+## Painel de Carga Tributaria (`docs/painel.html`)
+
+Pagina separada, ligada no header do `index.html`. Mostra quanto do preco e tributo
+na cesta basica (13 itens do DL 399/1938), no carro popular e na moto, ano a ano,
+com filtro de UF.
+
+- **Todo o dado vem de `api/painel.json`**, gerado por `src/gerarPainel.ts` a cada build. A pagina nao consulta os arquivos por versao
+- **Media anual ponderada pelos dias de vigencia**, nao por versao: as janelas variam de 29 a 183 dias
+- **Cada item e um par NCM + excecao tarifaria.** O mesmo codigo tem linha base e linha `Ex 01` com aliquotas diferentes e produtos diferentes
+- **Na mesma vigencia vence a revisao mais alta**, e versao com mais de 80% das aliquotas estaduais zeradas na UF e descartada como publicacao defeituosa
+- **Periodo sem nenhuma revisao sadia sai da media**, e a UF aparece com `cobertura` abaixo de 100
+- **A serie e cortada em 2021**, quando o IBPT trocou o criterio de publicacao (96,3% dos codigos mudaram de um mes para o outro). Os cards mostram dois blocos separados e a tabela deixa 2021 vazio
+- **Secao "O mesmo em dinheiro"**: uma compra de R$ 100 corrigida para tras pelo grupo do IPCA da categoria (alimentacao para a cesta, transportes para carro e moto), o imposto do ano em reais e quantas horas de trabalho isso custa no salario minimo ja sem o INSS. Os cartoes por era nunca cruzam 2021; so a linha de horas da compra atravessa a serie, porque nao usa aliquota
+- **Mapa de calor por estado**: as 27 UFs pintadas pela distancia ate a media nacional do ano, com uma aba por ano. E figura, nao controle: sem clique, sem hover, sem selecao. A cor e relativa de proposito, porque o nivel sobe em todos os estados junto e o que separa um do outro e o ICMS
+- **Rotulo do mapa fica todo fora do desenho**, ligado ao estado por um tracado. A posicao e procurada, nao digitada; `npm run mapa` confere se sobrou cruzamento ou sobreposicao
+- **UF inicial descoberta sozinha**: `localStorage`, depois IP (`ipwho.is`), depois geolocalizacao aproximada (`api.bigdatacloud.net`), depois SP. Escolha manual sobrescreve e persiste
+- Barras empilhadas federal + estadual na escala fixa de 0 a 60%; par de cores `#2E3ED6`/`#2E8B22`, validado para daltonismo
+- Numeros da abertura e do rodape saem de `meta.json`, como no `index.html`
+
+## Interface Web (`docs/index.html`)
 
 - **Numeros da pagina vem do build** - `meta.json` carrega `estatisticas` (tamanhos, reducao, tabelas, registros, media por UF, data do build) e `preencherTextosDinamicos()` preenche todo `<span class="est-*">` das abas Home e Informacoes; o valor no HTML e so fallback. Nunca escrever numero fixo nesses trechos
 - **Design System VALRAW UI (light corporate)** - Estrutura portada de `recuperaqui-landing`, mas com paleta propria tirada do logo: azul `#000793` primario, verde `#05C700` acento (`#037A00` quando precisa de texto branco em cima), slate `#1F2937` neutro, fundos brancos/`#F7F9FC`, sombras suaves em vez de glow, tipografia Ubuntu/Ubuntu Mono
