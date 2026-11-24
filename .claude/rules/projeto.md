@@ -147,7 +147,7 @@ Página única, sem build step. HTML, CSS e JS no mesmo arquivo, propositalmente
 
 ## Tabelas
 
-- 100 tabelas de 2015 a 2026, todas as versões publicadas pelo IBPT ou recuperáveis do mirror do ACBr
+- 103 tabelas de 2015 a 2026, todas as versões publicadas pelo IBPT ou recuperáveis do mirror do ACBr
 - Fontes dos ZIPs: portal De Olho no Imposto (IBPT) e SVN do Projeto ACBr (SourceForge / espelho GitHub `frones/ACBr`)
 - 2015 e 2016 vieram do histórico de commits de `frones/ACBr` em `Exemplos/ACBrTCP/ACBrIBPTax/tabela` (o mirror git-svn começa em 2015-03-23)
 - Para adicionar: colocar o ZIP em `repositorio-ibpt/` como `TabelaIBPTax_{versão}.zip` e rodar o build

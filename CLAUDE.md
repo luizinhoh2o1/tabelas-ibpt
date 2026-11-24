@@ -148,7 +148,7 @@ com filtro de UF.
 
 ## Tabelas Disponíveis
 
-100 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
+103 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
 
 - **2015:** 15.1.B, 15.2.A
 - **2016:** 16.1.A, 16.2.A, 16.2.B
@@ -161,7 +161,7 @@ com filtro de UF.
 - **2023:** 23.1.A–G, 23.2.A–F
 - **2024:** 24.1.A–F, 24.2.A–F
 - **2025:** 25.1.A–F, 25.2.A–H
-- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A
+- **2026:** 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A, 26.2.B, 26.2.C, 26.2.D
 
 ## Regras Importantes
 
