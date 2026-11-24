@@ -15,18 +15,18 @@
 
 As Tabelas IBPTax, publicadas pelo Instituto Brasileiro de Planejamento e Tributação, trazem a carga tributária aproximada de produtos e serviços exigida pela Lei da Transparência Fiscal (Lei 12.741/2012). O IBPT distribui essas tabelas como arquivos ZIP semestrais, um CSV por estado, e não oferece um histórico consolidado.
 
-Este repositório arquiva esses ZIPs desde 2015 e os converte em endpoints JSON estáticos, servidos pelo GitHub Pages. São 100 tabelas, 32,3 milhões de registros e todas as 27 UFs.
+Este repositório arquiva esses ZIPs desde 2015 e os converte em endpoints JSON estáticos, servidos pelo GitHub Pages. São 103 tabelas, 33,3 milhões de registros e todas as 27 UFs.
 
 > **Atenção:** os dados aqui não são atualizados em tempo real. As tabelas são as oficiais publicadas pelo IBPT, mas a atualização deste repositório é manual. Confira a vigência antes de usar em produção.
 
 ## Consulta rápida
 
-Os arquivos de dados são servidos como gzip puro, sem `Content-Encoding`, então o cliente precisa descomprimir por conta própria. Os exemplos abaixo buscam a tabela de NCM de São Paulo na versão 26.2.A.
+Os arquivos de dados são servidos como gzip puro, sem `Content-Encoding`, então o cliente precisa descomprimir por conta própria. Os exemplos abaixo buscam a tabela de NCM de São Paulo na versão 26.2.D.
 
 **Linux, macOS ou WSL**
 
 ```bash
-url=https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz
+url=https://ibpt.valraw.com.br/api/2026/26.2.D/ncm/SP.json.gz
 
 # Primeiro registro
 curl -s "$url" | gunzip | jq '.dados[0]'
@@ -35,7 +35,7 @@ curl -s "$url" | gunzip | jq '.dados[0]'
 curl -s "$url" | gunzip | jq -c '.dados[] | select(.codigo | startswith("0101"))'
 
 # Salvar a tabela descomprimida
-curl -s "$url" | gunzip > ncm-sp-26.2.A.json
+curl -s "$url" | gunzip > ncm-sp-26.2.D.json
 ```
 
 Sem `jq`, use `python3 -m json.tool` para formatar a saída.
@@ -43,7 +43,7 @@ Sem `jq`, use `python3 -m json.tool` para formatar a saída.
 **Windows (PowerShell 5.1 ou 7+)**
 
 ```powershell
-$url = 'https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz'
+$url = 'https://ibpt.valraw.com.br/api/2026/26.2.D/ncm/SP.json.gz'
 
 $gz = [IO.Compression.GZipStream]::new(
     [IO.MemoryStream]::new((Invoke-WebRequest $url).Content),
@@ -58,7 +58,7 @@ $tabela.dados | Where-Object codigo -like '0101*' |
     Format-Table codigo, descricao, aliquotaEstadual
 
 # Salvar a tabela descomprimida
-$tabela | ConvertTo-Json -Depth 5 | Set-Content ncm-sp-26.2.A.json -Encoding utf8
+$tabela | ConvertTo-Json -Depth 5 | Set-Content ncm-sp-26.2.D.json -Encoding utf8
 ```
 
 `Invoke-WebRequest` não descomprime sozinho porque a resposta não declara `Content-Encoding: gzip`; daí o `GZipStream` explícito.
@@ -68,7 +68,7 @@ $tabela | ConvertTo-Json -Depth 5 | Set-Content ncm-sp-26.2.A.json -Encoding utf
 ```python
 import gzip, json, urllib.request
 
-url = "https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz"
+url = "https://ibpt.valraw.com.br/api/2026/26.2.D/ncm/SP.json.gz"
 tabela = json.loads(gzip.decompress(urllib.request.urlopen(url).read()))
 
 for item in tabela["dados"][:5]:
@@ -80,7 +80,7 @@ for item in tabela["dados"][:5]:
 A descompressão é nativa, sem biblioteca:
 
 ```js
-const resp = await fetch('https://ibpt.valraw.com.br/api/2026/26.2.A/ncm/SP.json.gz');
+const resp = await fetch('https://ibpt.valraw.com.br/api/2026/26.2.D/ncm/SP.json.gz');
 const fluxo = resp.body.pipeThrough(new DecompressionStream('gzip'));
 const { dados } = await new Response(fluxo).json();
 ```
@@ -104,11 +104,11 @@ Os índices são JSON puro; os dados vêm comprimidos. Um arquivo típico de NCM
 | Parâmetro | Valores | Exemplo |
 |---|---|---|
 | `{ano}` | 2015 a 2026 | `2026` |
-| `{tabela}` | Código da versão | `26.2.A` |
+| `{tabela}` | Código da versão | `26.2.D` |
 | `{tipo}` | `ncm`, `nbs`, `lc116` | `ncm` |
 | `{uf}` | As 27 siglas | `SP` |
 
-Rotas sem extensão (`/api/2026/26.2.A/ncm/SP`) são interceptadas pelo `404.html`, que descomprime e exibe o JSON formatado no navegador. Prático para inspecionar, não para consumir por código.
+Rotas sem extensão (`/api/2026/26.2.D/ncm/SP`) são interceptadas pelo `404.html`, que descomprime e exibe o JSON formatado no navegador. Prático para inspecionar, não para consumir por código.
 
 ### Tipos de tabela
 
@@ -122,7 +122,7 @@ Rotas sem extensão (`/api/2026/26.2.A/ncm/SP`) são interceptadas pelo `404.htm
 
 ```json
 {
-  "tabela": "26.2.A",
+  "tabela": "26.2.D",
   "dados": [
     {
       "codigo": "01012100",
@@ -132,8 +132,8 @@ Rotas sem extensão (`/api/2026/26.2.A/ncm/SP`) são interceptadas pelo `404.htm
       "aliquotaImportadosFederal": 15.45,
       "aliquotaEstadual": 18.00,
       "aliquotaMunicipal": 0.00,
-      "vigenciaInicio": "20/08/2026",
-      "vigenciaFim": "30/09/2026"
+      "vigenciaInicio": "17/11/2026",
+      "vigenciaFim": "20/12/2026"
     }
   ]
 }
@@ -157,7 +157,7 @@ As alíquotas usam ponto como separador decimal. O CSV consolidado usa ponto e v
 
 O build lê os ZIPs em `repositorio-ibpt/`, extrai os CSVs, converte cada combinação de ano, versão, tipo e UF em um JSON comprimido, e monta os índices. O GitHub Actions roda isso a cada push na branch principal e publica `docs/` no Pages.
 
-Os CSVs originais somam 4,55 GB. Depois do gzip nível 9, a API publicada ocupa 1,1 GB em 8.496 arquivos, uma redução de 76%. Os CSVs do IBPT vêm em latin1 e são lidos por streaming, linha a linha, para o build não carregar tudo na memória.
+Os CSVs originais somam 4,7 GB. Depois do gzip nível 9, a API publicada ocupa 1,1 GB em 8.752 arquivos, uma redução de 76%. Os CSVs do IBPT vêm em latin1 e são lidos por streaming, linha a linha, para o build não carregar tudo na memória.
 
 A página de consulta roda inteiramente no navegador. Ela carrega o `meta.json` para montar os filtros e depois busca só os arquivos que a combinação escolhida exige, em lotes de 8 requisições paralelas. Quanto mais específico o filtro, menos dados trafegam: ano, versão, tipo e UF definidos baixam um único arquivo de 211 KB.
 
@@ -178,8 +178,8 @@ Consultas amplas seguem outro caminho. Acima de 50 arquivos, a página passa a u
 | 2023 | 23.1.A–G, 23.2.A–F | 13 |
 | 2024 | 24.1.A–F, 24.2.A–F | 12 |
 | 2025 | 25.1.A–F, 25.2.A–H | 14 |
-| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A | 8 |
-| **Total** | | **100** |
+| 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A, 26.2.B, 26.2.C, 26.2.D | 11 |
+| **Total** | | **103** |
 
 As tabelas de 2015 e 2016 foram recuperadas do histórico do Projeto ACBr, já que o portal do IBPT não disponibiliza versões antigas. UFs cobertas: AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO.
 
