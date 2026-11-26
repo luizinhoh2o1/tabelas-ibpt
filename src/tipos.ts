@@ -8,6 +8,8 @@ export interface Versao {
   revisao: string;
   codigo: string; // ex: "26.1.F"
   arquivo: string; // nome do ZIP
+  /** Tabela nacional de 2013 (0.0.1, 0.0.2): um arquivo so, gravado na UF "BR" */
+  nacional: boolean;
 }
 
 /** Registro descritivo com propriedades nomeadas */
@@ -17,8 +19,10 @@ export interface Registro {
   descricao: string;
   aliquotaNacionalFederal: number;
   aliquotaImportadosFederal: number;
-  aliquotaEstadual: number;
-  aliquotaMunicipal: number;
+  /** null nas tabelas nacionais de 2013, que nao traziam a parte estadual */
+  aliquotaEstadual: number | null;
+  /** null nas tabelas nacionais de 2013, que nao traziam a parte municipal */
+  aliquotaMunicipal: number | null;
   vigenciaInicio: string;
   vigenciaFim: string;
 }
@@ -79,6 +83,8 @@ export interface Estatisticas {
   anoInicial: number;
   anoFinal: number;
   totalRegistros: number;
+  /** Parte de totalRegistros que vem das versoes nacionais (versoesNacionais), que o painel nao usa */
+  registrosNacionais: number;
   /** Arquivos publicados em docs/api (json.gz, index.json, csv.gz e meta.json) */
   arquivosGerados: number;
   /** Soma dos CSVs extraidos dos ZIPs, antes da compressao */
@@ -96,6 +102,8 @@ export interface MetaDados {
   tipos: Record<TipoTabela, string>;
   ufs: string[];
   versoes: Record<string, string[]>;
+  /** Versoes sem UF (2013): os dados ficam so na UF "BR", sem estadual, municipal e vigencia */
+  versoesNacionais: string[];
   estatisticas: Estatisticas;
 }
 

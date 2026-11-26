@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel de Carga Tributária</title>
-  <meta name="description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado, calculado sobre as tabelas IBPTax de 2015 a hoje.">
+  <meta name="description" content="Quanto do preço é tributo na cesta básica, no carro popular e na moto, ano a ano e por estado, calculado sobre as tabelas IBPTax de 2014 a hoje.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ibpt.valraw.com.br/painel.html">
   <meta property="og:type" content="article">
@@ -676,8 +676,8 @@
     </ul>
 
     <div class="assinatura base-usada">
-      <span>Base: <span class="est-tabelas">103</span> versões, <span class="est-periodo">2015 a 2026</span></span>
-      <span><span class="est-registros">33.282.523</span> registros</span>
+      <span>Base: <span class="est-tabelas">105</span> versões, <span class="est-periodo">2014 a 2026</span></span>
+      <span><span class="est-registros">33.900.445</span> registros</span>
       <span><span class="est-ufs">27</span> UFs</span>
     </div>
   </main>
@@ -1875,10 +1875,11 @@
           + 'metade do ano saiu pelo critério antigo do IBPT e metade pelo novo, '
           + 'então a média mistura os dois.');
       }
-      // No ano corrente a cobertura parcial é o esperado e já está dita na
-      // frase acima. Em ano fechado ela significa tabela faltando ou defeituosa,
-      // e aí vale o alerta.
-      if (cobertura < 100 && anoCesta !== ULTIMO_ANO) {
+      // Dia sem nenhuma tabela publicada (antes de julho de 2014, quando a
+      // série começa, ou o futuro do ano corrente) já está dito na frase
+      // acima. O alerta é só para dia que tinha tabela e a UF perdeu por
+      // tabela faltando ou defeituosa.
+      if (cobertura < Math.round(100 * dias / total) && anoCesta !== ULTIMO_ANO) {
         partes.push(`${uf === BRASIL ? 'No Brasil' : `Em ${NOMES[uf]}`} este ano só tem `
           + `${cobertura}% dos dias com tabela confiável; o resto ficou de fora da média.`);
       }
@@ -2031,9 +2032,13 @@
       const texto = (classe, valor) => {
         document.querySelectorAll('.' + classe).forEach(el => { el.textContent = valor; });
       };
-      texto('est-tabelas', est.tabelas);
-      texto('est-periodo', `${est.anoInicial} a ${est.anoFinal}`);
-      texto('est-registros', est.totalRegistros.toLocaleString('pt-BR'));
+      // As tabelas nacionais de 2013 nao tem parte estadual e ficam fora do
+      // painel, entao saem tambem da contagem de versoes, do periodo e dos registros
+      const nacionais = meta.versoesNacionais || [];
+      const anosPorUf = meta.anos.filter(a => meta.versoes[a].some(v => !nacionais.includes(v)));
+      texto('est-tabelas', est.tabelas - nacionais.length);
+      texto('est-periodo', `${Math.min(...anosPorUf)} a ${est.anoFinal}`);
+      texto('est-registros', (est.totalRegistros - (est.registrosNacionais || 0)).toLocaleString('pt-BR'));
       texto('est-ufs', meta.ufs.length);
       texto('est-gerado-em', new Date(est.geradoEm).toLocaleDateString('pt-BR'));
     }

@@ -49,7 +49,7 @@ dados/
 /api/{ano}/index.json                  → Índice do ano
 /api/{ano}/{tabela}/index.json         → Índice da versão
 /api/{ano}/{tabela}/{tipo}/index.json  → Índice por tipo
-/api/{ano}/{tabela}/{tipo}/{uf}.json.gz → Dados comprimidos
+/api/{ano}/{tabela}/{tipo}/{uf}.json.gz → Dados comprimidos ({uf} = BR nas tabelas nacionais de 2013)
 /api/todos-{ano}.csv.gz                → CSV consolidado de um ano (todas as versões/tipos/UFs)
 /api/painel.json                       → Série por categoria/UF/ano consumida por painel.html
 /api/{ano}/{tabela}/{tipo}/{uf}        → Rota sem extensão (404.html descomprime e exibe)
@@ -72,10 +72,12 @@ Cada registro contém 9 propriedades extraídas do CSV original do IBPT:
 | `descricao` | string | campos[3] | Descrição do item |
 | `aliquotaNacionalFederal` | number | campos[4] | Alíquota federal (nacionais) % |
 | `aliquotaImportadosFederal` | number | campos[5] | Alíquota federal (importados) % |
-| `aliquotaEstadual` | number | campos[6] | Alíquota estadual (ICMS) % |
-| `aliquotaMunicipal` | number | campos[7] | Alíquota municipal (ISS) % |
+| `aliquotaEstadual` | number \| null | campos[6] | Alíquota estadual (ICMS) %. `null` em 2013 |
+| `aliquotaMunicipal` | number \| null | campos[7] | Alíquota municipal (ISS) %. `null` em 2013 |
 | `vigenciaInicio` | string | campos[8] | Data de início da vigência (dd/mm/aaaa) |
 | `vigenciaFim` | string | campos[9] | Data de fim da vigência (dd/mm/aaaa) |
+
+**Layout nacional de 2013** (0.0.1 e 0.0.2): `codigo;ex;tabela;[descricao;]aliqNac;aliqImp;versao`. `processadorCsv.ts` reconhece pelo cabeçalho (`aliqNac`) e acha as colunas pelo nome. Sem UF, estadual, municipal e vigência; a 0.0.1 não tem descrição. O build marca a versão como nacional pelo nome do ZIP (`TabelaIBPTax_0.0.N.zip`, ano 2013), grava só em `{uf}` = `BR` (`UF_NACIONAL`) e lista em `meta.json` → `versoesNacionais`. O painel ignora 2013 porque lê só arquivos por UF.
 
 ## Comandos
 
@@ -134,6 +136,7 @@ com filtro de UF.
 - **Design System VALRAW UI (light corporate)** - Estrutura portada de `recuperaqui-landing`, mas com paleta propria tirada do logo: azul `#000793` primario, verde `#05C700` acento (`#037A00` quando precisa de texto branco em cima), slate `#1F2937` neutro, fundos brancos/`#F7F9FC`, sombras suaves em vez de glow, tipografia Ubuntu/Ubuntu Mono
 - **4 abas:** Home (sobre a API), Pesquisa (filtros + tabela), Endpoints (documentação técnica), Informações (extras)
 - **6 filtros de pesquisa:** Ano, Versão, UF, Tipo, Código, Descrição
+- **Tabelas nacionais de 2013** - com ano 2013 ou versão `0.0.x` escolhida, `ajustarFiltrosNacionais()` trava a UF em "Nacional" (`BR`) e, na 0.0.1, a Descrição; estadual e municipal `null` aparecem como "n/d"
 - **Tooltips** nos cabeçalhos da tabela de resultados explicando cada coluna
 - **12 colunas na tabela:** Código, Ex, Tipo, UF, Tabela, Descrição, 4 alíquotas, Início Vig., Fim Vig.
 - **Consulta cancelavel** - `controleConsulta` (`AbortController`) e criado em `consultar()`/`consultarViaCsv()` e abortado por `limparFiltros()` ou por uma nova consulta; todo `fetch` da consulta recebe o `signal` (o `meta.json` da carga inicial fica de fora)
@@ -148,8 +151,10 @@ com filtro de UF.
 
 ## Tabelas Disponíveis
 
-103 tabelas IBPTax de 2015 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
+107 tabelas IBPTax de 2013 a 2026 (todas as versões publicadas pelo IBPT e/ou recuperáveis do mirror ACBr):
 
+- **2013:** 0.0.1, 0.0.2 (nacionais, sem UF)
+- **2014:** 14.2.A, 14.2.B
 - **2015:** 15.1.B, 15.2.A
 - **2016:** 16.1.A, 16.2.A, 16.2.B
 - **2017:** 17.1.A, 17.1.B, 17.2.A, 17.2.B

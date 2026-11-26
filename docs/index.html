@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tabelas IBPT</title>
-  <meta name="description" content="API estática com 103 tabelas IBPTax (2015–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
+  <meta name="description" content="API estática com 107 tabelas IBPTax (2013–2026). Consulte alíquotas tributárias por NCM, NBS e LC116, filtradas por ano, versão, UF e tipo, sem backend.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://ibpt.valraw.com.br/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ibpt.valraw.com.br/">
   <meta property="og:title" content="Tabelas IBPT">
-  <meta property="og:description" content="API estática com 103 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
+  <meta property="og:description" content="API estática com 107 tabelas IBPTax (2013–2026). Consulte alíquotas por NCM, NBS e LC116 gratuitamente, sem backend.">
   <meta property="og:image" content="https://ibpt.valraw.com.br/public/logo.webp">
   <meta property="og:image:width" content="2000">
   <meta property="og:image:height" content="1000">
@@ -18,7 +18,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://ibpt.valraw.com.br/public/logo.webp">
   <meta name="twitter:title" content="Tabelas IBPT">
-  <meta name="twitter:description" content="API estática com 103 tabelas IBPTax (2015–2026). Consulte alíquotas por NCM, NBS e LC116.">
+  <meta name="twitter:description" content="API estática com 107 tabelas IBPTax (2013–2026). Consulte alíquotas por NCM, NBS e LC116.">
   <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
@@ -269,6 +269,10 @@
     }
     .filter-group select { cursor: pointer; }
     .filter-group input::placeholder { color: var(--texto-mutado); }
+    .filter-group select:disabled, .filter-group input:disabled { opacity: 0.55; cursor: not-allowed; }
+    .nota-filtro { font-size: 13px; color: var(--texto-secundario); margin: -4px 0 16px; }
+    .nota-filtro i { color: var(--primaria); margin-right: 6px; }
+    .nd { color: var(--texto-mutado); cursor: help; }
     .search-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
     /* ── Botões ── */
@@ -480,7 +484,7 @@
         </div>
         <div class="feature-card">
           <h3>Todas as Versões</h3>
-          <p><span class="est-tabelas">103</span> tabelas de <span class="est-ano-inicial">2015</span> a <span class="est-ano-final">2026</span>, <span class="est-registros">33.282.523</span> registros. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
+          <p><span class="est-tabelas">107</span> tabelas de <span class="est-ano-inicial">2013</span> a <span class="est-ano-final">2026</span>, <span class="est-registros">33.923.526</span> registros. Todos os semestres e revisões (A, B, C…) disponíveis para consulta histórica.</p>
         </div>
       </div>
     </div>
@@ -524,6 +528,7 @@
               <input id="f-descricao" type="text" placeholder="Buscar…">
             </div>
           </div>
+          <p class="nota-filtro" id="nota-nacional" hidden><i class="fas fa-info-circle" aria-hidden="true"></i><span id="texto-nota-nacional"></span></p>
           <div class="search-actions">
             <button class="btn btn-primary" id="btn-consultar" onclick="consultar()"><i class="fas fa-search" aria-hidden="true"></i> Consultar</button>
             <button class="btn btn-ghost" onclick="limparFiltros()"><i class="fas fa-times" aria-hidden="true"></i> Limpar</button>
@@ -574,7 +579,7 @@
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/index.json</div><div class="path-desc">Índice do ano com todas as versões. Ex: <code>/api/2026/index.json</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/index.json</div><div class="path-desc">Índice de uma versão/tabela. Ex: <code>/api/2026/26.1.H/index.json</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/index.json</div><div class="path-desc">Índice por tipo com contagem por UF. Ex: <code>/api/2026/26.1.H/ncm/index.json</code></div></div></li>
-          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/{uf}.json.gz</div><div class="path-desc">Dados completos (gzip). Ex: <code>/api/2026/26.1.H/ncm/SP.json.gz</code></div></div></li>
+          <li><span class="method">GET</span><div><div class="path">/api/{ano}/{tabela}/{tipo}/{uf}.json.gz</div><div class="path-desc">Dados completos (gzip). Ex: <code>/api/2026/26.1.H/ncm/SP.json.gz</code>. Em 2013, <code>{uf}</code> é sempre <code>BR</code>: as tabelas 0.0.1 e 0.0.2 eram nacionais, sem alíquota estadual e municipal (<code>null</code>) e sem vigência. Ex: <code>/api/2013/0.0.2/ncm/BR.json.gz</code></div></div></li>
           <li><span class="method">GET</span><div><div class="path">/api/todos-{ano}.csv.gz</div><div class="path-desc">CSV consolidado de um ano, com todas as versões, tipos e UFs (gzip). Usado nas consultas amplas. Ex: <code>/api/todos-2026.csv.gz</code></div></div></li>
         </ul>
 
@@ -748,6 +753,7 @@ for item in dados['dados']:
         selUf.appendChild(opt);
       });
       selAno.addEventListener('change', atualizarVersoes);
+      document.getElementById('f-versao').addEventListener('change', ajustarFiltrosNacionais);
     }
 
     function atualizarVersoes() {
@@ -761,6 +767,61 @@ for item in dados['dados']:
           sel.appendChild(opt);
         });
       }
+      ajustarFiltrosNacionais();
+    }
+
+    // ── Tabelas nacionais de 2013 ──
+    // A 0.0.1 e a 0.0.2 sairam antes de o IBPT separar por estado: um arquivo
+    // so, gravado na UF "BR", sem aliquota estadual, municipal e vigencia.
+    const UF_NACIONAL = 'BR';
+    /** A 0.0.1 nao tem coluna de descricao */
+    const SEM_DESCRICAO = ['0.0.1'];
+    const ehNacional = v => (metaDados?.versoesNacionais || []).includes(v);
+
+    /** Escolha atual cobre so tabela nacional: versao nacional, ou ano em que todas sao. */
+    function selecaoNacional() {
+      const ano = document.getElementById('f-ano').value;
+      const versao = document.getElementById('f-versao').value;
+      if (versao) return ehNacional(versao);
+      const versoes = (ano && metaDados.versoes[ano]) || [];
+      return versoes.length > 0 && versoes.every(ehNacional);
+    }
+
+    /**
+     * Trava os filtros que nao se aplicam a 2013: a UF fica fixa em "Nacional"
+     * e a descricao some na 0.0.1. Ao sair de 2013 os dois voltam livres.
+     */
+    function ajustarFiltrosNacionais() {
+      if (!metaDados) return;
+      const selUf = document.getElementById('f-uf');
+      const descricao = document.getElementById('f-descricao');
+      const nacional = selecaoNacional();
+      const semDescricao = SEM_DESCRICAO.includes(document.getElementById('f-versao').value);
+
+      let opcao = selUf.querySelector(`option[value="${UF_NACIONAL}"]`);
+      if (nacional && !opcao) {
+        opcao = document.createElement('option');
+        opcao.value = UF_NACIONAL; opcao.textContent = 'Nacional';
+        selUf.appendChild(opcao);
+      }
+      if (nacional) selUf.value = UF_NACIONAL;
+      else if (opcao) { opcao.remove(); selUf.value = ''; }
+      selUf.disabled = nacional;
+
+      if (semDescricao) descricao.value = '';
+      descricao.disabled = semDescricao;
+
+      document.getElementById('texto-nota-nacional').textContent = 'As tabelas de 2013 são nacionais: '
+        + 'não separam por estado nem trazem alíquota estadual, municipal ou vigência.'
+        + (semDescricao ? ' A versão 0.0.1 também não tem descrição.' : '');
+      document.getElementById('nota-nacional').hidden = !nacional;
+    }
+
+    /** Aliquota na tabela: null e a parte que a tabela nacional de 2013 nao trazia. */
+    function celulaAliquota(valor) {
+      return valor == null
+        ? '<span class="nd" title="Não informado: as tabelas nacionais de 2013 não traziam esta alíquota">n/d</span>'
+        : valor.toFixed(2) + '%';
     }
 
     function mostrarEstatisticas() {
@@ -879,11 +940,13 @@ for item in dados['dados']:
               const desc = c[6].replace(/^"|"$/g, '').replace(/""/g, '"');
               if (descricao && !desc.toLowerCase().includes(descricao)) continue;
               const vi = c[11] || '', vf = c[12] || '';
+              // Campo vazio e aliquota que a tabela nacional de 2013 nao trazia
+              const aliq = s => s === '' ? null : (parseFloat(s) || 0);
               todosResultados.push({
                 ano: c[0], tabela: c[1], tipo: c[2], uf: c[3],
                 r: { codigo: c[4], excecao: c[5].replace(/^"|"$/g,'').replace(/""/g,'"'), descricao: desc,
                   aliquotaNacionalFederal: parseFloat(c[7])||0, aliquotaImportadosFederal: parseFloat(c[8])||0,
-                  aliquotaEstadual: parseFloat(c[9])||0, aliquotaMunicipal: parseFloat(c[10])||0,
+                  aliquotaEstadual: aliq(c[9]), aliquotaMunicipal: aliq(c[10]),
                   vigenciaInicio: vi, vigenciaFim: vf }
               });
               linhas++;
@@ -977,11 +1040,11 @@ for item in dados['dados']:
       document.getElementById('titulo-resultados').textContent = `Resultados (${todosResultados.length.toLocaleString('pt-BR')} registros)`;
       const bt = t => `<span class="badge badge-${t}">${t.toUpperCase()}</span>`;
       corpo.innerHTML = pagina.map(r => `<tr>
-        <td class="code">${r.r.codigo}</td><td>${r.r.excecao}</td><td>${bt(r.tipo)}</td><td>${r.uf}</td>
+        <td class="code">${r.r.codigo}</td><td>${r.r.excecao}</td><td>${bt(r.tipo)}</td><td>${r.uf === UF_NACIONAL ? 'Nacional' : r.uf}</td>
         <td style="font-family:'Ubuntu Mono',monospace;color:var(--texto-secundario)">${r.tabela}</td>
         <td class="desc" title="${r.r.descricao}">${r.r.descricao}</td>
         <td class="num">${r.r.aliquotaNacionalFederal.toFixed(2)}%</td><td class="num">${r.r.aliquotaImportadosFederal.toFixed(2)}%</td>
-        <td class="num">${r.r.aliquotaEstadual.toFixed(2)}%</td><td class="num">${r.r.aliquotaMunicipal.toFixed(2)}%</td>
+        <td class="num">${celulaAliquota(r.r.aliquotaEstadual)}</td><td class="num">${celulaAliquota(r.r.aliquotaMunicipal)}</td>
         <td style="font-family:'Ubuntu Mono',monospace;font-size:12px;white-space:nowrap">${r.r.vigenciaInicio||''}</td>
         <td style="font-family:'Ubuntu Mono',monospace;font-size:12px;white-space:nowrap">${r.r.vigenciaFim||''}</td>
       </tr>`).join('');
@@ -1000,7 +1063,8 @@ for item in dados['dados']:
       if (colunaOrdenada === coluna) ordemCrescente = !ordemCrescente;
       else { colunaOrdenada = coluna; ordemCrescente = true; }
       const campos = ['codigo','excecao','tipo','uf','tabela','descricao','aliquotaNacionalFederal','aliquotaImportadosFederal','aliquotaEstadual','aliquotaMunicipal','vigenciaInicio','vigenciaFim'];
-      const val = (r,c) => { const f=campos[c]; return f==='tipo'?r.tipo:f==='uf'?r.uf:f==='tabela'?r.tabela:r.r[f]; };
+      // Aliquota null (2013) ordena como -1: fica antes de qualquer 0,00%
+      const val = (r,c) => { const f=campos[c]; return f==='tipo'?r.tipo:f==='uf'?r.uf:f==='tabela'?r.tabela:(r.r[f] ?? -1); };
       todosResultados.sort((a,b) => { let va=val(a,coluna),vb=val(b,coluna); if (typeof va==='number') return ordemCrescente?va-vb:vb-va; return ordemCrescente?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va)); });
       paginaAtual = 1;
       atualizarAriaSort();
@@ -1062,7 +1126,7 @@ for item in dados['dados']:
     "@context": "https://schema.org",
     "@type": "Dataset",
     "name": "Tabelas IBPT",
-    "description": "API estática com 103 tabelas IBPTax (2015–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
+    "description": "API estática com 107 tabelas IBPTax (2013–2026) do Instituto Brasileiro de Planejamento e Tributação. Alíquotas por NCM, NBS e LC116 para todas as 27 UFs brasileiras.",
     "url": "https://ibpt.valraw.com.br/",
     "creator": {
       "@type": "Organization",
@@ -1071,7 +1135,7 @@ for item in dados['dados']:
     },
     "license": "https://www.apache.org/licenses/LICENSE-2.0",
     "keywords": ["IBPT", "IBPTax", "alíquotas", "NCM", "NBS", "LC116", "tributação", "impostos", "Brasil"],
-    "temporalCoverage": "2015/2026",
+    "temporalCoverage": "2013/2026",
     "spatialCoverage": "BR"
   }
   </script>
