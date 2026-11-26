@@ -15,7 +15,7 @@
 
 As Tabelas IBPTax, publicadas pelo Instituto Brasileiro de Planejamento e Tributação, trazem a carga tributária aproximada de produtos e serviços exigida pela Lei da Transparência Fiscal (Lei 12.741/2012). O IBPT distribui essas tabelas como arquivos ZIP semestrais, um CSV por estado, e não oferece um histórico consolidado.
 
-Este repositório arquiva esses ZIPs desde 2015 e os converte em endpoints JSON estáticos, servidos pelo GitHub Pages. São 103 tabelas, 33,3 milhões de registros e todas as 27 UFs.
+Este repositório arquiva esses ZIPs desde 2013 e os converte em endpoints JSON estáticos, servidos pelo GitHub Pages. São 107 tabelas, 33,9 milhões de registros e todas as 27 UFs.
 
 > **Atenção:** os dados aqui não são atualizados em tempo real. As tabelas são as oficiais publicadas pelo IBPT, mas a atualização deste repositório é manual. Confira a vigência antes de usar em produção.
 
@@ -103,12 +103,14 @@ Os índices são JSON puro; os dados vêm comprimidos. Um arquivo típico de NCM
 
 | Parâmetro | Valores | Exemplo |
 |---|---|---|
-| `{ano}` | 2015 a 2026 | `2026` |
+| `{ano}` | 2013 a 2026 | `2026` |
 | `{tabela}` | Código da versão | `26.2.D` |
 | `{tipo}` | `ncm`, `nbs`, `lc116` | `ncm` |
-| `{uf}` | As 27 siglas | `SP` |
+| `{uf}` | As 27 siglas, ou `BR` em 2013 | `SP` |
 
 Rotas sem extensão (`/api/2026/26.2.D/ncm/SP`) são interceptadas pelo `404.html`, que descomprime e exibe o JSON formatado no navegador. Prático para inspecionar, não para consumir por código.
+
+As tabelas de 2013 (0.0.1 e 0.0.2) são anteriores à separação por estado: um arquivo nacional único, publicado em `{uf}` = `BR`, com `aliquotaEstadual` e `aliquotaMunicipal` em `null` e vigência vazia. A 0.0.1 também não tem descrição nem LC116. `meta.json` lista essas versões em `versoesNacionais`.
 
 ### Tipos de tabela
 
@@ -146,8 +148,8 @@ Rotas sem extensão (`/api/2026/26.2.D/ncm/SP`) são interceptadas pelo `404.htm
 | `descricao` | string | Descrição do produto ou serviço |
 | `aliquotaNacionalFederal` | number | Tributos federais sobre itens nacionais, em % |
 | `aliquotaImportadosFederal` | number | Tributos federais sobre itens importados, em % |
-| `aliquotaEstadual` | number | ICMS e demais tributos estaduais, em % |
-| `aliquotaMunicipal` | number | ISS e demais tributos municipais, em % |
+| `aliquotaEstadual` | number ou null | ICMS e demais tributos estaduais, em %. `null` em 2013 |
+| `aliquotaMunicipal` | number ou null | ISS e demais tributos municipais, em %. `null` em 2013 |
 | `vigenciaInicio` | string | Início da vigência, `dd/mm/aaaa` |
 | `vigenciaFim` | string | Fim da vigência, `dd/mm/aaaa` |
 
@@ -157,7 +159,7 @@ As alíquotas usam ponto como separador decimal. O CSV consolidado usa ponto e v
 
 O build lê os ZIPs em `repositorio-ibpt/`, extrai os CSVs, converte cada combinação de ano, versão, tipo e UF em um JSON comprimido, e monta os índices. O GitHub Actions roda isso a cada push na branch principal e publica `docs/` no Pages.
 
-Os CSVs originais somam 4,7 GB. Depois do gzip nível 9, a API publicada ocupa 1,1 GB em 8.752 arquivos, uma redução de 76%. Os CSVs do IBPT vêm em latin1 e são lidos por streaming, linha a linha, para o build não carregar tudo na memória.
+Os CSVs originais somam 4,8 GB. Depois do gzip nível 9, a API publicada ocupa 1,1 GB em 8.885 arquivos, uma redução de 76%. Os CSVs do IBPT vêm em latin1 e são lidos por streaming, linha a linha, para o build não carregar tudo na memória.
 
 A página de consulta roda inteiramente no navegador. Ela carrega o `meta.json` para montar os filtros e depois busca só os arquivos que a combinação escolhida exige, em lotes de 8 requisições paralelas. Quanto mais específico o filtro, menos dados trafegam: ano, versão, tipo e UF definidos baixam um único arquivo de 211 KB.
 
@@ -167,6 +169,8 @@ Consultas amplas seguem outro caminho. Acima de 50 arquivos, a página passa a u
 
 | Ano | Versões | Qtd |
 |---|---|---|
+| 2013 | 0.0.1, 0.0.2 (nacionais) | 2 |
+| 2014 | 14.2.A, 14.2.B | 2 |
 | 2015 | 15.1.B, 15.2.A | 2 |
 | 2016 | 16.1.A, 16.2.A, 16.2.B | 3 |
 | 2017 | 17.1.A, 17.1.B, 17.2.A, 17.2.B | 4 |
@@ -179,9 +183,9 @@ Consultas amplas seguem outro caminho. Acima de 50 arquivos, a página passa a u
 | 2024 | 24.1.A–F, 24.2.A–F | 12 |
 | 2025 | 25.1.A–F, 25.2.A–H | 14 |
 | 2026 | 26.1.C, 26.1.E, 26.1.F, 26.1.G, 26.1.H, 26.1.K, 26.1.L, 26.2.A, 26.2.B, 26.2.C, 26.2.D | 11 |
-| **Total** | | **103** |
+| **Total** | | **107** |
 
-As tabelas de 2015 e 2016 foram recuperadas do histórico do Projeto ACBr, já que o portal do IBPT não disponibiliza versões antigas. UFs cobertas: AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO.
+As tabelas de 2013 a 2016 foram recuperadas do histórico do Projeto ACBr, já que o portal do IBPT não disponibiliza versões antigas. A 14.2.A é a primeira publicada por estado; as duas de 2013 são nacionais e numeradas no esquema antigo do IBPT (0.0.N), sem ano nem semestre. Em 2014 não há LC116. UFs cobertas: AC, AL, AM, AP, BA, CE, DF, ES, GO, MA, MG, MS, MT, PA, PB, PE, PI, PR, RJ, RN, RO, RR, RS, SC, SE, SP, TO.
 
 ## Rodando localmente
 
@@ -236,6 +240,6 @@ Os dados são de autoria do [IBPT](https://ibpt.com.br) / empresometro.com.br e 
 <details>
 <summary>Termos relacionados</summary>
 
-Tabela IBPT, TabelaIBPTax, IBPT histórico, alíquota IBPT, IBPT NCM, IBPT NBS, IBPT LC116, tabela de impostos Brasil, De Olho no Imposto, Lei 12.741, valor aproximado de tributos, carga tributária NCM, alíquota federal nacional, alíquota federal importado, alíquota estadual, alíquota municipal, IBPT 2015, IBPT 2016, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020, IBPT 2021, IBPT 2022, IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT, auditoria fiscal NF-e, auditoria retroativa tributária, recuperação de créditos tributários, nota fiscal eletrônica impostos, NF-e tributos, NFC-e IBPT, ERP fiscal Brasil, Simples Nacional alíquota, NCM impostos, NCM alíquota, classificação fiscal NCM, ibpt.valraw.com.br, VALRAW, API IBPT, API fiscal brasileira, API NCM, API tributária, tabela IBPT JSON, tabela IBPT CSV, tabela IBPT open source, tabela IBPT gratuita, IBPT API estática, IBPT GitHub Pages, IBPT sem cadastro, IBPT sem token, IBPT todas as versões, IBPT semestral, IBPT vigência, IBPT revisões A B C, deolhonoimposto, iws.ibpt.org.br, apidoni.ibpt.org.br, imposto nota fiscal consumidor, transparência tributária, Lei de Transparência Fiscal
+Tabela IBPT, TabelaIBPTax, IBPT histórico, alíquota IBPT, IBPT NCM, IBPT NBS, IBPT LC116, tabela de impostos Brasil, De Olho no Imposto, Lei 12.741, valor aproximado de tributos, carga tributária NCM, alíquota federal nacional, alíquota federal importado, alíquota estadual, alíquota municipal, IBPT 2013, IBPT 2014, IBPT 2015, IBPT 2016, IBPT 2017, IBPT 2018, IBPT 2019, IBPT 2020, IBPT 2021, IBPT 2022, IBPT 2023, IBPT 2024, IBPT 2025, IBPT 2026, versões IBPT, histórico IBPT, auditoria fiscal NF-e, auditoria retroativa tributária, recuperação de créditos tributários, nota fiscal eletrônica impostos, NF-e tributos, NFC-e IBPT, ERP fiscal Brasil, Simples Nacional alíquota, NCM impostos, NCM alíquota, classificação fiscal NCM, ibpt.valraw.com.br, VALRAW, API IBPT, API fiscal brasileira, API NCM, API tributária, tabela IBPT JSON, tabela IBPT CSV, tabela IBPT open source, tabela IBPT gratuita, IBPT API estática, IBPT GitHub Pages, IBPT sem cadastro, IBPT sem token, IBPT todas as versões, IBPT semestral, IBPT vigência, IBPT revisões A B C, deolhonoimposto, iws.ibpt.org.br, apidoni.ibpt.org.br, imposto nota fiscal consumidor, transparência tributária, Lei de Transparência Fiscal
 
 </details>

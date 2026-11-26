@@ -24,6 +24,7 @@ paths: ["**/*"]
 
 - Registro: `codigo`, `excecao`, `descricao`, `aliquotaNacionalFederal`, `aliquotaImportadosFederal`, `aliquotaEstadual`, `aliquotaMunicipal`, `vigenciaInicio`, `vigenciaFim`
 - Vigências são string `dd/mm/aaaa`, vindas de `campos[8]` e `campos[9]` do CSV original
+- `aliquotaEstadual` e `aliquotaMunicipal` são `number | null`: `null` só nas tabelas nacionais de 2013, que não traziam essas partes. Nunca gravar 0 no lugar, pareceria ICMS zero. No CSV consolidado o `null` vira campo vazio, e a página lê campo vazio de volta como `null`
 - Tipos: `ncm`, `nbs`, `lc116`. 27 UFs
 - CSV consolidado tem 13 colunas: `ano;tabela;tipo;uf;codigo;excecao;descricao;` + 4 alíquotas + 2 vigências
 
@@ -120,6 +121,7 @@ Página separada, sem build step. Chega por dois caminhos: o link no header do `
 - Barras na escala fixa de 0 a 60%, para o comprimento ser comparável entre categorias, anos e estados
 - Cards são montados uma vez e atualizados no lugar por `atualizarCards()`; refazer o HTML mataria a transição das barras na troca de UF
 - `.anim` só entra no `<body>` depois de dois `requestAnimationFrame`: a primeira pintura nasce pronta e só as mudanças posteriores animam
+- **O rodapé desconta as tabelas nacionais de 2013**, que o painel não usa: versões por `meta.versoesNacionais`, registros por `estatisticas.registrosNacionais` (somado do `index.json` de cada ano, que existe também em ano reaproveitado do cache)
 - Cobertura do ano incompleto sai de `painel.diasCobertos`, nunca de conta feita sobre o percentual arredondado
 
 ## Interface web (`docs/index.html`)
@@ -147,8 +149,14 @@ Página única, sem build step. HTML, CSS e JS no mesmo arquivo, propositalmente
 
 ## Tabelas
 
-- 103 tabelas de 2015 a 2026, todas as versões publicadas pelo IBPT ou recuperáveis do mirror do ACBr
+- 107 tabelas de 2013 a 2026, todas as versões publicadas pelo IBPT ou recuperáveis do mirror do ACBr
 - Fontes dos ZIPs: portal De Olho no Imposto (IBPT) e SVN do Projeto ACBr (SourceForge / espelho GitHub `frones/ACBr`)
 - 2015 e 2016 vieram do histórico de commits de `frones/ACBr` em `Exemplos/ACBrTCP/ACBrIBPTax/tabela` (o mirror git-svn começa em 2015-03-23)
+- 2014 veio do SVN do SourceForge, onde o `trunk` antigo foi apagado mas segue legível por revisão: `https://svn.code.sf.net/p/acbr/code/!svn/bc/<rev>/trunk/Exemplos/ACBrIBPTax/tabela/`. 14.2.a da r7800, 14.2.b da r7950. Não há outra tabela nesse SVN antes de 2015
+- **A 14.2.a teve duas publicações.** A primeira (chave `6ed75L`, a que o blog Regys ainda distribui) traz vigência só na primeira linha de cada arquivo e MA com estadual zerada; a corrigida (chave `6oi7aC`, ACBr r7767 em diante) é a do ZIP
+- Antes da 14.2.a o IBPT publicava um CSV nacional único (`AcspDeOlhoNoImpostoIbptV.0.0.1.csv` em maio de 2013 e `0.0.2` em junho, SVN r7699), sem UF, sem estadual e sem vigência. A 0.0.2 seguiu em uso até a 14.2.a. Entre as duas não houve outra tabela: os números 0.0.3 a 0.0.9 que aparecem nos PDFs do IBPT são versões do manual
+- **Tabela nacional vai só para `BR`**, nunca replicada nas 27 UFs. A réplica é o tratamento do CSV consolidado sem UF no nome (26.1.E), que tem estadual de verdade. Em 2013 ela faria SP parecer ter ICMS zero
+- A versão nacional é reconhecida pelo nome do ZIP (`TabelaIBPTax_0.0.N.zip`), não pelo conteúdo, para o build incremental montar `versoesNacionais` sem reabrir ZIP de ano reaproveitado
+- Na página, `ajustarFiltrosNacionais()` trava a UF em "Nacional" quando o ano ou a versão escolhida só tem tabela nacional, e trava a Descrição na 0.0.1 (`SEM_DESCRICAO`). Sair de 2013 devolve a UF livre e remove a opção "Nacional"
 - Para adicionar: colocar o ZIP em `repositorio-ibpt/` como `TabelaIBPTax_{versão}.zip` e rodar o build
 - 7 ZIPs (17.2.B, 18.2.A, 18.2.B, 21.1.A, 21.1.I, 22.1.B, 23.2.A) vinham com os CSVs dentro de pasta e foram achatados em 2026-09-05
