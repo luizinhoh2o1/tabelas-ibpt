@@ -9,6 +9,34 @@ const CODIGO_ASPA = 34;    // "
 const CODIGO_PONTO_VIRGULA = 59;    // ;
 
 /**
+ * UF dos arquivos das tabelas nacionais de 2013 (0.0.1 e 0.0.2), que o IBPT
+ * publicou antes de separar por estado. Nao e uma UF: e o pais inteiro.
+ */
+export const UF_NACIONAL = 'BR';
+
+/** Posicao das colunas no layout nacional de 2013, achada pelo cabecalho. */
+interface ColunasNacionais {
+  /** -1 na 0.0.1, que nao tem descricao */
+  descricao: number;
+  nacional: number;
+  importados: number;
+}
+
+/**
+ * Reconhece o layout nacional de 2013 pelo cabecalho: `codigo;ex;tabela;
+ * aliqNac;aliqImp;0.0.1`, com `descricao` antes das aliquotas a partir da
+ * 0.0.2. Sem UF, sem aliquota estadual e municipal e sem vigencia. Devolve
+ * null para o layout por UF, usado de 14.2.a em diante.
+ */
+function colunasNacionais(cabecalho: string): ColunasNacionais | null {
+  const nomes = analisarLinhaCsv(cabecalho);
+  const nacional = nomes.indexOf('aliqNac');
+  const importados = nomes.indexOf('aliqImp');
+  if (nacional < 0 || importados < 0) return null;
+  return { descricao: nomes.indexOf('descricao'), nacional, importados };
+}
+
+/**
  * Extrai um campo de `linha` entre os indices [inicio, fim).
  * Remove aspas envolventes e desescapa "" → " (convencao CSV).
  * Fast path quando o campo nao comeca com aspas.
@@ -59,20 +87,38 @@ export async function processarCsv(caminhoArquivo: string): Promise<DadosPorTipo
   const leitor = createInterface({ input: fluxo, crlfDelay: Infinity });
 
   let primeiraLinha = true;
+  let nacionais: ColunasNacionais | null = null;
 
   for await (const linha of leitor) {
     if (primeiraLinha) {
       primeiraLinha = false;
-      continue; // pular cabecalho
+      nacionais = colunasNacionais(linha);
+      continue;
     }
 
     if (linha.length === 0) continue;
 
     const campos = analisarLinhaCsv(linha);
-    if (campos.length < 10) continue;
-
     const tipo = MAPA_TIPO[campos[2]];
     if (!tipo) continue;
+
+    if (nacionais) {
+      if (campos.length <= nacionais.importados) continue;
+      dados[tipo].push({
+        codigo: campos[0],
+        excecao: campos[1] || '',
+        descricao: nacionais.descricao >= 0 ? campos[nacionais.descricao] : '',
+        aliquotaNacionalFederal: parseFloat(campos[nacionais.nacional]) || 0,
+        aliquotaImportadosFederal: parseFloat(campos[nacionais.importados]) || 0,
+        aliquotaEstadual: null,
+        aliquotaMunicipal: null,
+        vigenciaInicio: '',
+        vigenciaFim: ''
+      });
+      continue;
+    }
+
+    if (campos.length < 10) continue;
 
     const registro: Registro = {
       codigo: campos[0],

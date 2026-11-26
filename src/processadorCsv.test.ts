@@ -144,6 +144,54 @@ test('aceita arquivo terminado em CRLF', async () => {
   }
 });
 
+// ─── layout nacional de 2013 ──────────────────────────────
+
+test('0.0.1: sem descricao, estadual e municipal null, sem vigencia', async () => {
+  const { caminho, limpar } = csvTemporario([
+    'codigo;ex;tabela;aliqNac;aliqImp;0.0.1',
+    '01012100;;0;32.09;32.69;',
+    '101011000;;1;17.39;17.99;'
+  ].join('\r\n'));
+
+  try {
+    const dados = await processarCsv(caminho);
+    assert.equal(dados.nbs.length, 1);
+    assert.deepEqual(dados.ncm[0], {
+      codigo: '01012100',
+      excecao: '',
+      descricao: '',
+      aliquotaNacionalFederal: 32.09,
+      aliquotaImportadosFederal: 32.69,
+      aliquotaEstadual: null,
+      aliquotaMunicipal: null,
+      vigenciaInicio: '',
+      vigenciaFim: ''
+    });
+  } finally {
+    limpar();
+  }
+});
+
+test('0.0.2: descricao entre aspas com ponto-e-virgula e excecao', async () => {
+  const { caminho, limpar } = csvTemporario([
+    'codigo;ex;tabela;descricao;aliqNac;aliqImp;0.0.2',
+    '02109100;01;0;"Ex 01 - Miudezas; farinhas e pós";31.45;37.15;',
+    '0101;;2;Análise e desenvolvimento de sistemas.;17.59;18.19;'
+  ].join('\n'));
+
+  try {
+    const dados = await processarCsv(caminho);
+    assert.equal(dados.ncm[0].excecao, '01');
+    assert.equal(dados.ncm[0].descricao, 'Ex 01 - Miudezas; farinhas e pós');
+    assert.equal(dados.ncm[0].aliquotaImportadosFederal, 37.15);
+    assert.equal(dados.ncm[0].aliquotaEstadual, null);
+    assert.equal(dados.lc116[0].descricao, 'Análise e desenvolvimento de sistemas.');
+    assert.equal(dados.lc116[0].aliquotaNacionalFederal, 17.59);
+  } finally {
+    limpar();
+  }
+});
+
 // ─── extrairUfDoNomeArquivo ───────────────────────────────
 
 test('extrai a UF do nome do arquivo', () => {

@@ -199,7 +199,7 @@ function lerTabela(api: string, vigencia: Vigencia, uf: string): TabelaLida {
     if (CHAVES.has(chave)) {
       // Municipal entra junto do estadual: para NCM e sempre 0, mas somar evita
       // perder o valor caso o IBPT passe a preencher.
-      aliquotas.set(chave, [r.aliquotaNacionalFederal, r.aliquotaEstadual + r.aliquotaMunicipal]);
+      aliquotas.set(chave, [r.aliquotaNacionalFederal, (r.aliquotaEstadual ?? 0) + (r.aliquotaMunicipal ?? 0)]);
     }
   }
 

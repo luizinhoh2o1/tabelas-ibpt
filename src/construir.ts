@@ -20,7 +20,7 @@ import { join, basename } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { unzipSync } from 'fflate';
-import { processarCsv, extrairUfDoNomeArquivo, type DadosPorTipo } from './processadorCsv.js';
+import { processarCsv, extrairUfDoNomeArquivo, UF_NACIONAL, type DadosPorTipo } from './processadorCsv.js';
 import {
   gerarArquivoDados,
   gerarIndiceVersao,
@@ -51,6 +51,21 @@ const ANO_DIR = /^[0-9]{4}$/;
 // ─── Funcoes auxiliares ───────────────────────────────────
 
 function analisarNomeArquivoZip(nomeArquivo: string): Versao | null {
+  // Tabelas nacionais de 2013. A numeracao 0.0.N nao traz ano: as duas
+  // versoes foram publicadas em 2013 (0.0.1 em maio, 0.0.2 em junho), e a
+  // 0.0.2 seguiu em uso ate a 14.2.a, em outubro de 2014.
+  const nacional = nomeArquivo.match(/TabelaIBPTax_0\.0\.(\d)\.zip/);
+  if (nacional) {
+    return {
+      ano: 2013,
+      semestre: 1,
+      revisao: nacional[1],
+      codigo: `0.0.${nacional[1]}`,
+      arquivo: nomeArquivo,
+      nacional: true
+    };
+  }
+
   const resultado = nomeArquivo.match(/TabelaIBPTax_(\d{2})\.(\d)\.([A-Z])\.zip/);
   if (!resultado) return null;
   return {
@@ -58,7 +73,8 @@ function analisarNomeArquivoZip(nomeArquivo: string): Versao | null {
     semestre: parseInt(resultado[2]),
     revisao: resultado[3],
     codigo: `${resultado[1]}.${resultado[2]}.${resultado[3]}`,
-    arquivo: nomeArquivo
+    arquivo: nomeArquivo,
+    nacional: false
   };
 }
 
@@ -230,6 +246,9 @@ async function processarVersao(
 
   // Processar todos os CSVs em paralelo. Quando o CSV nao tem UF no nome
   // (publicacao consolidada do IBPT), os dados sao replicados para todas as UFs.
+  // A tabela nacional de 2013 e a excecao: nao tem parte estadual, entao vai
+  // so para UF_NACIONAL, em vez de 27 copias que pareceriam ICMS zero.
+  const ufsDaVersao: readonly string[] = versao.nacional ? [UF_NACIONAL] : UFS;
   const tarefas = arquivosCsv.map(async (csvFile) => {
     const uf = extrairUfDoNomeArquivo(csvFile);
     const caminhoCsv = join(diretorioExtracao, csvFile);
@@ -245,7 +264,7 @@ async function processarVersao(
   };
 
   for (const resultado of resultados) {
-    const ufsAlvo = resultado.uf ? [resultado.uf] : [...UFS];
+    const ufsAlvo = versao.nacional || !resultado.uf ? ufsDaVersao : [resultado.uf];
     for (const tipo of TIPOS) {
       if (resultado.dados[tipo].length > 0) {
         for (const uf of ufsAlvo) {
@@ -270,7 +289,7 @@ async function processarVersao(
   for (const tipo of TIPOS) {
     const contagemTipo = { total: 0, ufs: {} as Record<string, number> };
 
-    for (const uf of UFS) {
+    for (const uf of ufsDaVersao) {
       const registros = dadosPorTipoUf[tipo][uf];
       if (registros && registros.length > 0) {
         tarefasEscrita.push(
@@ -340,6 +359,7 @@ async function construir(): Promise<void> {
     tipos: ROTULO_TIPO,
     ufs: [...UFS],
     versoes: {},
+    versoesNacionais: [],
     // Preenchido no fim, quando os totais do build sao conhecidos
     estatisticas: {} as Estatisticas
   };
@@ -480,6 +500,24 @@ async function construir(): Promise<void> {
   }
 
   metaDados.anos.sort((a, b) => b - a);
+  // Como `versoes`, so entra o que virou arquivo
+  metaDados.versoesNacionais = anos.flatMap(ano => porAno.get(ano)!
+    .filter(v => v.nacional && metaDados.versoes[ano]?.includes(v.codigo))
+    .map(v => v.codigo));
+
+  // Registros das versoes nacionais, para o painel descontar da base dele.
+  // Saem do indice do ano, que existe tanto em ano refeito quanto reaproveitado.
+  let registrosNacionais = 0;
+  for (const ano of metaDados.anos) {
+    if (!metaDados.versoes[ano].some(v => metaDados.versoesNacionais.includes(v))) continue;
+    const indice = JSON.parse(
+      readFileSync(join(DIRETORIO_API, ano.toString(), 'index.json'), 'utf-8')
+    ) as IndiceAno;
+    for (const v of indice.versoes) {
+      if (metaDados.versoesNacionais.includes(v.tabela)) registrosNacionais += v.registros;
+    }
+  }
+
   await gravarManifesto(DIRETORIO_API, manifesto);
 
   // Painel da pagina docs/painel.html. Depende so dos arquivos ja publicados,
@@ -507,6 +545,7 @@ async function construir(): Promise<void> {
     anoInicial: anos[0],
     anoFinal: anos[anos.length - 1],
     totalRegistros,
+    registrosNacionais,
     arquivosGerados: arquivos + 1,
     bytesCsvBruto,
     bytesComprimido: tamanho,

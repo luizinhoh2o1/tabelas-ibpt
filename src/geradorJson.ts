@@ -170,7 +170,7 @@ export function criarFluxoCsvGz(caminho: string): FluxoCsvGz {
     escreverRegistros(ano: number, tabela: string, tipo: TipoTabela, uf: string, registros: Registro[]) {
       const linhas: string[] = [];
       for (const r of registros) {
-        linhas.push(`${ano};${tabela};${tipo};${uf};${r.codigo};${escaparCampoCsv(r.excecao)};${escaparCampoCsv(r.descricao)};${r.aliquotaNacionalFederal};${r.aliquotaImportadosFederal};${r.aliquotaEstadual};${r.aliquotaMunicipal};${r.vigenciaInicio};${r.vigenciaFim}\n`);
+        linhas.push(`${ano};${tabela};${tipo};${uf};${r.codigo};${escaparCampoCsv(r.excecao)};${escaparCampoCsv(r.descricao)};${r.aliquotaNacionalFederal};${r.aliquotaImportadosFederal};${r.aliquotaEstadual ?? ''};${r.aliquotaMunicipal ?? ''};${r.vigenciaInicio};${r.vigenciaFim}\n`);
       }
       gzip.write(linhas.join(''));
     },
